@@ -1,0 +1,16 @@
+{
+  "name": "terrain-simulation-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter \"*\" run dev",
+    "build": "pnpm --filter \"*\" run build",
+    "test": "pnpm --filter \"*\" run test",
+    "lint": "pnpm --filter \"*\" run lint"
+  }
+}

@@ -17,6 +17,34 @@ node_modules/
 dist/
 .npm/
 .pnpm-debug.log*
+.pnpm-store/
+pnpm-lock.yaml
+
+# === Vite ===
+.vite/
+*.local
+
+# === Build outputs ===
+*.tsbuildinfo
+
+# === Test coverage ===
+coverage/
+.nyc_output/
+
+# === Cache directories ===
+.cache/
+.turbo/
+.next/
+.nuxt/
+.output/
+
+# === Logs ===
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # === IDE & OS ===
 .vscode/
