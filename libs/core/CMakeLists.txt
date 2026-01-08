@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Define the library
 add_library(terrain_core
     src/Heightmap.cpp
+    src/TerrainGenerators.cpp
 )
 target_include_directories(terrain_core PUBLIC include)
 
@@ -25,6 +26,7 @@ enable_testing()
 add_executable(terrain_core_tests
     tests/TerrainTest.cpp
     tests/HeightmapTest.cpp
+    tests/TerrainGeneratorsTest.cpp
 )
 target_link_libraries(terrain_core_tests PRIVATE terrain_core gtest_main)
 

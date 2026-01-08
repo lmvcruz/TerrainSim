@@ -1,0 +1,395 @@
+Implementation Roadmap (Iterative Development)
+
+The project follows an iterative development model, with each iteration delivering a functional, testable increment that builds upon the previous iteration. This approach ensures continuous integration, early feedback, and incremental complexity growth.
+
+---
+
+### **Iteration 1: Foundation & Basic Visualization**
+**Goal:** Establish the core infrastructure and render a simple, static heightmap.
+
+**Backend Deliverables:**
+*   Set up Monorepo structure with pnpm workspaces.
+*   Configure CI/CD pipeline (GitHub Actions) with basic linting and test runners.
+*   Implement a simple `Heightmap` class in C++ (`libs/core`):
+    *   Fixed-size 2D grid (e.g., 256×256).
+    *   Generic data container with no initialization strategies built-in.
+    *   Basic getters/setters for grid access.
+*   Create `TerrainGenerators` module with factory functions:
+    *   `generateSemiSphere()` - Hemisphere shape for testing
+    *   `generateCone()` - Conical peak
+    *   `generateSigmoid()` - Smooth transition surface
+    *   These functions create and return configured Heightmap instances
+*   Write initial GoogleTest suite for `Heightmap` class (boundary checks, memory layout).
+
+**Design Note:** The Heightmap class is intentionally kept generic and free of initialization logic. Terrain generation strategies (semi-sphere, cone, noise, etc.) are implemented as separate factory functions in the TerrainGenerators module. This separation maintains single responsibility and allows easy extension of generation methods without modifying the core Heightmap class.
+
+**Frontend Deliverables:**
+*   Set up React + Vite + TypeScript project (`apps/web`).
+*   Implement basic R3F terrain component:
+    *   Plane geometry with vertex displacement shader.
+    *   Load heightmap data from a static Float32Array.
+    *   Simple grayscale or single-color material.
+*   Add orbit controls for camera navigation.
+*   Display a flat or manually defined heightmap (e.g., a pyramid or ramp).
+
+**Integration:**
+*   No API yet; frontend uses hardcoded heightmap data for testing.
+
+**Tasks:**
+- [x] **INFRA-001:** Initialize pnpm-workspace.yaml and root package.json
+- [x] **INFRA-002:** Set up GitHub Actions workflow (build + test jobs)
+- [x] **INFRA-003:** Configure linting tools (ESLint for TS, clang-format for C++)
+- [x] **CORE-001:** Create Heightmap class with 2D grid storage (Row-Major Order)
+- [x] **CORE-002:** Create TerrainGenerators module with factory functions (semi-sphere, cone, sigmoid)
+- [x] **CORE-003:** Add getter/setter methods (at(), set(), width(), height())
+- [x] **CORE-004:** Write GoogleTest suite (10+ test cases)
+- [x] **CORE-005:** Add CMakeLists.txt with GoogleTest integration
+- [x] **WEB-001:** Scaffold React + Vite + TypeScript app (apps/web)
+- [x] **WEB-002:** Install Three.js and React Three Fiber dependencies
+- [ ] **WEB-003:** Create TerrainMesh component with PlaneGeometry
+- [ ] **WEB-004:** Implement vertex displacement shader (basic GLSL)
+- [x] **WEB-005:** Add OrbitControls for camera navigation
+- [ ] **WEB-006:** Load hardcoded Float32Array heightmap data
+- [ ] **WEB-007:** Apply simple material (MeshStandardMaterial)
+- [x] **TEST-001:** Verify CI pipeline passes all checks
+- [ ] **TEST-002:** Manual test: Render semi-sphere in 3D viewport
+- [ ] **DOC-001:** Update README with build and run instructions
+
+**Success Criteria:**
+*   CI pipeline runs successfully (build + tests pass).
+*   3D viewport renders a simple terrain mesh.
+*   User can rotate, pan, and zoom the camera.
+
+---
+
+### **Iteration 2: Procedural Noise Generation**
+**Goal:** Add parameterized noise functions for terrain generation.
+
+**Backend Deliverables:**
+*   Implement Perlin Noise algorithm in `libs/core`:
+    *   Configurable parameters: seed, frequency, amplitude.
+    *   Pure function: `generatePerlinNoise(width, height, seed, frequency, amplitude) -> Heightmap`.
+*   Add unit tests for noise generation (deterministic output, value ranges).
+*   Implement Fractional Brownian Motion (fBm):
+    *   Layered octaves of Perlin noise.
+    *   Parameters: octave count, persistence, lacunarity.
+
+**Frontend Deliverables:**
+*   Add UI controls for noise generation:
+    *   Seed input field.
+    *   Sliders for frequency, amplitude, octaves.
+    *   "Generate" button to trigger terrain creation.
+*   Improve visualization:
+    *   Color gradient based on elevation (low = blue, mid = green, high = white).
+    *   Wireframe toggle for debugging.
+*   Add basic statistics display (min/max elevation).
+
+**Integration:**
+*   Create a simple local API endpoint (e.g., HTTP server or direct WASM binding) to call C++ noise functions from the frontend.
+*   Frontend sends parameters and receives heightmap as Float32Array.
+
+**Tasks:**
+- [ ] **CORE-006:** Implement Perlin Noise gradient generation
+- [ ] **CORE-007:** Add interpolation functions (smoothstep, lerp)
+- [ ] **CORE-008:** Create generatePerlinNoise() function
+- [ ] **CORE-009:** Write unit tests for noise determinism
+- [ ] **CORE-010:** Implement fBm with octave layering
+- [ ] **CORE-011:** Add parameter validation (range checks)
+- [ ] **API-001:** Set up simple HTTP server (Express.js or Crow C++)
+- [ ] **API-002:** Create /generate endpoint accepting noise parameters
+- [ ] **API-003:** Serialize Heightmap to Float32Array in response
+- [ ] **API-004:** Add CORS support for local development
+- [ ] **WEB-008:** Create NoiseParametersPanel UI component
+- [ ] **WEB-009:** Add seed input field with validation
+- [ ] **WEB-010:** Implement sliders (frequency, amplitude, octaves)
+- [ ] **WEB-011:** Wire "Generate" button to API call
+- [ ] **WEB-012:** Implement elevation-based color gradient shader
+- [ ] **WEB-013:** Add wireframe toggle button
+- [ ] **WEB-014:** Create StatisticsPanel component (min/max elevation)
+- [ ] **WEB-015:** Handle loading states and error messages
+- [ ] **TEST-003:** Verify same seed produces identical terrain
+- [ ] **TEST-004:** Test different parameter combinations
+- [ ] **DOC-002:** Document API endpoints and parameters
+
+**Success Criteria:**
+*   User can generate varied terrains by adjusting noise parameters.
+*   Different seeds produce reproducible but distinct terrains.
+*   Color-coded elevation provides visual feedback.
+
+---
+
+### **Iteration 3: Hydraulic Erosion Simulation**
+**Goal:** Implement physics-based hydraulic erosion as the first dynamic simulation method.
+
+**Backend Deliverables:**
+*   Implement a particle-based hydraulic erosion algorithm:
+    *   Simulate water droplets traversing the terrain.
+    *   Sediment pickup, transport, and deposition based on slope and velocity.
+    *   Configurable parameters: rain intensity, erosion rate, deposition rate, particle count.
+*   Add simulation loop:
+    *   Iterate erosion over multiple steps.
+    *   Return intermediate heightmaps for animation.
+*   Write performance benchmarks (cycles-per-cell, total iteration time).
+
+**Frontend Deliverables:**
+*   Add erosion parameter controls:
+    *   Sliders for rain intensity, erosion rate, sediment capacity.
+    *   Time step and iteration count inputs.
+*   Implement playback controls:
+    *   Play/Pause/Stop buttons.
+    *   Speed multiplier for time-lapse viewing.
+*   Real-time terrain updates:
+    *   Receive heightmap frames from backend at regular intervals.
+    *   Smooth transitions between frames (optional interpolation).
+
+**Integration:**
+*   Extend API to support streaming simulation frames (WebSocket or Server-Sent Events).
+*   Backend sends `TerrainFrame` objects (heightmap + metadata) to frontend.
+
+**Tasks:**
+- [ ] **CORE-012:** Implement WaterParticle class (position, velocity, sediment)
+- [ ] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors)
+- [ ] **CORE-014:** Implement particle movement logic (steepest descent)
+- [ ] **CORE-015:** Add sediment pickup calculation (erosion rate × slope)
+- [ ] **CORE-016:** Implement deposition logic (sediment capacity threshold)
+- [ ] **CORE-017:** Create HydraulicErosion class with configurable parameters
+- [ ] **CORE-018:** Implement simulation loop (multi-step iteration)
+- [ ] **CORE-019:** Add frame snapshot functionality (save intermediate states)
+- [ ] **CORE-020:** Write GoogleTest suite for erosion logic
+- [ ] **CORE-021:** Set up Google Benchmark for performance tracking
+- [ ] **CORE-022:** Add benchmark tests (cycles-per-cell, throughput)
+- [ ] **API-005:** Upgrade to WebSocket server (Socket.io or native WebSockets)
+- [ ] **API-006:** Create /simulate endpoint (accept erosion parameters)
+- [ ] **API-007:** Implement frame streaming (send TerrainFrame objects)
+- [ ] **API-008:** Add simulation control messages (start/stop/pause)
+- [ ] **WEB-016:** Create ErosionParametersPanel UI component
+- [ ] **WEB-017:** Add sliders (rain intensity, erosion rate, sediment capacity)
+- [ ] **WEB-018:** Implement PlaybackControls component (Play/Pause/Stop)
+- [ ] **WEB-019:** Add speed multiplier selector (1x, 2x, 5x, 10x)
+- [ ] **WEB-020:** Set up WebSocket client connection
+- [ ] **WEB-021:** Handle incoming TerrainFrame messages
+- [ ] **WEB-022:** Update terrain mesh with new heightmap data
+- [ ] **WEB-023:** Add frame interpolation for smooth transitions
+- [ ] **WEB-024:** Display simulation progress (iteration count, elapsed time)
+- [ ] **WEB-025:** Add error handling for connection failures
+- [ ] **TEST-005:** Verify erosion produces realistic valley formation
+- [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles)
+- [ ] **TEST-007:** Performance test: 256×256 grid at 30+ FPS
+- [ ] **DOC-003:** Document hydraulic erosion algorithm and parameters
+
+**Success Criteria:**
+*   User can start/stop erosion simulation with configurable parameters.
+*   Terrain visibly evolves over time (valleys form, peaks erode).
+*   Simulation runs at acceptable frame rates (target: 30+ FPS for 256×256 grid).
+
+---
+
+### **Iteration 4: Thermal Erosion & Combined Simulation**
+**Goal:** Add thermal erosion and enable multi-method simulations.
+
+**Backend Deliverables:**
+*   Implement thermal erosion (talus-angle based material slippage).
+*   Allow simultaneous execution of hydraulic + thermal erosion.
+*   Add material property system:
+    *   Per-cell rock hardness coefficient.
+    *   Heterogeneous terrain behavior (e.g., soft valleys, hard peaks).
+
+**Frontend Deliverables:**
+*   Add thermal erosion controls to UI.
+*   Multi-method selector (Hydraulic Only, Thermal Only, Combined).
+*   Improved statistics dashboard:
+    *   Total sediment moved, average slope, erosion rate graph.
+
+**Tasks:**
+- [ ] **CORE-023:** Implement talus angle calculation (angle of repose)
+- [ ] **CORE-024:** Add material transfer logic (neighbor height difference)
+- [ ] **CORE-025:** Create ThermalErosion class with parameters
+- [ ] **CORE-026:** Implement combined simulation orchestrator
+- [ ] **CORE-027:** Add MaterialProperties layer to Heightmap
+- [ ] **CORE-028:** Implement rock hardness coefficient system
+- [ ] **CORE-029:** Write unit tests for thermal erosion
+- [ ] **CORE-030:** Add integration tests (hydraulic + thermal combined)
+- [ ] **CORE-031:** Benchmark thermal erosion performance
+- [ ] **WEB-026:** Create ThermalErosionPanel UI component
+- [ ] **WEB-027:** Add simulation method selector (radio buttons/dropdown)
+- [ ] **WEB-028:** Implement talus angle slider
+- [ ] **WEB-029:** Add material transfer rate control
+- [ ] **WEB-030:** Expand StatisticsPanel with new metrics
+- [ ] **WEB-031:** Add sediment movement graph (real-time chart)
+- [ ] **WEB-032:** Display average slope calculation
+- [ ] **API-009:** Extend /simulate endpoint for combined simulations
+- [ ] **API-010:** Add material properties in TerrainFrame payload
+- [ ] **TEST-008:** Verify thermal erosion smooths sharp peaks
+- [ ] **TEST-009:** Test combined simulation produces realistic results
+- [ ] **DOC-004:** Document thermal erosion algorithm
+
+**Success Criteria:**
+*   Both erosion methods work independently and in combination.
+*   User can observe realistic terrain aging (sharp peaks → rounded hills).
+
+---
+
+### **Iteration 5: Performance Optimization & Parallel Execution**
+**Goal:** Optimize simulation for high-resolution grids and multi-core CPUs.
+
+**Backend Deliverables:**
+*   Add OpenMP parallelization to simulation loops.
+*   Implement SIMD-optimized stencil operations for neighbor lookups.
+*   Add adaptive LOD (Level of Detail) system for large grids.
+*   Integrate Google Benchmark into CI pipeline for regression tracking.
+
+**Frontend Deliverables:**
+*   Support for high-resolution terrains (512×512, 1024×1024).
+*   Dynamic LOD rendering in R3F (lower detail for distant regions).
+*   Performance profiler overlay (FPS, CPU usage, memory consumption).
+
+**Tasks:**
+- [ ] **CORE-032:** Add OpenMP pragmas to main simulation loops
+- [ ] **CORE-033:** Implement grid partitioning for thread distribution
+- [ ] **CORE-034:** Add SIMD intrinsics for height calculations (AVX/SSE)
+- [ ] **CORE-035:** Optimize memory access patterns (cache locality)
+- [ ] **CORE-036:** Implement quadtree LOD structure
+- [ ] **CORE-037:** Add distance-based resolution switching
+- [ ] **CORE-038:** Write scalability benchmarks (1-16 threads)
+- [ ] **CORE-039:** Add benchmark regression checks to CI
+- [ ] **CORE-040:** Profile with Valgrind/perf for hotspot identification
+- [ ] **CORE-041:** Optimize particle allocation (object pools)
+- [ ] **WEB-033:** Add resolution selector (256, 512, 1024)
+- [ ] **WEB-034:** Implement R3F LOD components
+- [ ] **WEB-035:** Add distance culling for far terrain chunks
+- [ ] **WEB-036:** Create PerformanceProfiler overlay component
+- [ ] **WEB-037:** Display FPS counter (real-time)
+- [ ] **WEB-038:** Add CPU/GPU usage metrics (if available)
+- [ ] **WEB-039:** Show memory consumption tracker
+- [ ] **WEB-040:** Implement performance graph (historical data)
+- [ ] **TEST-010:** Verify linear scaling with thread count (1-8 cores)
+- [ ] **TEST-011:** Test 1024×1024 grid at 15+ FPS
+- [ ] **TEST-012:** Validate SIMD calculations match scalar results
+- [ ] **DOC-005:** Document performance tuning guidelines
+
+**Success Criteria:**
+*   Simulation achieves near-linear scaling with thread count.
+*   1024×1024 grid runs at interactive frame rates (15+ FPS).
+*   No performance regressions detected in CI benchmarks.
+
+---
+
+### **Iteration 6: Preset Library & Export Features**
+**Goal:** Add user convenience features for saving, loading, and sharing terrains.
+
+**Backend Deliverables:**
+*   Implement heightmap serialization (save/load from disk).
+*   Add preset configuration system (JSON-based parameter templates).
+
+**Frontend Deliverables:**
+*   Preset library UI:
+    *   Thumbnails of pre-configured terrains (Canyon, Mountain, Coastal).
+    *   One-click load functionality.
+*   Export features:
+    *   Download heightmap as PNG/EXR.
+    *   Export simulation parameters as JSON.
+    *   Share link generation (URL-encoded parameters).
+
+**Tasks:**
+- [ ] **CORE-042:** Implement Heightmap serialization to binary format
+- [ ] **CORE-043:** Add PNG export (heightmap as grayscale image)
+- [ ] **CORE-044:** Implement EXR export (HDR elevation data)
+- [ ] **CORE-045:** Create JSON schema for preset configurations
+- [ ] **CORE-046:** Add preset loader/validator
+- [ ] **CORE-047:** Write unit tests for serialization
+- [ ] **API-011:** Create /export endpoint (supports PNG/EXR/JSON)
+- [ ] **API-012:** Add /presets endpoint (list available presets)
+- [ ] **API-013:** Implement /load-preset endpoint
+- [ ] **WEB-041:** Create PresetLibrary UI component
+- [ ] **WEB-042:** Design preset cards with thumbnails
+- [ ] **WEB-043:** Add preset search/filter functionality
+- [ ] **WEB-044:** Implement one-click load button
+- [ ] **WEB-045:** Create ExportPanel UI component
+- [ ] **WEB-046:** Add format selector (PNG/EXR/JSON)
+- [ ] **WEB-047:** Implement download functionality
+- [ ] **WEB-048:** Add share link generator (URL encoding)
+- [ ] **WEB-049:** Implement clipboard copy for share links
+- [ ] **WEB-050:** Add preset saving dialog (user-created presets)
+- [ ] **TEST-013:** Verify exported heightmaps load correctly in Blender
+- [ ] **TEST-014:** Test JSON parameter round-trip (save → load)
+- [ ] **TEST-015:** Validate share links restore exact simulation state
+- [ ] **DOC-006:** Document export formats and preset structure
+
+**Success Criteria:**
+*   User can save and restore simulation sessions.
+*   Presets provide quick-start templates for experimentation.
+*   Exported heightmaps are compatible with external 3D tools (Blender, Unity).
+    *   Heterogeneous terrain behavior (e.g., soft valleys, hard peaks).
+
+**Frontend Deliverables:**
+*   Add thermal erosion controls to UI.
+*   Multi-method selector (Hydraulic Only, Thermal Only, Combined).
+*   Improved statistics dashboard:
+    *   Total sediment moved, average slope, erosion rate graph.
+
+**Success Criteria:**
+*   Both erosion methods work independently and in combination.
+*   User can observe realistic terrain aging (sharp peaks → rounded hills).
+
+---
+
+### **Iteration 5: Performance Optimization & Parallel Execution**
+**Goal:** Optimize simulation for high-resolution grids and multi-core CPUs.
+
+**Backend Deliverables:**
+*   Add OpenMP parallelization to simulation loops.
+*   Implement SIMD-optimized stencil operations for neighbor lookups.
+*   Add adaptive LOD (Level of Detail) system for large grids.
+*   Integrate Google Benchmark into CI pipeline for regression tracking.
+
+**Frontend Deliverables:**
+*   Support for high-resolution terrains (512×512, 1024×1024).
+*   Dynamic LOD rendering in R3F (lower detail for distant regions).
+*   Performance profiler overlay (FPS, CPU usage, memory consumption).
+
+**Success Criteria:**
+*   Simulation achieves near-linear scaling with thread count.
+*   1024×1024 grid runs at interactive frame rates (15+ FPS).
+*   No performance regressions detected in CI benchmarks.
+
+---
+
+### **Iteration 6: Preset Library & Export Features**
+**Goal:** Add user convenience features for saving, loading, and sharing terrains.
+
+**Backend Deliverables:**
+*   Implement heightmap serialization (save/load from disk).
+*   Add preset configuration system (JSON-based parameter templates).
+
+**Frontend Deliverables:**
+*   Preset library UI:
+    *   Thumbnails of pre-configured terrains (Canyon, Mountain, Coastal).
+    *   One-click load functionality.
+*   Export features:
+    *   Download heightmap as PNG/EXR.
+    *   Export simulation parameters as JSON.
+    *   Share link generation (URL-encoded parameters).
+
+**Success Criteria:**
+*   User can save and restore simulation sessions.
+*   Presets provide quick-start templates for experimentation.
+*   Exported heightmaps are compatible with external 3D tools (Blender, Unity).
+
+---
+
+### **Future Iterations (Roadmap Extensions)**
+
+*   **Iteration 7:** Tectonic deformation (uplift, folding, fault lines).
+*   **Iteration 8:** Interactive sculpting tools (raise/lower, smooth, flatten brushes).
+*   **Iteration 9:** Real-world data import (GeoTIFF, DEM files).
+*   **Iteration 10:** Advanced rendering (PBR materials, atmospheric effects, shadows).
+*   **Iteration 11:** Multiplayer/collaborative editing (real-time shared simulations).
+*   **Iteration 12:** Machine learning integration (erosion pattern prediction, terrain generation from text prompts).
+
+---
+
+**Iteration Principles:**
+*   Each iteration is fully tested and deployable.
+*   CI/CD pipeline validates all changes before merging.
+*   User feedback informs priority adjustments between iterations.
+*   Technical debt is addressed incrementally (no "big bang" refactors).
