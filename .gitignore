@@ -1,0 +1,25 @@
+# === Build & Binary Artifacts ===
+build/
+bin/
+obj/
+out/
+*.exe
+*.so
+*.dll
+
+# === C++ / vcpkg ===
+vcpkg_installed/
+vcpkg.user.targets
+cmake-build-*/
+
+# === Node / Frontend ===
+node_modules/
+dist/
+.npm/
+.pnpm-debug.log*
+
+# === IDE & OS ===
+.vscode/
+.vs/
+.idea/
+.DS_Store
