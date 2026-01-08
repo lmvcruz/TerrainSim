@@ -52,8 +52,8 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **WEB-006:** Load hardcoded Float32Array heightmap data
 - [x] **TEST-001:** Verify CI pipeline passes all checks
 - [x] **TEST-002:** Manual test: Render semi-sphere in 3D viewport
-- [ ] **DEPLOY-001:** Configure GitHub Pages deployment with GitHub Actions
-- [ ] **DOC-001:** Update README with build and run instructions
+- [x] **DEPLOY-001:** Configure GitHub Pages deployment with GitHub Actions
+- [x] **DOC-001:** Update README with build and run instructions
 
 **Success Criteria:**
 *   CI pipeline runs successfully (build + tests pass).
