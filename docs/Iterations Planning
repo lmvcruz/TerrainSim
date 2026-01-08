@@ -47,7 +47,7 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **WEB-001:** Scaffold React + Vite + TypeScript app (apps/web)
 - [x] **WEB-002:** Install Three.js and React Three Fiber dependencies
 - [x] **WEB-003:** Create TerrainMesh component with PlaneGeometry
-- [ ] **WEB-004:** Implement vertex displacement shader (basic GLSL)
+- [x] **WEB-004:** Implement vertex displacement shader (basic GLSL)
 - [x] **WEB-005:** Add OrbitControls for camera navigation
 - [ ] **WEB-006:** Load hardcoded Float32Array heightmap data
 - [ ] **WEB-007:** Apply simple material (MeshStandardMaterial)

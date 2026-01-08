@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { Mesh } from 'three'
+import { useRef, useMemo } from 'react'
+import { Mesh, DataTexture, RGBAFormat, FloatType } from 'three'
 
 interface TerrainMeshProps {
   /**
@@ -24,11 +24,81 @@ interface TerrainMeshProps {
   heightmap?: Float32Array
 }
 
+// Vertex shader - displaces vertices based on heightmap texture
+const vertexShader = `
+  uniform sampler2D heightmapTexture;
+  uniform float meshWidth;
+  uniform float meshDepth;
+  uniform float gridWidth;
+  uniform float gridHeight;
+
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+
+  void main() {
+    // Map vertex position to heightmap UV coordinates
+    // Position goes from -meshWidth/2 to +meshWidth/2
+    // UV goes from 0 to 1
+    vec2 uv = vec2(
+      (position.x / meshWidth) + 0.5,
+      (position.y / meshDepth) + 0.5
+    );
+
+    // Sample heightmap texture (stored in red channel)
+    float elevation = texture2D(heightmapTexture, uv).r;
+
+    // Scale elevation to match world units
+    float worldScale = meshWidth / gridWidth;
+    float elevationInWorldUnits = elevation * worldScale;
+
+    // Displace vertex in Z direction (after rotation, this becomes vertical)
+    vec3 displacedPosition = position;
+    displacedPosition.z = elevationInWorldUnits;
+
+    // Calculate normal for lighting (approximate using neighboring samples)
+    float offset = 1.0 / gridWidth;
+    float hL = texture2D(heightmapTexture, uv + vec2(-offset, 0.0)).r * worldScale;
+    float hR = texture2D(heightmapTexture, uv + vec2(offset, 0.0)).r * worldScale;
+    float hD = texture2D(heightmapTexture, uv + vec2(0.0, -offset)).r * worldScale;
+    float hU = texture2D(heightmapTexture, uv + vec2(0.0, offset)).r * worldScale;
+
+    vec3 normal = normalize(vec3(hL - hR, hD - hU, 2.0 * offset * meshWidth));
+    vNormal = normalMatrix * normal;
+
+    vPosition = displacedPosition;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPosition, 1.0);
+  }
+`
+
+// Fragment shader - applies lighting and color
+const fragmentShader = `
+  uniform vec3 terrainColor;
+  uniform vec3 lightDirection;
+  uniform vec3 ambientColor;
+  uniform vec3 lightColor;
+
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+
+  void main() {
+    // Normalize the interpolated normal
+    vec3 normal = normalize(vNormal);
+
+    // Calculate diffuse lighting
+    float diffuse = max(dot(normal, lightDirection), 0.0);
+
+    // Combine ambient and diffuse lighting
+    vec3 finalColor = terrainColor * (ambientColor + lightColor * diffuse);
+
+    gl_FragColor = vec4(finalColor, 1.0);
+  }
+`
+
 /**
- * TerrainMesh component renders a terrain using PlaneGeometry with optional heightmap displacement.
+ * TerrainMesh component renders a terrain using PlaneGeometry with GPU-based vertex displacement.
  *
- * The mesh uses a plane geometry subdivided into segments that match the heightmap resolution.
- * When a heightmap is provided, vertex heights are displaced according to the elevation data.
+ * The mesh uses a custom shader material that displaces vertices on the GPU based on a heightmap texture.
+ * This approach is more performant than CPU-based displacement, especially for high-resolution terrains.
  */
 export function TerrainMesh({
   width = 256,
@@ -39,65 +109,52 @@ export function TerrainMesh({
 }: TerrainMeshProps) {
   const meshRef = useRef<Mesh>(null)
 
-  // Apply heightmap displacement to geometry vertices
-  // This will be called when the geometry is created and when heightmap changes
-  const applyHeightmap = (geometry: THREE.PlaneGeometry) => {
-    if (!heightmap) return
-
-    const positions = geometry.attributes.position
-    const vertexCount = positions.count
-
-    // Ensure heightmap matches expected vertex count
-    if (heightmap.length !== vertexCount) {
-      console.warn(
-        `Heightmap size (${heightmap.length}) doesn't match vertex count (${vertexCount})`
-      )
-      return
+  // Convert heightmap Float32Array to DataTexture for GPU access
+  const heightmapTexture = useMemo(() => {
+    if (!heightmap) {
+      // Create a flat heightmap if none provided
+      const flatHeightmap = new Float32Array(width * height).fill(0)
+      const data = new Float32Array(width * height * 4) // RGBA
+      for (let i = 0; i < flatHeightmap.length; i++) {
+        data[i * 4] = flatHeightmap[i] // R channel = elevation
+        data[i * 4 + 1] = 0 // G channel unused
+        data[i * 4 + 2] = 0 // B channel unused
+        data[i * 4 + 3] = 1 // A channel = 1
+      }
+      const texture = new DataTexture(data, width, height, RGBAFormat, FloatType)
+      texture.needsUpdate = true
+      return texture
     }
 
-    // PlaneGeometry creates vertices in a grid starting from bottom-left
-    // Our heightmap is in row-major order (top-left to bottom-right)
-    // We need to map correctly considering the plane is rotated -90° around X
-
-    // For a plane with widthSegments and heightSegments:
-    // - X goes from -width/2 to +width/2 (left to right)
-    // - Y goes from -height/2 to +height/2 (bottom to top)
-    // After rotation by -90° around X, Y becomes Z
-
-    for (let i = 0; i < vertexCount; i++) {
-      // Get the current vertex position
-      const x = positions.getX(i)
-      const y = positions.getY(i)
-
-      // Map from mesh coordinates to heightmap grid coordinates
-      // Plane goes from -meshWidth/2 to +meshWidth/2
-      // Heightmap goes from 0 to width-1
-      const gridX = Math.round(((x / meshWidth) + 0.5) * (width - 1))
-      const gridY = Math.round(((y / meshDepth) + 0.5) * (height - 1))
-
-      // Clamp to valid range
-      const clampedX = Math.max(0, Math.min(width - 1, gridX))
-      const clampedY = Math.max(0, Math.min(height - 1, gridY))
-
-      // Get elevation from heightmap (row-major order)
-      const heightmapIndex = clampedY * width + clampedX
-      const elevation = heightmap[heightmapIndex]
-
-      // Scale elevation to match world units
-      // Heightmap values are in grid units, we need to convert to world units
-      // The mesh spans meshWidth world units across width grid cells
-      // So: worldScale = meshWidth / width
-      const worldScale = meshWidth / width
-      const elevationInWorldUnits = elevation * worldScale
-
-      // Set the Z coordinate to the elevation value
-      // (before rotation this is Y, after rotation it becomes Z)
-      positions.setZ(i, elevationInWorldUnits)
+    // Pack heightmap data into RGBA texture (elevation in red channel)
+    const data = new Float32Array(width * height * 4)
+    for (let i = 0; i < heightmap.length; i++) {
+      data[i * 4] = heightmap[i] // R channel = elevation
+      data[i * 4 + 1] = 0 // G channel unused
+      data[i * 4 + 2] = 0 // B channel unused
+      data[i * 4 + 3] = 1 // A channel = 1
     }
 
-    positions.needsUpdate = true
-    geometry.computeVertexNormals() // Recompute normals for proper lighting
-  }
+    const texture = new DataTexture(data, width, height, RGBAFormat, FloatType)
+    texture.needsUpdate = true
+    return texture
+  }, [heightmap, width, height])
+
+  // Shader uniforms
+  const uniforms = useMemo(
+    () => ({
+      heightmapTexture: { value: heightmapTexture },
+      meshWidth: { value: meshWidth },
+      meshDepth: { value: meshDepth },
+      gridWidth: { value: width },
+      gridHeight: { value: height },
+      terrainColor: { value: [0.23, 0.49, 0.27] }, // #3a7d44 in RGB
+      lightDirection: { value: [0.5, 0.5, 0.7] }, // Normalized light direction
+      ambientColor: { value: [0.3, 0.3, 0.3] }, // Ambient light
+      lightColor: { value: [0.7, 0.7, 0.7] }, // Directional light color
+    }),
+    [heightmapTexture, meshWidth, meshDepth, width, height]
+  )
 
   return (
     <mesh
@@ -105,14 +162,11 @@ export function TerrainMesh({
       rotation={[-Math.PI / 2, 0, 0]} // Rotate to make it horizontal (XZ plane)
       position={[0, 0, 0]}
     >
-      <planeGeometry
-        args={[meshWidth, meshDepth, width - 1, height - 1]}
-        onUpdate={(geometry) => applyHeightmap(geometry)}
-      />
-      <meshStandardMaterial
-        color="#3a7d44"
-        wireframe={false}
-        flatShading={false}
+      <planeGeometry args={[meshWidth, meshDepth, width - 1, height - 1]} />
+      <shaderMaterial
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        uniforms={uniforms}
       />
     </mesh>
   )
