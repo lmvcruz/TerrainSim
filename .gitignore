@@ -18,7 +18,6 @@ dist/
 .npm/
 .pnpm-debug.log*
 .pnpm-store/
-pnpm-lock.yaml
 
 # === Vite ===
 .vite/
