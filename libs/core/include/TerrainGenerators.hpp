@@ -48,5 +48,22 @@ Heightmap createSemiSphere(size_t width, size_t height, float centerX, float cen
  */
 Heightmap createCone(size_t width, size_t height, float centerX, float centerY, float radius, float peakHeight);
 
+/**
+ * @brief Generate a heightmap using Perlin noise.
+ *
+ * Creates a procedurally generated terrain using gradient-based Perlin noise.
+ * The noise function generates smooth, continuous variations that are useful
+ * for creating natural-looking terrain features.
+ *
+ * @param width Number of columns (X-dimension)
+ * @param height Number of rows (Y-dimension)
+ * @param seed Random seed for reproducible noise generation
+ * @param frequency Controls the scale of terrain features (higher = more detail)
+ * @param amplitude Controls the height variation (higher = more dramatic terrain)
+ * @return A Heightmap object filled with Perlin noise values
+ */
+Heightmap generatePerlinNoise(size_t width, size_t height, uint32_t seed = 0,
+                               float frequency = 0.05f, float amplitude = 1.0f);
+
 } // namespace generators
 } // namespace terrain

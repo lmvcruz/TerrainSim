@@ -132,6 +132,31 @@ TEST_F(PerlinNoiseTest, LerpFunction) {
     EXPECT_FLOAT_EQ(PerlinNoise::lerp(0.5f, -10.0f, 10.0f), 0.0f);
 }
 
+// Test smoothstep function (CORE-007)
+TEST_F(PerlinNoiseTest, SmoothstepFunction) {
+    // Test endpoints
+    EXPECT_FLOAT_EQ(PerlinNoise::smoothstep(0.0f), 0.0f);
+    EXPECT_FLOAT_EQ(PerlinNoise::smoothstep(1.0f), 1.0f);
+
+    // Test midpoint (should be 0.5 for symmetric function)
+    EXPECT_FLOAT_EQ(PerlinNoise::smoothstep(0.5f), 0.5f);
+
+    // Test monotonicity (should always increase)
+    for (float t = 0.0f; t < 1.0f; t += 0.1f) {
+        float v1 = PerlinNoise::smoothstep(t);
+        float v2 = PerlinNoise::smoothstep(t + 0.01f);
+        EXPECT_LT(v1, v2) << "Smoothstep should be monotonically increasing";
+    }
+
+    // Test smoothness at endpoints (derivative should be 0)
+    float epsilon = 0.0001f;
+    float d0 = (PerlinNoise::smoothstep(epsilon) - PerlinNoise::smoothstep(0.0f)) / epsilon;
+    float d1 = (PerlinNoise::smoothstep(1.0f) - PerlinNoise::smoothstep(1.0f - epsilon)) / epsilon;
+
+    EXPECT_NEAR(d0, 0.0f, 0.01f) << "Smoothstep should have zero derivative at t=0";
+    EXPECT_NEAR(d1, 0.0f, 0.01f) << "Smoothstep should have zero derivative at t=1";
+}
+
 // Test that noise is translation-invariant in distribution
 TEST_F(PerlinNoiseTest, TranslationInvariance) {
     // Sample noise in two different regions

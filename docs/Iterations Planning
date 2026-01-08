@@ -90,8 +90,8 @@ The project follows an iterative development model, with each iteration deliveri
 
 **Tasks:**
 - [x] **CORE-006:** Implement Perlin Noise gradient generation
-- [ ] **CORE-007:** Add interpolation functions (smoothstep, lerp)
-- [ ] **CORE-008:** Create generatePerlinNoise() function
+- [x] **CORE-007:** Add interpolation functions (smoothstep, lerp)
+- [x] **CORE-008:** Create generatePerlinNoise() function
 - [ ] **CORE-009:** Write unit tests for noise determinism
 - [ ] **CORE-010:** Implement fBm with octave layering
 - [ ] **CORE-011:** Add parameter validation (range checks)

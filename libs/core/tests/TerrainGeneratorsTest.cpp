@@ -188,3 +188,139 @@ TEST(TerrainGeneratorsTest, CreateConeDimensions) {
     EXPECT_EQ(heightmap.height(), height);
     EXPECT_EQ(heightmap.size(), width * height);
 }
+
+// Test: generatePerlinNoise produces valid dimensions
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseDimensions) {
+    const size_t width = 128;
+    const size_t height = 64;
+
+    Heightmap heightmap = generatePerlinNoise(width, height);
+
+    EXPECT_EQ(heightmap.width(), width);
+    EXPECT_EQ(heightmap.height(), height);
+    EXPECT_EQ(heightmap.size(), width * height);
+}
+
+// Test: generatePerlinNoise is deterministic (same seed produces same result)
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseDeterminism) {
+    const size_t width = 100;
+    const size_t height = 100;
+    const uint32_t seed = 12345;
+    const float frequency = 0.05f;
+    const float amplitude = 10.0f;
+
+    Heightmap heightmap1 = generatePerlinNoise(width, height, seed, frequency, amplitude);
+    Heightmap heightmap2 = generatePerlinNoise(width, height, seed, frequency, amplitude);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_FLOAT_EQ(heightmap1.at(x, y), heightmap2.at(x, y))
+                << "Noise should be deterministic at (" << x << ", " << y << ")";
+        }
+    }
+}
+
+// Test: generatePerlinNoise different seeds produce different results
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseDifferentSeeds) {
+    const size_t width = 50;
+    const size_t height = 50;
+
+    Heightmap heightmap1 = generatePerlinNoise(width, height, 100);
+    Heightmap heightmap2 = generatePerlinNoise(width, height, 200);
+
+    int differentCount = 0;
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            if (std::abs(heightmap1.at(x, y) - heightmap2.at(x, y)) > 0.01f) {
+                differentCount++;
+            }
+        }
+    }
+
+    // At least 90% of values should be different
+    EXPECT_GT(differentCount, static_cast<int>(width * height * 0.9f))
+        << "Different seeds should produce mostly different terrain";
+}
+
+// Test: generatePerlinNoise values are scaled by amplitude
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseAmplitude) {
+    const size_t width = 100;
+    const size_t height = 100;
+    const float amplitude = 50.0f;
+
+    Heightmap heightmap = generatePerlinNoise(width, height, 42, 0.05f, amplitude);
+
+    // Values should generally be within [-amplitude, amplitude]
+    // (allowing some margin for edge cases)
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            float value = heightmap.at(x, y);
+            EXPECT_GE(value, -amplitude * 1.5f);
+            EXPECT_LE(value, amplitude * 1.5f);
+        }
+    }
+}
+
+// Test: generatePerlinNoise frequency affects detail level
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseFrequency) {
+    const size_t width = 100;
+    const size_t height = 100;
+    const uint32_t seed = 42;
+
+    // Low frequency = large features (less variation between neighbors)
+    Heightmap lowFreq = generatePerlinNoise(width, height, seed, 0.01f, 1.0f);
+
+    // High frequency = small features (more variation between neighbors)
+    Heightmap highFreq = generatePerlinNoise(width, height, seed, 0.1f, 1.0f);
+
+    // Measure variation: sum of absolute differences between neighbors
+    float lowFreqVariation = 0.0f;
+    float highFreqVariation = 0.0f;
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            lowFreqVariation += std::abs(lowFreq.at(x+1, y) - lowFreq.at(x, y));
+            lowFreqVariation += std::abs(lowFreq.at(x, y+1) - lowFreq.at(x, y));
+
+            highFreqVariation += std::abs(highFreq.at(x+1, y) - highFreq.at(x, y));
+            highFreqVariation += std::abs(highFreq.at(x, y+1) - highFreq.at(x, y));
+        }
+    }
+
+    // Higher frequency should have more variation
+    EXPECT_GT(highFreqVariation, lowFreqVariation)
+        << "Higher frequency should produce more detailed terrain";
+}
+
+// Test: generatePerlinNoise produces continuous (smooth) output
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseContinuity) {
+    const size_t width = 100;
+    const size_t height = 100;
+
+    Heightmap heightmap = generatePerlinNoise(width, height, 42, 0.05f, 10.0f);
+
+    // Check that neighboring values don't have extreme jumps
+    const float maxJump = 2.0f; // Reasonable threshold for smoothness
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            float current = heightmap.at(x, y);
+            float right = heightmap.at(x + 1, y);
+            float down = heightmap.at(x, y + 1);
+
+            EXPECT_LT(std::abs(right - current), maxJump)
+                << "Terrain should be continuous (no large jumps) at (" << x << ", " << y << ")";
+            EXPECT_LT(std::abs(down - current), maxJump)
+                << "Terrain should be continuous (no large jumps) at (" << x << ", " << y << ")";
+        }
+    }
+}
+
+// Test: generatePerlinNoise default parameters work
+TEST(TerrainGeneratorsTest, GeneratePerlinNoiseDefaultParameters) {
+    EXPECT_NO_THROW({
+        Heightmap heightmap = generatePerlinNoise(64, 64);
+        EXPECT_EQ(heightmap.width(), 64);
+        EXPECT_EQ(heightmap.height(), 64);
+    });
+}

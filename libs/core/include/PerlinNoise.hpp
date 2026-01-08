@@ -71,6 +71,18 @@ public:
      */
     static float lerp(float t, float a, float b);
 
+    /**
+     * @brief Smooth Hermite interpolation (smoothstep: 3t² - 2t³).
+     *
+     * A cubic Hermite interpolation that provides smooth transitions
+     * with zero first derivatives at t=0 and t=1 (C1 continuity).
+     * Simpler than fade() but still provides smooth interpolation.
+     *
+     * @param t Input value in range [0, 1]
+     * @return Smoothed value in range [0, 1]
+     */
+    static float smoothstep(float t);
+
 private:
     /**
      * @brief Permutation table for pseudorandom gradient selection.

@@ -1,4 +1,5 @@
 #include "TerrainGenerators.hpp"
+#include "PerlinNoise.hpp"
 #include <cmath>
 
 namespace terrain {
@@ -52,6 +53,28 @@ Heightmap createCone(size_t width, size_t height, float centerX, float centerY, 
                 // Outside the cone: flat at 0
                 heightmap.set(x, y, 0.0f);
             }
+        }
+    }
+
+    return heightmap;
+}
+
+Heightmap generatePerlinNoise(size_t width, size_t height, uint32_t seed,
+                               float frequency, float amplitude) {
+    Heightmap heightmap(width, height);
+    PerlinNoise perlin(seed);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            // Scale coordinates by frequency to control feature size
+            const float nx = static_cast<float>(x) * frequency;
+            const float ny = static_cast<float>(y) * frequency;
+
+            // Generate noise value and scale by amplitude
+            const float noiseValue = perlin.noise(nx, ny);
+            const float elevation = noiseValue * amplitude;
+
+            heightmap.set(x, y, elevation);
         }
     }
 

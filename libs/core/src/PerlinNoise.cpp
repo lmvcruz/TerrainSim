@@ -41,6 +41,12 @@ float PerlinNoise::lerp(float t, float a, float b) {
     return a + t * (b - a);
 }
 
+float PerlinNoise::smoothstep(float t) {
+    // Smooth Hermite interpolation: 3t² - 2t³
+    // This has zero first derivative at t=0 and t=1
+    return t * t * (3.0f - 2.0f * t);
+}
+
 float PerlinNoise::grad(int32_t ix, int32_t iy, float dx, float dy) const {
     // Get a pseudorandom hash value for this grid point
     uint8_t h = hash(ix, iy) & 15; // Use lower 4 bits to select from 16 gradients
