@@ -112,6 +112,12 @@ The simulation workflow is divided into three distinct stages, each with specifi
 The pre-modeling stage establishes the initial terrain state before any dynamic simulation occurs. This stage combines procedural generation, data import, and manual sculpting capabilities.
 
 #### 6.1.1 Terrain Generation Methods
+*   **Geometric Primitives (TerrainGenerators):**
+    *   **Flat Plane:** Uniform elevation baseline for testing or as a starting point for additive generation.
+    *   **Semi-Sphere (Hemisphere):** Smooth hemispherical dome using the equation $z = \sqrt{r^2 - d^2}$, useful for mountain peaks or testing terrain rendering.
+    *   **Cone:** Linear slope from peak to base, ideal for volcanic formations or simple elevation features.
+    *   These factory functions provide deterministic, parameterized shapes for rapid prototyping and testing.
+
 *   **Procedural Noise Functions:**
     *   **Perlin Noise:** Classic gradient-based noise for smooth, natural-looking terrain.
     *   **Simplex Noise:** Improved variant with lower computational cost and fewer directional artifacts.
