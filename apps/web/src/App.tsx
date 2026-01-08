@@ -1,8 +1,15 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Box } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
+import { TerrainMesh } from './components/TerrainMesh'
+import { generateSemiSphere } from './utils/terrainGenerators'
 import './App.css'
 
 function App() {
+  // Generate a semi-sphere heightmap (128x128 grid, centered at 64,64, radius 50)
+  const width = 128
+  const height = 128
+  const heightmap = generateSemiSphere(width, height, 64, 64, 50)
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <h1 style={{
@@ -16,13 +23,17 @@ function App() {
       }}>
         Hello Terrain
       </h1>
-      <Canvas camera={{ position: [3, 3, 3], fov: 50 }}>
+      <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
         <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
-        <Box args={[1, 1, 1]} position={[0, 0, 0]}>
-          <meshStandardMaterial color="green" />
-        </Box>
-        <gridHelper args={[10, 10]} />
+        <directionalLight position={[10, 10, 10]} intensity={1} />
+        <TerrainMesh
+          width={width}
+          height={height}
+          meshWidth={10}
+          meshDepth={10}
+          heightmap={heightmap}
+        />
+        <gridHelper args={[12, 12]} />
         <OrbitControls />
       </Canvas>
     </div>
