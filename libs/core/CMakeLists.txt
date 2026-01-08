@@ -5,8 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Define the library
-add_library(terrain_core INTERFACE)
-target_include_directories(terrain_core INTERFACE include)
+add_library(terrain_core
+    src/Heightmap.cpp
+)
+target_include_directories(terrain_core PUBLIC include)
 
 # Testing Setup
 include(FetchContent)
@@ -20,7 +22,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(terrain_core_tests tests/TerrainTest.cpp)
+add_executable(terrain_core_tests
+    tests/TerrainTest.cpp
+    tests/HeightmapTest.cpp
+)
 target_link_libraries(terrain_core_tests PRIVATE terrain_core gtest_main)
 
 include(GoogleTest)
