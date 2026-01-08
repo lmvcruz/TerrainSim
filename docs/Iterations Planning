@@ -89,7 +89,7 @@ The project follows an iterative development model, with each iteration deliveri
 *   Frontend sends parameters and receives heightmap as Float32Array.
 
 **Tasks:**
-- [ ] **CORE-006:** Implement Perlin Noise gradient generation
+- [x] **CORE-006:** Implement Perlin Noise gradient generation
 - [ ] **CORE-007:** Add interpolation functions (smoothstep, lerp)
 - [ ] **CORE-008:** Create generatePerlinNoise() function
 - [ ] **CORE-009:** Write unit tests for noise determinism

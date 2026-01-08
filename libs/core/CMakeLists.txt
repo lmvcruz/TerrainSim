@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(terrain_core
     src/Heightmap.cpp
     src/TerrainGenerators.cpp
+    src/PerlinNoise.cpp
 )
 target_include_directories(terrain_core PUBLIC include)
 
@@ -27,6 +28,7 @@ add_executable(terrain_core_tests
     tests/TerrainTest.cpp
     tests/HeightmapTest.cpp
     tests/TerrainGeneratorsTest.cpp
+    tests/PerlinNoiseTest.cpp
 )
 target_link_libraries(terrain_core_tests PRIVATE terrain_core gtest_main)
 
