@@ -440,9 +440,10 @@ TEST(TerrainGeneratorsTest, GenerateFbmOctavesAddDetail) {
     const size_t height = 100;
     const uint32_t seed = 42;
 
-    // Generate with different octave counts
-    Heightmap singleOctave = generateFbm(width, height, seed, 1);
-    Heightmap multiOctave = generateFbm(width, height, seed, 6);
+    // Generate with different octave counts, using higher persistence to ensure
+    // additional octaves contribute meaningfully across different platforms
+    Heightmap singleOctave = generateFbm(width, height, seed, 1, 0.05f, 1.0f, 0.65f, 2.0f);
+    Heightmap multiOctave = generateFbm(width, height, seed, 6, 0.05f, 1.0f, 0.65f, 2.0f);
 
     // Measure local variation (sum of differences between neighbors)
     float singleVariation = 0.0f;
@@ -458,9 +459,11 @@ TEST(TerrainGeneratorsTest, GenerateFbmOctavesAddDetail) {
         }
     }
 
-    // More octaves should produce more detail (higher variation)
-    EXPECT_GT(multiVariation, singleVariation)
-        << "Multiple octaves should add more detail than single octave";
+    // More octaves should produce significantly more detail (at least 5% more variation)
+    // Using a relative threshold to handle platform-specific floating-point differences
+    EXPECT_GT(multiVariation, singleVariation * 1.05f)
+        << "Multiple octaves should add more detail than single octave. "
+        << "Multi: " << multiVariation << ", Single: " << singleVariation;
 }
 
 // CORE-010: Test persistence effect
