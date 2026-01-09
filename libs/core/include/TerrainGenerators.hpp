@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Heightmap.hpp"
+#include <cstdint>
 
 namespace terrain {
 namespace generators {
