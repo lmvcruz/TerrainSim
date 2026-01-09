@@ -324,3 +324,237 @@ TEST(TerrainGeneratorsTest, GeneratePerlinNoiseDefaultParameters) {
         EXPECT_EQ(heightmap.height(), 64);
     });
 }
+
+// CORE-009: Additional determinism tests across different parameter combinations
+TEST(TerrainGeneratorsTest, NoiseDeterminismAcrossMultipleParameters) {
+    const size_t width = 64;
+    const size_t height = 64;
+
+    // Test with various parameter combinations
+    std::vector<std::tuple<uint32_t, float, float>> paramSets = {
+        {42, 0.1f, 5.0f},
+        {12345, 0.05f, 10.0f},
+        {99999, 0.01f, 1.0f}
+    };
+
+    for (const auto& params : paramSets) {
+        uint32_t seed = std::get<0>(params);
+        float freq = std::get<1>(params);
+        float amp = std::get<2>(params);
+
+        Heightmap h1 = generatePerlinNoise(width, height, seed, freq, amp);
+        Heightmap h2 = generatePerlinNoise(width, height, seed, freq, amp);
+
+        for (size_t y = 0; y < height; ++y) {
+            for (size_t x = 0; x < width; ++x) {
+                EXPECT_FLOAT_EQ(h1.at(x, y), h2.at(x, y))
+                    << "Determinism failed for seed=" << seed
+                    << " at (" << x << ", " << y << ")";
+            }
+        }
+    }
+}
+
+// CORE-009: Test determinism with extreme parameter values
+TEST(TerrainGeneratorsTest, NoiseDeterminismWithExtremeParameters) {
+    const size_t width = 32;
+    const size_t height = 32;
+
+    // Very low frequency (large features)
+    Heightmap low1 = generatePerlinNoise(width, height, 100, 0.001f, 1.0f);
+    Heightmap low2 = generatePerlinNoise(width, height, 100, 0.001f, 1.0f);
+
+    // Very high frequency (small features)
+    Heightmap high1 = generatePerlinNoise(width, height, 100, 1.0f, 1.0f);
+    Heightmap high2 = generatePerlinNoise(width, height, 100, 1.0f, 1.0f);
+
+    // Very large amplitude
+    Heightmap amp1 = generatePerlinNoise(width, height, 100, 0.05f, 1000.0f);
+    Heightmap amp2 = generatePerlinNoise(width, height, 100, 0.05f, 1000.0f);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_FLOAT_EQ(low1.at(x, y), low2.at(x, y));
+            EXPECT_FLOAT_EQ(high1.at(x, y), high2.at(x, y));
+            EXPECT_FLOAT_EQ(amp1.at(x, y), amp2.at(x, y));
+        }
+    }
+}
+
+// CORE-011: Test parameter validation for generatePerlinNoise
+TEST(TerrainGeneratorsTest, PerlinNoiseParameterValidation) {
+    // Invalid dimensions
+    EXPECT_THROW(generatePerlinNoise(0, 100), std::invalid_argument);
+    EXPECT_THROW(generatePerlinNoise(100, 0), std::invalid_argument);
+
+    // Invalid frequency
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, 0.0f, 1.0f), std::invalid_argument);
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, -0.1f, 1.0f), std::invalid_argument);
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, INFINITY, 1.0f), std::invalid_argument);
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, NAN, 1.0f), std::invalid_argument);
+
+    // Invalid amplitude (NaN/Inf)
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, 0.05f, INFINITY), std::invalid_argument);
+    EXPECT_THROW(generatePerlinNoise(64, 64, 0, 0.05f, NAN), std::invalid_argument);
+
+    // Valid edge cases should work
+    EXPECT_NO_THROW(generatePerlinNoise(1, 1, 0, 0.001f, 0.0f)); // Zero amplitude is ok
+    EXPECT_NO_THROW(generatePerlinNoise(1, 1, 0, 0.001f, -10.0f)); // Negative amplitude is ok
+}
+
+// CORE-010: Test fBm basic functionality
+TEST(TerrainGeneratorsTest, GenerateFbmDimensions) {
+    const size_t width = 128;
+    const size_t height = 64;
+
+    Heightmap heightmap = generateFbm(width, height);
+
+    EXPECT_EQ(heightmap.width(), width);
+    EXPECT_EQ(heightmap.height(), height);
+    EXPECT_EQ(heightmap.size(), width * height);
+}
+
+// CORE-010: Test fBm determinism
+TEST(TerrainGeneratorsTest, GenerateFbmDeterminism) {
+    const size_t width = 64;
+    const size_t height = 64;
+    const uint32_t seed = 42;
+    const int octaves = 5;
+    const float frequency = 0.05f;
+    const float amplitude = 10.0f;
+
+    Heightmap h1 = generateFbm(width, height, seed, octaves, frequency, amplitude);
+    Heightmap h2 = generateFbm(width, height, seed, octaves, frequency, amplitude);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_FLOAT_EQ(h1.at(x, y), h2.at(x, y))
+                << "fBm should be deterministic at (" << x << ", " << y << ")";
+        }
+    }
+}
+
+// CORE-010: Test that more octaves add detail
+TEST(TerrainGeneratorsTest, GenerateFbmOctavesAddDetail) {
+    const size_t width = 100;
+    const size_t height = 100;
+    const uint32_t seed = 42;
+
+    // Generate with different octave counts
+    Heightmap singleOctave = generateFbm(width, height, seed, 1);
+    Heightmap multiOctave = generateFbm(width, height, seed, 6);
+
+    // Measure local variation (sum of differences between neighbors)
+    float singleVariation = 0.0f;
+    float multiVariation = 0.0f;
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            singleVariation += std::abs(singleOctave.at(x+1, y) - singleOctave.at(x, y));
+            singleVariation += std::abs(singleOctave.at(x, y+1) - singleOctave.at(x, y));
+
+            multiVariation += std::abs(multiOctave.at(x+1, y) - multiOctave.at(x, y));
+            multiVariation += std::abs(multiOctave.at(x, y+1) - multiOctave.at(x, y));
+        }
+    }
+
+    // More octaves should produce more detail (higher variation)
+    EXPECT_GT(multiVariation, singleVariation)
+        << "Multiple octaves should add more detail than single octave";
+}
+
+// CORE-010: Test persistence effect
+TEST(TerrainGeneratorsTest, GenerateFbmPersistenceEffect) {
+    const size_t width = 64;
+    const size_t height = 64;
+    const uint32_t seed = 42;
+
+    // Low persistence = rapid amplitude decay (smoother)
+    Heightmap lowPersist = generateFbm(width, height, seed, 4, 0.05f, 10.0f, 0.2f, 2.0f);
+
+    // High persistence = slow amplitude decay (rougher)
+    Heightmap highPersist = generateFbm(width, height, seed, 4, 0.05f, 10.0f, 0.8f, 2.0f);
+
+    // Measure roughness
+    float lowRoughness = 0.0f;
+    float highRoughness = 0.0f;
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            lowRoughness += std::abs(lowPersist.at(x+1, y) - lowPersist.at(x, y));
+            highRoughness += std::abs(highPersist.at(x+1, y) - highPersist.at(x, y));
+        }
+    }
+
+    // Higher persistence should produce rougher terrain
+    EXPECT_GT(highRoughness, lowRoughness)
+        << "Higher persistence should produce rougher terrain";
+}
+
+// CORE-010: Test lacunarity effect
+TEST(TerrainGeneratorsTest, GenerateFbmLacunarityEffect) {
+    const size_t width = 64;
+    const size_t height = 64;
+    const uint32_t seed = 42;
+
+    // Different lacunarity values affect frequency scaling between octaves
+    Heightmap lac2 = generateFbm(width, height, seed, 4, 0.02f, 10.0f, 0.5f, 2.0f);
+    Heightmap lac3 = generateFbm(width, height, seed, 4, 0.02f, 10.0f, 0.5f, 3.0f);
+
+    // Results should be different
+    int differentCount = 0;
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            if (std::abs(lac2.at(x, y) - lac3.at(x, y)) > 0.1f) {
+                differentCount++;
+            }
+        }
+    }
+
+    // Most values should differ
+    EXPECT_GT(differentCount, static_cast<int>(width * height * 0.8f))
+        << "Different lacunarity should produce different terrain";
+}
+
+// CORE-011: Test fBm parameter validation
+TEST(TerrainGeneratorsTest, FbmParameterValidation) {
+    // Invalid dimensions
+    EXPECT_THROW(generateFbm(0, 100), std::invalid_argument);
+    EXPECT_THROW(generateFbm(100, 0), std::invalid_argument);
+
+    // Invalid octaves
+    EXPECT_THROW(generateFbm(64, 64, 0, 0), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, -1), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 17), std::invalid_argument); // Max is 16
+
+    // Invalid frequency
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.0f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, -0.1f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, INFINITY), std::invalid_argument);
+
+    // Invalid amplitude
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, 0.0f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, -1.0f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, NAN), std::invalid_argument);
+
+    // Invalid persistence
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, 1.0f, 0.0f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, 1.0f, -0.5f), std::invalid_argument);
+
+    // Invalid lacunarity
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, 1.0f, 0.5f, 0.0f), std::invalid_argument);
+    EXPECT_THROW(generateFbm(64, 64, 0, 4, 0.05f, 1.0f, 0.5f, -2.0f), std::invalid_argument);
+
+    // Valid edge cases
+    EXPECT_NO_THROW(generateFbm(1, 1, 0, 1, 0.001f, 0.001f, 0.001f, 0.001f));
+    EXPECT_NO_THROW(generateFbm(64, 64, 0, 16, 1.0f, 100.0f, 0.99f, 10.0f)); // Max octaves
+}
+
+// CORE-010: Test fBm default parameters
+TEST(TerrainGeneratorsTest, GenerateFbmDefaultParameters) {
+    EXPECT_NO_THROW({
+        Heightmap heightmap = generateFbm(64, 64);
+        EXPECT_EQ(heightmap.width(), 64);
+        EXPECT_EQ(heightmap.height(), 64);
+    });
+}

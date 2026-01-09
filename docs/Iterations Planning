@@ -92,9 +92,9 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **CORE-006:** Implement Perlin Noise gradient generation
 - [x] **CORE-007:** Add interpolation functions (smoothstep, lerp)
 - [x] **CORE-008:** Create generatePerlinNoise() function
-- [ ] **CORE-009:** Write unit tests for noise determinism
-- [ ] **CORE-010:** Implement fBm with octave layering
-- [ ] **CORE-011:** Add parameter validation (range checks)
+- [x] **CORE-009:** Write unit tests for noise determinism
+- [x] **CORE-010:** Implement fBm with octave layering
+- [x] **CORE-011:** Add parameter validation (range checks)
 - [ ] **API-001:** Set up simple HTTP server (Express.js or Crow C++)
 - [ ] **API-002:** Create /generate endpoint accepting noise parameters
 - [ ] **API-003:** Serialize Heightmap to Float32Array in response

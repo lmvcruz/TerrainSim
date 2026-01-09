@@ -1,6 +1,8 @@
 #include "TerrainGenerators.hpp"
 #include "PerlinNoise.hpp"
 #include <cmath>
+#include <stdexcept>
+#include <string>
 
 namespace terrain {
 namespace generators {
@@ -61,6 +63,20 @@ Heightmap createCone(size_t width, size_t height, float centerX, float centerY, 
 
 Heightmap generatePerlinNoise(size_t width, size_t height, uint32_t seed,
                                float frequency, float amplitude) {
+    // CORE-011: Parameter validation
+    if (width == 0 || height == 0) {
+        throw std::invalid_argument("Width and height must be greater than 0");
+    }
+    if (frequency <= 0.0f) {
+        throw std::invalid_argument("Frequency must be greater than 0");
+    }
+    if (!std::isfinite(frequency)) {
+        throw std::invalid_argument("Frequency must be a finite number");
+    }
+    if (!std::isfinite(amplitude)) {
+        throw std::invalid_argument("Amplitude must be a finite number");
+    }
+
     Heightmap heightmap(width, height);
     PerlinNoise perlin(seed);
 
@@ -75,6 +91,70 @@ Heightmap generatePerlinNoise(size_t width, size_t height, uint32_t seed,
             const float elevation = noiseValue * amplitude;
 
             heightmap.set(x, y, elevation);
+        }
+    }
+
+    return heightmap;
+}
+
+Heightmap generateFbm(size_t width, size_t height, uint32_t seed,
+                      int octaves, float frequency, float amplitude,
+                      float persistence, float lacunarity) {
+    // CORE-011: Parameter validation
+    if (width == 0 || height == 0) {
+        throw std::invalid_argument("Width and height must be greater than 0");
+    }
+    if (octaves < 1) {
+        throw std::invalid_argument("Octaves must be at least 1");
+    }
+    if (octaves > 16) {
+        throw std::invalid_argument("Octaves must not exceed 16 (performance limit)");
+    }
+    if (frequency <= 0.0f) {
+        throw std::invalid_argument("Frequency must be greater than 0");
+    }
+    if (amplitude <= 0.0f) {
+        throw std::invalid_argument("Amplitude must be greater than 0");
+    }
+    if (persistence <= 0.0f) {
+        throw std::invalid_argument("Persistence must be greater than 0");
+    }
+    if (lacunarity <= 0.0f) {
+        throw std::invalid_argument("Lacunarity must be greater than 0");
+    }
+    if (!std::isfinite(frequency) || !std::isfinite(amplitude) ||
+        !std::isfinite(persistence) || !std::isfinite(lacunarity)) {
+        throw std::invalid_argument("All parameters must be finite numbers");
+    }
+
+    Heightmap heightmap(width, height);
+    PerlinNoise perlin(seed);
+
+    // CORE-010: Fractional Brownian Motion implementation
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            float totalValue = 0.0f;
+            float currentAmplitude = amplitude;
+            float currentFrequency = frequency;
+            float maxValue = 0.0f; // For normalization
+
+            // Layer multiple octaves of noise
+            for (int octave = 0; octave < octaves; ++octave) {
+                const float nx = static_cast<float>(x) * currentFrequency;
+                const float ny = static_cast<float>(y) * currentFrequency;
+
+                const float noiseValue = perlin.noise(nx, ny);
+                totalValue += noiseValue * currentAmplitude;
+                maxValue += currentAmplitude;
+
+                // Update frequency and amplitude for next octave
+                currentFrequency *= lacunarity;
+                currentAmplitude *= persistence;
+            }
+
+            // Normalize to approximately [-amplitude, amplitude] range
+            const float normalizedValue = totalValue / maxValue * amplitude;
+            heightmap.set(x, y, normalizedValue);
         }
     }
 

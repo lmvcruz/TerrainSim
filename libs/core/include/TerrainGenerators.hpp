@@ -65,5 +65,31 @@ Heightmap createCone(size_t width, size_t height, float centerX, float centerY, 
 Heightmap generatePerlinNoise(size_t width, size_t height, uint32_t seed = 0,
                                float frequency = 0.05f, float amplitude = 1.0f);
 
+/**
+ * @brief Generate a heightmap using Fractional Brownian Motion (fBm).
+ *
+ * Creates terrain with multiple octaves of Perlin noise layered together.
+ * Each octave has increasing frequency and decreasing amplitude, creating
+ * natural-looking terrain with details at multiple scales.
+ *
+ * fBm formula: sum(amplitude * noise(frequency * position) for each octave)
+ * - frequency *= lacunarity (typically 2.0)
+ * - amplitude *= persistence (typically 0.5)
+ *
+ * @param width Number of columns (X-dimension)
+ * @param height Number of rows (Y-dimension)
+ * @param seed Random seed for reproducible noise generation
+ * @param octaves Number of noise layers to combine (must be >= 1, typically 4-8)
+ * @param frequency Base frequency for first octave (must be > 0)
+ * @param amplitude Base amplitude for first octave (must be > 0)
+ * @param persistence Amplitude multiplier per octave (must be > 0, typically 0.5)
+ * @param lacunarity Frequency multiplier per octave (must be > 0, typically 2.0)
+ * @return A Heightmap object filled with fBm noise values
+ * @throws std::invalid_argument if parameters are out of valid range
+ */
+Heightmap generateFbm(size_t width, size_t height, uint32_t seed = 0,
+                      int octaves = 4, float frequency = 0.05f, float amplitude = 1.0f,
+                      float persistence = 0.5f, float lacunarity = 2.0f);
+
 } // namespace generators
 } // namespace terrain
