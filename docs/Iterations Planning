@@ -95,10 +95,10 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **CORE-009:** Write unit tests for noise determinism
 - [x] **CORE-010:** Implement fBm with octave layering
 - [x] **CORE-011:** Add parameter validation (range checks)
-- [ ] **API-001:** Set up simple HTTP server (Express.js or Crow C++)
-- [ ] **API-002:** Create /generate endpoint accepting noise parameters
-- [ ] **API-003:** Serialize Heightmap to Float32Array in response
-- [ ] **API-004:** Add CORS support for local development
+- [x] **API-001:** Set up simple HTTP server (Express.js or Crow C++)
+- [x] **API-002:** Create /generate endpoint accepting noise parameters
+- [x] **API-003:** Serialize Heightmap to Float32Array in response
+- [x] **API-004:** Add CORS support for local development
 - [ ] **WEB-007:** Enhance material with elevation-based color gradient
 - [ ] **WEB-008:** Create NoiseParametersPanel UI component
 - [ ] **WEB-009:** Add seed input field with validation
