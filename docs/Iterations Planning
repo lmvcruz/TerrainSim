@@ -106,11 +106,11 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **WEB-011:** Wire "Generate" button to API call
 - [x] **WEB-012:** Implement elevation-based color gradient shader
 - [x] **WEB-013:** Add wireframe toggle button
-- [ ] **WEB-014:** Create StatisticsPanel component (min/max elevation)
-- [ ] **WEB-015:** Handle loading states and error messages
-- [ ] **TEST-003:** Verify same seed produces identical terrain
-- [ ] **TEST-004:** Test different parameter combinations
-- [ ] **DOC-002:** Document API endpoints and parameters
+- [x] **WEB-014:** Create StatisticsPanel component (min/max elevation)
+- [x] **WEB-015:** Handle loading states and error messages
+- [x] **TEST-003:** Verify same seed produces identical terrain
+- [x] **TEST-004:** Test different parameter combinations
+- [x] **DOC-002:** Document API endpoints and parameters
 
 **Success Criteria:**
 *   User can generate varied terrains by adjusting noise parameters.

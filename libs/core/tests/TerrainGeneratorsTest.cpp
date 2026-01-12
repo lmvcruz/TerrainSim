@@ -561,3 +561,280 @@ TEST(TerrainGeneratorsTest, GenerateFbmDefaultParameters) {
         EXPECT_EQ(heightmap.height(), 64);
     });
 }
+
+// TEST-003: Verify same seed produces identical terrain
+TEST(TerrainGeneratorsTest, SameSeedProducesIdenticalTerrain) {
+    const size_t width = 256;
+    const size_t height = 256;
+    const uint32_t seed = 12345;
+    const int octaves = 6;
+    const float frequency = 0.05f;
+    const float amplitude = 50.0f;
+    const float persistence = 0.5f;
+    const float lacunarity = 2.0f;
+
+    // Generate terrain with same parameters twice
+    Heightmap terrain1 = generateFbm(width, height, seed, octaves, frequency, amplitude, persistence, lacunarity);
+    Heightmap terrain2 = generateFbm(width, height, seed, octaves, frequency, amplitude, persistence, lacunarity);
+
+    // Verify dimensions match
+    EXPECT_EQ(terrain1.width(), terrain2.width());
+    EXPECT_EQ(terrain1.height(), terrain2.height());
+
+    // Verify every single heightmap value is identical
+    int matchCount = 0;
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_FLOAT_EQ(terrain1.at(x, y), terrain2.at(x, y))
+                << "Terrain should be identical for same seed at (" << x << ", " << y << ")";
+            if (terrain1.at(x, y) == terrain2.at(x, y)) {
+                matchCount++;
+            }
+        }
+    }
+
+    // All values must match exactly for true determinism
+    EXPECT_EQ(matchCount, static_cast<int>(width * height))
+        << "All heightmap values should be identical for same seed";
+}
+
+// TEST-003: Verify different seeds produce different terrain
+TEST(TerrainGeneratorsTest, DifferentSeedsProduceDifferentTerrain) {
+    const size_t width = 256;
+    const size_t height = 256;
+    const int octaves = 6;
+    const float frequency = 0.05f;
+    const float amplitude = 50.0f;
+    const float persistence = 0.5f;
+    const float lacunarity = 2.0f;
+
+    // Generate terrain with different seeds
+    Heightmap terrain1 = generateFbm(width, height, 111, octaves, frequency, amplitude, persistence, lacunarity);
+    Heightmap terrain2 = generateFbm(width, height, 222, octaves, frequency, amplitude, persistence, lacunarity);
+    Heightmap terrain3 = generateFbm(width, height, 333, octaves, frequency, amplitude, persistence, lacunarity);
+
+    // Count how many values differ
+    int differentCount12 = 0;
+    int differentCount13 = 0;
+    int differentCount23 = 0;
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            if (std::abs(terrain1.at(x, y) - terrain2.at(x, y)) > 0.01f) {
+                differentCount12++;
+            }
+            if (std::abs(terrain1.at(x, y) - terrain3.at(x, y)) > 0.01f) {
+                differentCount13++;
+            }
+            if (std::abs(terrain2.at(x, y) - terrain3.at(x, y)) > 0.01f) {
+                differentCount23++;
+            }
+        }
+    }
+
+    const int totalCells = static_cast<int>(width * height);
+    const int minDifferentCells = static_cast<int>(totalCells * 0.95f); // 95% should be different
+
+    // Different seeds should produce significantly different terrains
+    EXPECT_GT(differentCount12, minDifferentCells)
+        << "Seeds 111 and 222 should produce mostly different terrain";
+    EXPECT_GT(differentCount13, minDifferentCells)
+        << "Seeds 111 and 333 should produce mostly different terrain";
+    EXPECT_GT(differentCount23, minDifferentCells)
+        << "Seeds 222 and 333 should produce mostly different terrain";
+}
+
+// TEST-004: Test low frequency parameter (large features)
+TEST(TerrainGeneratorsTest, LowFrequencyProducesLargeFeatures) {
+    const size_t width = 128;
+    const size_t height = 128;
+    const uint32_t seed = 42;
+
+    // Low frequency = large features (slow change)
+    Heightmap lowFreq = generateFbm(width, height, seed, 4, 0.01f, 10.0f);
+
+    // Check that adjacent values are very similar (smooth, large features)
+    float avgDifference = 0.0f;
+    int count = 0;
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            avgDifference += std::abs(lowFreq.at(x+1, y) - lowFreq.at(x, y));
+            avgDifference += std::abs(lowFreq.at(x, y+1) - lowFreq.at(x, y));
+            count += 2;
+        }
+    }
+    avgDifference /= count;
+
+    // Low frequency should have small differences between adjacent cells
+    EXPECT_LT(avgDifference, 0.5f)
+        << "Low frequency should produce smooth, large-scale features";
+}
+
+// TEST-004: Test high frequency parameter (small features)
+TEST(TerrainGeneratorsTest, HighFrequencyProducesSmallFeatures) {
+    const size_t width = 128;
+    const size_t height = 128;
+    const uint32_t seed = 42;
+
+    // High frequency = small features (rapid change)
+    Heightmap highFreq = generateFbm(width, height, seed, 4, 0.2f, 10.0f);
+
+    // Check that adjacent values vary more (detailed, small features)
+    float avgDifference = 0.0f;
+    int count = 0;
+
+    for (size_t y = 0; y < height - 1; ++y) {
+        for (size_t x = 0; x < width - 1; ++x) {
+            avgDifference += std::abs(highFreq.at(x+1, y) - highFreq.at(x, y));
+            avgDifference += std::abs(highFreq.at(x, y+1) - highFreq.at(x, y));
+            count += 2;
+        }
+    }
+    avgDifference /= count;
+
+    // High frequency should have larger differences between adjacent cells
+    EXPECT_GT(avgDifference, 0.3f)
+        << "High frequency should produce detailed, small-scale features";
+}
+
+// TEST-004: Test low amplitude parameter (flat terrain)
+TEST(TerrainGeneratorsTest, LowAmplitudeProducesFlatTerrain) {
+    const size_t width = 128;
+    const size_t height = 128;
+    const uint32_t seed = 42;
+
+    // Low amplitude = small elevation changes
+    Heightmap lowAmp = generateFbm(width, height, seed, 4, 0.05f, 1.0f);
+
+    // Find min and max elevations
+    float minElev = lowAmp.at(0, 0);
+    float maxElev = lowAmp.at(0, 0);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            float val = lowAmp.at(x, y);
+            minElev = std::min(minElev, val);
+            maxElev = std::max(maxElev, val);
+        }
+    }
+
+    float range = maxElev - minElev;
+
+    // Low amplitude should produce small elevation range
+    EXPECT_LT(range, 5.0f)
+        << "Low amplitude should produce relatively flat terrain";
+}
+
+// TEST-004: Test high amplitude parameter (mountainous terrain)
+TEST(TerrainGeneratorsTest, HighAmplitudeProducesMountainousTerrain) {
+    const size_t width = 128;
+    const size_t height = 128;
+    const uint32_t seed = 42;
+
+    // High amplitude = large elevation changes
+    Heightmap highAmp = generateFbm(width, height, seed, 4, 0.05f, 100.0f);
+
+    // Find min and max elevations
+    float minElev = highAmp.at(0, 0);
+    float maxElev = highAmp.at(0, 0);
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            float val = highAmp.at(x, y);
+            minElev = std::min(minElev, val);
+            maxElev = std::max(maxElev, val);
+        }
+    }
+
+    float range = maxElev - minElev;
+
+    // High amplitude should produce large elevation range
+    EXPECT_GT(range, 50.0f)
+        << "High amplitude should produce mountainous terrain";
+}
+
+// TEST-004: Test single octave produces simple noise
+TEST(TerrainGeneratorsTest, SingleOctaveProducesSimpleNoise) {
+    const size_t width = 64;
+    const size_t height = 64;
+    const uint32_t seed = 42;
+
+    Heightmap singleOctave = generateFbm(width, height, seed, 1, 0.05f, 10.0f);
+
+    // Single octave should produce smooth, simple patterns
+    // Verify it doesn't throw and produces valid output
+    EXPECT_EQ(singleOctave.width(), width);
+    EXPECT_EQ(singleOctave.height(), height);
+
+    // Check all values are finite
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_TRUE(std::isfinite(singleOctave.at(x, y)))
+                << "Single octave should produce finite values";
+        }
+    }
+}
+
+// TEST-004: Test maximum octaves produces complex terrain
+TEST(TerrainGeneratorsTest, MaximumOctavesProducesComplexTerrain) {
+    const size_t width = 64;
+    const size_t height = 64;
+    const uint32_t seed = 42;
+
+    // 16 octaves is the maximum
+    Heightmap maxOctaves = generateFbm(width, height, seed, 16, 0.05f, 10.0f);
+
+    EXPECT_EQ(maxOctaves.width(), width);
+    EXPECT_EQ(maxOctaves.height(), height);
+
+    // Verify all values are finite
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            EXPECT_TRUE(std::isfinite(maxOctaves.at(x, y)))
+                << "Maximum octaves should produce finite values";
+        }
+    }
+}
+
+// TEST-004: Test typical game terrain parameters
+TEST(TerrainGeneratorsTest, TypicalGameTerrainParameters) {
+    const size_t width = 256;
+    const size_t height = 256;
+    const uint32_t seed = 999;
+    const int octaves = 6;
+    const float frequency = 0.03f;
+    const float amplitude = 50.0f;
+    const float persistence = 0.5f;
+    const float lacunarity = 2.0f;
+
+    Heightmap terrain = generateFbm(width, height, seed, octaves, frequency, amplitude, persistence, lacunarity);
+
+    // Verify basic properties
+    EXPECT_EQ(terrain.width(), width);
+    EXPECT_EQ(terrain.height(), height);
+
+    // Calculate statistics
+    float minElev = terrain.at(0, 0);
+    float maxElev = terrain.at(0, 0);
+    float sum = 0.0f;
+
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            float val = terrain.at(x, y);
+            minElev = std::min(minElev, val);
+            maxElev = std::max(maxElev, val);
+            sum += val;
+            EXPECT_TRUE(std::isfinite(val)) << "All values should be finite";
+        }
+    }
+
+    float avgElev = sum / (width * height);
+    float range = maxElev - minElev;
+
+    // Typical game terrain should have reasonable values
+    EXPECT_GT(range, 10.0f) << "Should have meaningful elevation variation";
+    EXPECT_LT(range, 200.0f) << "Should not have extreme elevation variation";
+    EXPECT_TRUE(std::abs(avgElev) < amplitude * 2.0f)
+        << "Average elevation should be within reasonable bounds";
+}
