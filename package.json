@@ -12,6 +12,7 @@
     "build": "pnpm --filter \"*\" run build",
     "test": "pnpm --filter \"*\" run test",
     "lint": "pnpm --filter \"*\" run lint",
-    "typecheck": "pnpm --filter \"*\" run typecheck"
+    "typecheck": "pnpm --filter \"*\" run typecheck",
+    "ci": "python scripts/run-ci-locally.py"
   }
 }

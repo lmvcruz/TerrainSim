@@ -155,15 +155,49 @@ See [docs/Iterations Planning](./docs/Iterations%20Planning) for the complete ro
 # Run all tests
 pnpm test
 
+# Run TypeScript type checking
+pnpm typecheck
+
 # Run frontend tests only
 pnpm --filter @terrain/web run test
 
 # Run backend tests only
 cd libs/core/build && ctest --output-on-failure
-
-# Run CI pipeline locally (requires act)
-act push
 ```
+
+### Local CI Validation
+
+Run the complete CI pipeline locally before pushing to catch issues early:
+
+```bash
+# Quick way - Run all CI steps via pnpm
+pnpm run ci
+
+# Or use Python directly for more options:
+
+# Run all CI steps (frontend tests, backend tests, build, deploy check)
+python scripts/run-ci-locally.py
+
+# Run specific steps (1=frontend, 2=backend, 3=build, 4=deploy)
+python scripts/run-ci-locally.py --steps 1,2,3
+
+# Skip backend tests (useful if C++ compiler not available)
+python scripts/run-ci-locally.py --skip-backend
+
+# Show detailed output
+python scripts/run-ci-locally.py --verbose
+
+# Get help
+python scripts/run-ci-locally.py --help
+```
+
+**CI Steps:**
+1. **Test Frontend** - TypeScript type check + Vitest tests
+2. **Test Backend** - CMake + C++ build + CTest
+3. **Build** - Production build of web app
+4. **Deploy Check** - Verify build artifacts (dry run)
+
+This script mimics exactly what GitHub Actions does in the CI/CD pipeline.
 
 ## 📝 License
 
