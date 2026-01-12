@@ -59,11 +59,9 @@ function App() {
     }
 
     setHeightmap(demo)
-    setError('Running in demo mode. Backend API not available in production.')
   }
   const handleGenerate = async (parameters: NoiseParameters) => {
     if (!apiAvailable) {
-      setError('Backend API not available. Running in demo mode.')
       generateDemoTerrain()
       return
     }

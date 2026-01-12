@@ -244,7 +244,8 @@ The project follows an iterative development model, with each iteration deliveri
 
 **Tasks:**
 
-**Delivery Block 1: Particle Physics + Basic Visualization**
+
+
 *Water particles move across terrain following gravity. Visible but no erosion yet.*
 - [ ] **CORE-012:** Implement WaterParticle class (position, velocity, sediment)
 - [ ] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors)
