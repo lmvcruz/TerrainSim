@@ -70,25 +70,61 @@ const vertexShader = `
   }
 `
 
-// Fragment shader - applies lighting and color
+// Fragment shader - applies lighting and elevation-based color gradient
 const fragmentShader = `
   uniform vec3 terrainColor;
   uniform vec3 lightDirection;
   uniform vec3 ambientColor;
   uniform vec3 lightColor;
+  uniform float minElevation;
+  uniform float maxElevation;
 
   varying vec3 vNormal;
   varying vec3 vPosition;
+
+  // Color gradient based on elevation
+  vec3 getElevationColor(float elevation) {
+    // Normalize elevation to 0-1 range
+    float t = (elevation - minElevation) / (maxElevation - minElevation);
+    t = clamp(t, 0.0, 1.0);
+
+    // Define color stops for elevation gradient
+    vec3 lowColor = vec3(0.13, 0.37, 0.57);   // Deep blue (water/low)
+    vec3 midLowColor = vec3(0.23, 0.49, 0.27); // Green (valleys)
+    vec3 midHighColor = vec3(0.55, 0.47, 0.33); // Brown (hills)
+    vec3 highColor = vec3(0.95, 0.95, 0.95);   // White (peaks/snow)
+
+    // Multi-stop gradient with smooth transitions
+    vec3 color;
+    if (t < 0.33) {
+      // Low to mid-low (blue to green)
+      float localT = t / 0.33;
+      color = mix(lowColor, midLowColor, localT);
+    } else if (t < 0.66) {
+      // Mid-low to mid-high (green to brown)
+      float localT = (t - 0.33) / 0.33;
+      color = mix(midLowColor, midHighColor, localT);
+    } else {
+      // Mid-high to high (brown to white)
+      float localT = (t - 0.66) / 0.34;
+      color = mix(midHighColor, highColor, localT);
+    }
+
+    return color;
+  }
 
   void main() {
     // Normalize the interpolated normal
     vec3 normal = normalize(vNormal);
 
+    // Get base color from elevation
+    vec3 baseColor = getElevationColor(vPosition.z);
+
     // Calculate diffuse lighting
     float diffuse = max(dot(normal, lightDirection), 0.0);
 
-    // Combine ambient and diffuse lighting
-    vec3 finalColor = terrainColor * (ambientColor + lightColor * diffuse);
+    // Combine ambient and diffuse lighting with elevation-based color
+    vec3 finalColor = baseColor * (ambientColor + lightColor * diffuse);
 
     gl_FragColor = vec4(finalColor, 1.0);
   }
@@ -141,20 +177,35 @@ export function TerrainMesh({
   }, [heightmap, width, height])
 
   // Shader uniforms
-  const uniforms = useMemo(
-    () => ({
+  const uniforms = useMemo(() => {
+    // Calculate min and max elevation from heightmap
+    let minElevation = 0
+    let maxElevation = 0
+
+    if (heightmap && heightmap.length > 0) {
+      minElevation = Math.min(...heightmap)
+      maxElevation = Math.max(...heightmap)
+
+      // Ensure there's a valid range
+      if (maxElevation === minElevation) {
+        maxElevation = minElevation + 1
+      }
+    }
+
+    return {
       heightmapTexture: { value: heightmapTexture },
       meshWidth: { value: meshWidth },
       meshDepth: { value: meshDepth },
       gridWidth: { value: width },
       gridHeight: { value: height },
-      terrainColor: { value: [0.23, 0.49, 0.27] }, // #3a7d44 in RGB
+      terrainColor: { value: [0.23, 0.49, 0.27] }, // #3a7d44 in RGB (legacy, not used in new shader)
       lightDirection: { value: [0.5, 0.5, 0.7] }, // Normalized light direction
       ambientColor: { value: [0.3, 0.3, 0.3] }, // Ambient light
       lightColor: { value: [0.7, 0.7, 0.7] }, // Directional light color
-    }),
-    [heightmapTexture, meshWidth, meshDepth, width, height]
-  )
+      minElevation: { value: minElevation },
+      maxElevation: { value: maxElevation },
+    }
+  }, [heightmapTexture, meshWidth, meshDepth, width, height, heightmap])
 
   return (
     <mesh

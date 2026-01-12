@@ -99,9 +99,9 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **API-002:** Create /generate endpoint accepting noise parameters
 - [x] **API-003:** Serialize Heightmap to Float32Array in response
 - [x] **API-004:** Add CORS support for local development
-- [ ] **WEB-007:** Enhance material with elevation-based color gradient
-- [ ] **WEB-008:** Create NoiseParametersPanel UI component
-- [ ] **WEB-009:** Add seed input field with validation
+- [x] **WEB-007:** Enhance material with elevation-based color gradient
+- [x] **WEB-008:** Create NoiseParametersPanel UI component
+- [x] **WEB-009:** Add seed input field with validation
 - [ ] **WEB-010:** Implement sliders (frequency, amplitude, octaves)
 - [ ] **WEB-011:** Wire "Generate" button to API call
 - [ ] **WEB-012:** Implement elevation-based color gradient shader

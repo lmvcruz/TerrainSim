@@ -1,14 +1,27 @@
+import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { TerrainMesh } from './components/TerrainMesh'
+import { NoiseParametersPanel, NoiseParameters } from './components/NoiseParametersPanel'
 import { generateSemiSphere } from './utils/terrainGenerators'
 import './App.css'
 
 function App() {
-  // Generate a semi-sphere heightmap (128x128 grid, centered at 64,64, radius 50)
   const width = 128
   const height = 128
-  const heightmap = generateSemiSphere(width, height, 64, 64, 50)
+
+  // Initial terrain: semi-sphere
+  const [heightmap, setHeightmap] = useState<Float32Array>(() =>
+    generateSemiSphere(width, height, 64, 64, 50)
+  )
+
+  const handleGenerate = (parameters: NoiseParameters) => {
+    console.log('Generate terrain with parameters:', parameters)
+    // TODO: Call API endpoint to generate noise-based terrain
+    // For now, regenerate the semi-sphere as a placeholder
+    const newHeightmap = generateSemiSphere(width, height, 64, 64, 50)
+    setHeightmap(newHeightmap)
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -23,6 +36,9 @@ function App() {
       }}>
         Hello Terrain
       </h1>
+
+      <NoiseParametersPanel onGenerate={handleGenerate} />
+
       <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 10]} intensity={1} />
