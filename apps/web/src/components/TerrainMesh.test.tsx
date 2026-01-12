@@ -1,6 +1,6 @@
 /**
  * Unit tests for TerrainMesh component
- * 
+ *
  * Note: These tests focus on component logic and prop handling.
  * Visual Three.js rendering cannot be tested in JSDOM.
  */
@@ -12,7 +12,7 @@ import { TerrainMesh } from './TerrainMesh'
 // Mock Three.js DataTexture
 vi.mock('three', async () => {
   const actual = await vi.importActual('three')
-  
+
   class MockDataTexture {
     needsUpdate: boolean = false
     uuid: string = `texture-${Math.random()}`
@@ -28,7 +28,7 @@ vi.mock('three', async () => {
       this.height = height
     }
   }
-  
+
   return {
     ...actual,
     DataTexture: MockDataTexture,
@@ -43,7 +43,7 @@ describe('TerrainMesh', () => {
   describe('Heightmap Prop Handling', () => {
     it('should render with valid heightmap data', () => {
       const heightmap = new Float32Array(128 * 128).fill(5)
-      
+
       const { container } = render(
         <TerrainMesh
           heightmap={heightmap}
