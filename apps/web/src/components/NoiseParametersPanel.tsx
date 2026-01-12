@@ -215,7 +215,7 @@ export function NoiseParametersPanel({
           <strong>Error:</strong> {error}
         </div>
       )}
-      </>
+        </>
       )}
     </div>
   )

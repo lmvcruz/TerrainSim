@@ -131,7 +131,7 @@ export function StatisticsPanel({ heightmap, width, height }: StatisticsPanelPro
           </div>
         </div>
       </div>
-      </>
+        </>
       )}
     </div>
   )
