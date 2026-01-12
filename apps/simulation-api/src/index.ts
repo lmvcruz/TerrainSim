@@ -2,11 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import { createServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 import { generatePerlinNoise, generateFbm } from './generators/heightmapGenerators.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const IS_DEV = process.env.NODE_ENV !== 'production';
+
+// Create HTTP server and Socket.IO instance
+const httpServer = createServer(app);
+const io = new SocketServer(httpServer, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
 
 // Development log storage
 const DEV_LOGS_DIR = path.join(process.cwd(), '.dev-logs');
@@ -232,12 +244,109 @@ if (IS_DEV) {
   });
 }
 
+// API-005: WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log(`🔌 Client connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 Client disconnected: ${socket.id}`);
+  });
+
+  socket.on('ping', () => {
+    socket.emit('pong', { timestamp: Date.now() });
+  });
+
+  // API-006: Handle erosion simulation request
+  socket.on('simulate', async (params) => {
+    try {
+      const {
+        width = 256,
+        height = 256,
+        seed = 0,
+        numParticles = 5000,
+        erosionParams = {}
+      } = params;
+
+      console.log(`🌊 Starting erosion simulation for ${socket.id}:`, {
+        width,
+        height,
+        seed,
+        numParticles
+      });
+
+      // Generate initial heightmap
+      const heightmap = generateFbm(width, height, seed, 4, 0.05, 1.0, 0.5, 2.0);
+
+      // Send initial state
+      socket.emit('terrain-frame', {
+        frameType: 'initial',
+        width,
+        height,
+        data: Array.from(heightmap),
+        particlesSimulated: 0,
+        totalParticles: numParticles
+      });
+
+      // Simulate erosion in batches
+      const batchSize = 100; // Process 100 particles before sending update
+      const updateInterval = 10; // Send update every 10 batches (1000 particles)
+
+      for (let i = 0; i < numParticles; i++) {
+        // Simulate one particle (placeholder - will be replaced with C++ binding)
+        // For now, just simulate the process with random drops
+        const x = Math.floor(Math.random() * width);
+        const y = Math.floor(Math.random() * height);
+        const idx = y * width + x;
+
+        // Simple erosion simulation (placeholder)
+        const erodeAmount = 0.001;
+        heightmap[idx] = Math.max(0, heightmap[idx] - erodeAmount);
+
+        // Send periodic updates
+        if ((i + 1) % (batchSize * updateInterval) === 0) {
+          socket.emit('terrain-frame', {
+            frameType: 'update',
+            width,
+            height,
+            data: Array.from(heightmap),
+            particlesSimulated: i + 1,
+            totalParticles: numParticles
+          });
+
+          // Small delay to prevent overwhelming the client
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+      }
+
+      // Send final state
+      socket.emit('terrain-frame', {
+        frameType: 'final',
+        width,
+        height,
+        data: Array.from(heightmap),
+        particlesSimulated: numParticles,
+        totalParticles: numParticles
+      });
+
+      console.log(`✅ Erosion simulation complete for ${socket.id}`);
+
+    } catch (error) {
+      console.error('Error during erosion simulation:', error);
+      socket.emit('error', {
+        message: error instanceof Error ? error.message : 'Simulation error'
+      });
+    }
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`🌍 TerrainSim API server running on http://localhost:${PORT}`);
+  console.log(`� WebSocket server ready`);
   console.log(`📊 Endpoints:`);
   console.log(`   GET  /health     - Health check`);
   console.log(`   POST /generate   - Generate heightmap`);
+  console.log(`   WS   /           - WebSocket for erosion simulation`);
 
   if (IS_DEV) {
     console.log(`\n🔧 Development endpoints:`);

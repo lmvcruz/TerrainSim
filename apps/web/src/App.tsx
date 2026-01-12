@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
+import { io, Socket } from 'socket.io-client'
 import { TerrainMesh } from './components/TerrainMesh'
 import { NoiseParametersPanel } from './components/NoiseParametersPanel'
 import type { NoiseParameters } from './components/NoiseParametersPanel'
+import { ErosionParametersPanel } from './components/ErosionParametersPanel'
+import type { ErosionParameters } from './components/ErosionParametersPanel'
 import { StatisticsPanel } from './components/StatisticsPanel'
 import { trackGeneration } from './utils/terrainTracker'
 import { logger } from './utils/logger'
@@ -32,7 +35,64 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [wireframe, setWireframe] = useState(false)
+  const [simulating, setSimulating] = useState(false)
+  const [simulationProgress, setSimulationProgress] = useState<{
+    particlesSimulated: number
+    totalParticles: number
+  } | null>(null)
+  const socketRef = useRef<Socket | null>(null)
   const apiAvailable = !IS_PRODUCTION
+
+  // Setup WebSocket connection
+  useEffect(() => {
+    if (!apiAvailable) return
+
+    const socket = io(API_BASE_URL)
+    socketRef.current = socket
+
+    socket.on('connect', () => {
+      logger.info('🔌 WebSocket connected')
+    })
+
+    socket.on('disconnect', () => {
+      logger.info('🔌 WebSocket disconnected')
+    })
+
+    socket.on('error', (error) => {
+      logger.error('WebSocket error', error)
+      setError(error.message || 'WebSocket error')
+      setSimulating(false)
+    })
+
+    socket.on('terrain-frame', (frame) => {
+      logger.debug('Received terrain frame', {
+        frameType: frame.frameType,
+        particlesSimulated: frame.particlesSimulated,
+        totalParticles: frame.totalParticles,
+      })
+
+      // Update heightmap with new data
+      const newHeightmap = new Float32Array(frame.data)
+      setHeightmap(newHeightmap)
+
+      // Update progress
+      setSimulationProgress({
+        particlesSimulated: frame.particlesSimulated,
+        totalParticles: frame.totalParticles,
+      })
+
+      // If simulation is complete, stop loading
+      if (frame.frameType === 'final') {
+        setSimulating(false)
+        setSimulationProgress(null)
+        logger.info('✅ Erosion simulation complete')
+      }
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [apiAvailable])
 
   // Generate default terrain on mount (only if API is available)
   useEffect(() => {
@@ -171,6 +231,45 @@ function App() {
     }
   }
 
+  const handleSimulate = (parameters: ErosionParameters) => {
+    if (!apiAvailable || !socketRef.current) {
+      setError('Erosion simulation requires API server connection')
+      return
+    }
+
+    logger.info('🌊 Starting erosion simulation', parameters)
+
+    setSimulating(true)
+    setError(null)
+    setSimulationProgress({ particlesSimulated: 0, totalParticles: parameters.numParticles })
+
+    socketRef.current.emit('simulate', {
+      width,
+      height,
+      seed: 42, // Use current terrain seed
+      numParticles: parameters.numParticles,
+      erosionParams: {
+        inertia: parameters.inertia,
+        sedimentCapacityFactor: parameters.sedimentCapacityFactor,
+        minSedimentCapacity: parameters.minSedimentCapacity,
+        erodeSpeed: parameters.erodeSpeed,
+        depositSpeed: parameters.depositSpeed,
+        evaporateSpeed: parameters.evaporateSpeed,
+        gravity: parameters.gravity,
+        maxDropletLifetime: parameters.maxDropletLifetime,
+        initialWaterVolume: parameters.initialWaterVolume,
+        initialSpeed: parameters.initialSpeed,
+      },
+    })
+  }
+
+  const handleStopSimulation = () => {
+    logger.info('⏸ Stopping erosion simulation')
+    setSimulating(false)
+    setSimulationProgress(null)
+    // Could emit 'stop-simulation' to server if implemented
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <h1 style={{
@@ -190,6 +289,14 @@ function App() {
         onGenerate={handleGenerate}
         loading={loading}
         error={error}
+      />
+
+      <ErosionParametersPanel
+        onSimulate={handleSimulate}
+        onStop={handleStopSimulation}
+        loading={simulating}
+        error={error}
+        progress={simulationProgress}
       />
 
       <StatisticsPanel
@@ -221,7 +328,7 @@ function App() {
       </button>
 
       {/* Loading Overlay */}
-      {loading && (
+      {(loading || simulating) && (
         <div style={{
           position: 'absolute',
           top: 0,
@@ -251,12 +358,17 @@ function App() {
             <div className="spinner" style={{
               width: '40px',
               height: '40px',
-              border: '4px solid rgba(74, 158, 255, 0.2)',
-              borderTop: '4px solid #4a9eff',
+              border: simulating ? '4px solid rgba(255, 140, 66, 0.2)' : '4px solid rgba(74, 158, 255, 0.2)',
+              borderTop: simulating ? '4px solid #ff8c42' : '4px solid #4a9eff',
               borderRadius: '50%',
               animation: 'spin 1s linear infinite',
             }} />
-            <span>Generating Terrain...</span>
+            <span>{simulating ? 'Simulating Erosion...' : 'Generating Terrain...'}</span>
+            {simulationProgress && (
+              <span style={{ fontSize: '14px', color: '#ccc' }}>
+                {simulationProgress.particlesSimulated.toLocaleString()} / {simulationProgress.totalParticles.toLocaleString()} particles
+              </span>
+            )}
           </div>
         </div>
       )}
