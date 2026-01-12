@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import './StatisticsPanel.css'
 
 export interface TerrainStatistics {
@@ -23,8 +23,10 @@ interface StatisticsPanelProps {
  * - Average elevation
  * - Elevation range
  * - Grid dimensions
+ * - Collapsible interface
  */
 export function StatisticsPanel({ heightmap, width, height }: StatisticsPanelProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const statistics = useMemo<TerrainStatistics | null>(() => {
     if (!heightmap || heightmap.length === 0) {
       return null
@@ -55,18 +57,38 @@ export function StatisticsPanel({ heightmap, width, height }: StatisticsPanelPro
 
   if (!statistics) {
     return (
-      <div className="statistics-panel">
-        <h3>Terrain Statistics</h3>
-        <p className="no-data">No terrain data available</p>
+      <div className={`statistics-panel ${isCollapsed ? 'collapsed' : ''}`}>
+        <div className="panel-header">
+          <h3>Terrain Statistics</h3>
+          <button
+            className="collapse-button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title={isCollapsed ? "Expand" : "Collapse"}
+          >
+            {isCollapsed ? '▲' : '▼'}
+          </button>
+        </div>
+        {!isCollapsed && <p className="no-data">No terrain data available</p>}
       </div>
     )
   }
 
   return (
-    <div className="statistics-panel">
-      <h3>Terrain Statistics</h3>
+    <div className={`statistics-panel ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="panel-header">
+        <h3>Terrain Statistics</h3>
+        <button
+          className="collapse-button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          title={isCollapsed ? "Expand" : "Collapse"}
+        >
+          {isCollapsed ? '▲' : '▼'}
+        </button>
+      </div>
 
-      <div className="stat-grid">
+      {!isCollapsed && (
+        <>
+          <div className="stat-grid">
         <div className="stat-item">
           <span className="stat-label">Min Elevation</span>
           <span className="stat-value">{statistics.minElevation.toFixed(2)}</span>
@@ -109,6 +131,8 @@ export function StatisticsPanel({ heightmap, width, height }: StatisticsPanelPro
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   )
 }

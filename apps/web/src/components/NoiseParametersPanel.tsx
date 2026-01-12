@@ -33,6 +33,7 @@ const DEFAULT_PARAMETERS: NoiseParameters = {
  * - Sliders for frequency, amplitude, and octaves
  * - Generate button to trigger terrain creation
  * - Real-time parameter display
+ * - Collapsible interface
  */
 export function NoiseParametersPanel({
   onGenerate,
@@ -40,6 +41,7 @@ export function NoiseParametersPanel({
   loading = false,
   error = null,
 }: NoiseParametersPanelProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const [parameters, setParameters] = useState<NoiseParameters>({
     ...DEFAULT_PARAMETERS,
     ...initialParameters,
@@ -97,9 +99,20 @@ export function NoiseParametersPanel({
   }
 
   return (
-    <div className="noise-parameters-panel">
-      <h2>Noise Parameters</h2>
+    <div className={`noise-parameters-panel ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="panel-header">
+        <h2>Noise Parameters</h2>
+        <button
+          className="collapse-button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          title={isCollapsed ? "Expand" : "Collapse"}
+        >
+          {isCollapsed ? '▲' : '▼'}
+        </button>
+      </div>
 
+      {!isCollapsed && (
+        <>
       {/* Seed Input */}
       <div className="parameter-group">
         <label htmlFor="seed-input">
@@ -201,6 +214,8 @@ export function NoiseParametersPanel({
         <div className="api-error-message">
           <strong>Error:</strong> {error}
         </div>
+      )}
+      </>
       )}
     </div>
   )
