@@ -314,8 +314,8 @@ io.on('connection', (socket) => {
           for (let step = 0; step < 10; step++) {
             const idx = py * width + px;
 
-            // Very gentle erosion amount (reduced by 10x)
-            const erodeAmount = 0.0001;
+            // More visible erosion - increased 100x from 0.0001 to 0.01
+            const erodeAmount = 0.01;
             heightmap[idx] = Math.max(0, heightmap[idx] - erodeAmount);
 
             // Move to lowest neighbor
@@ -360,6 +360,8 @@ io.on('connection', (socket) => {
           particlesSimulated,
           totalParticles: numParticles
         });
+
+        console.log(`📊 Frame update: ${particlesSimulated}/${numParticles} particles (${Math.round(particlesSimulated/numParticles*100)}%)`);
 
         // Delay between frames for visible animation
         await new Promise(resolve => setTimeout(resolve, frameDelay));

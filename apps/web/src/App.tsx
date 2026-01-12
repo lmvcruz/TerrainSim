@@ -65,13 +65,16 @@ function App() {
     })
 
     socket.on('terrain-frame', (frame) => {
-      logger.debug('Received terrain frame', {
+      logger.info('📥 Received terrain frame', {
         frameType: frame.frameType,
         particlesSimulated: frame.particlesSimulated,
         totalParticles: frame.totalParticles,
+        dataLength: frame.data.length,
+        firstValue: frame.data[0].toFixed(4),
+        centerValue: frame.data[Math.floor(frame.data.length / 2)].toFixed(4),
       })
 
-      // Update heightmap with new data
+      // Update heightmap with new data - FORCE new reference for React to detect change
       const newHeightmap = new Float32Array(frame.data)
       setHeightmap(newHeightmap)
 
