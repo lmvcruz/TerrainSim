@@ -66,7 +66,7 @@ function App() {
       const data = await response.json()
 
       // Convert the heightmap array to Float32Array
-      const newHeightmap = new Float32Array(data.heightmap)
+      const newHeightmap = new Float32Array(data.data)
       setHeightmap(newHeightmap)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
