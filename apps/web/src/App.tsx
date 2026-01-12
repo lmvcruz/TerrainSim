@@ -10,6 +10,7 @@ import { logger } from './utils/logger'
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const IS_PRODUCTION = window.location.hostname.includes('github.io')
 
 // Default parameters for initial terrain generation
 const DEFAULT_PARAMETERS: NoiseParameters = {
@@ -31,13 +32,42 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [wireframe, setWireframe] = useState(false)
+  const apiAvailable = !IS_PRODUCTION
 
-  // Generate default terrain on mount
+  // Generate default terrain on mount (only if API is available)
   useEffect(() => {
-    handleGenerate(DEFAULT_PARAMETERS)
-  }, []) // Empty dependency array = run once on mount
+    if (apiAvailable) {
+      handleGenerate(DEFAULT_PARAMETERS)
+    } else {
+      // In production without backend, generate a simple demo terrain
+      logger.warn('Running in production mode without backend API. Using demo terrain.')
+      generateDemoTerrain()
+    }
+  }, [apiAvailable]) // Re-run if apiAvailable changes
+  const generateDemoTerrain = () => {
+    logger.info('Generating demo terrain (no API)')
+    const demo = new Float32Array(width * height)
 
+    // Simple sine wave pattern for demo
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const nx = x / width - 0.5
+        const ny = y / height - 0.5
+        const dist = Math.sqrt(nx * nx + ny * ny)
+        demo[y * width + x] = 20 * Math.sin(dist * 10) * (1 - dist * 2)
+      }
+    }
+
+    setHeightmap(demo)
+    setError('Running in demo mode. Backend API not available in production.')
+  }
   const handleGenerate = async (parameters: NoiseParameters) => {
+    if (!apiAvailable) {
+      setError('Backend API not available. Running in demo mode.')
+      generateDemoTerrain()
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -130,6 +160,26 @@ function App() {
       }}>
         Hello Terrain
       </h1>
+
+      {/* Production Mode Banner */}
+      {!apiAvailable && (
+        <div style={{
+          position: 'absolute',
+          top: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1,
+          background: 'rgba(255, 165, 0, 0.9)',
+          color: 'white',
+          padding: '8px 16px',
+          borderRadius: '6px',
+          fontSize: '13px',
+          fontWeight: 600,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        }}>
+          ⚠️ Demo Mode: Backend API not available
+        </div>
+      )}
 
       <NoiseParametersPanel
         initialParameters={DEFAULT_PARAMETERS}
