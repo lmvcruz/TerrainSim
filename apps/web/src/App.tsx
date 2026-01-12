@@ -159,26 +159,6 @@ function App() {
         Hello Terrain
       </h1>
 
-      {/* Production Mode Banner */}
-      {!apiAvailable && (
-        <div style={{
-          position: 'absolute',
-          top: '70px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1,
-          background: 'rgba(255, 165, 0, 0.9)',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '6px',
-          fontSize: '13px',
-          fontWeight: 600,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-        }}>
-          ⚠️ Demo Mode: Backend API not available
-        </div>
-      )}
-
       <NoiseParametersPanel
         initialParameters={DEFAULT_PARAMETERS}
         onGenerate={handleGenerate}
