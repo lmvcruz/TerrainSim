@@ -62,6 +62,101 @@ The project follows an iterative development model, with each iteration deliveri
 
 ---
 
+### **Iteration 1.5: Testing & Debugging Infrastructure**
+**Goal:** Establish comprehensive testing, logging, and debugging capabilities to support rapid development and AI-assisted debugging.
+
+**Backend Deliverables:**
+*   Set up development log endpoints (`/dev/logs`):
+    *   POST endpoint to receive browser logs from frontend.
+    *   GET endpoint with filtering (level, component, timestamp, limit).
+    *   DELETE endpoint to clear logs.
+    *   File-based storage in `.dev-logs/browser-logs.json` (max 5000 entries).
+*   Configure backend for CORS with DELETE method support.
+
+**Frontend Deliverables:**
+*   Achieve >85% test coverage for critical components:
+    *   Install `@vitest/coverage-v8` for code coverage reporting.
+    *   Write comprehensive tests for `App.tsx` state management.
+    *   Add 14 tests for `TerrainMesh.tsx` component (texture updates, prop changes, lifecycle).
+    *   Mock Three.js objects for JSDOM environment.
+*   Implement centralized logging system:
+    *   Create `Logger` class with log levels (debug, info, warn, error).
+    *   Add component-scoped loggers (e.g., `TerrainMesh`, `App`).
+    *   Implement log groups for related operations.
+    *   Add performance timing utilities (`logger.time()`, `logger.timeAsync()`, `logger.measure()`).
+    *   Replace all `console.log` calls with structured logging.
+*   Create `LogCollector` for development:
+    *   Capture all logs in memory with filtering capabilities.
+    *   Auto-save to localStorage every 5 seconds.
+    *   Provide `window.downloadLogs()` for manual export.
+    *   Auto-send logs to backend every 30 seconds (if available).
+    *   Graceful degradation when backend unavailable.
+*   Set up Playwright for E2E and visual regression testing:
+    *   Install Playwright with Chromium browser.
+    *   Create functional E2E tests (app load, API connection, console errors).
+    *   Implement visual regression test with baseline screenshots.
+    *   Configure generous diff tolerances for WebGL rendering (maxDiffPixels: 1000).
+    *   Add test scripts: `test:e2e`, `test:visual`, `test:e2e:ui`, `test:visual:update`.
+
+**Integration:**
+*   Backend and frontend coordinate for log collection:
+    *   Frontend checks backend health on startup.
+    *   If available, enables automatic log transmission.
+    *   Backend stores logs with query/filter capabilities.
+    *   AI agents can retrieve logs via HTTP GET without manual user intervention.
+*   CI pipeline extended with E2E tests:
+    *   Step 2 in CI script runs E2E and visual tests.
+    *   Auto-starts both API server and web server for tests.
+    *   Visual baselines stored in version control.
+
+**Tasks:**
+- [x] **TEST-101:** Install @vitest/coverage-v8 package
+- [x] **TEST-102:** Generate initial coverage report (58.15% baseline)
+- [x] **TEST-103:** Write App.tsx state management tests
+- [x] **TEST-104:** Create TerrainMesh.tsx comprehensive test suite (14 tests)
+- [x] **TEST-105:** Implement Three.js mocking for JSDOM
+- [x] **TEST-106:** Achieve 86.95% overall coverage
+- [x] **LOG-001:** Create Logger class with log levels
+- [x] **LOG-002:** Add component-scoped logger factory
+- [x] **LOG-003:** Implement log groups for operation tracking
+- [x] **LOG-004:** Add performance timing utilities
+- [x] **LOG-005:** Replace all console.log with structured logging
+- [x] **LOG-006:** Create LogCollector class
+- [x] **LOG-007:** Implement localStorage auto-save (5s interval)
+- [x] **LOG-008:** Add downloadLogs() helper function
+- [x] **LOG-009:** Expose window.downloadLogs() for debugging
+- [x] **API-014:** Create POST /dev/logs endpoint
+- [x] **API-015:** Create GET /dev/logs endpoint with filtering
+- [x] **API-016:** Create DELETE /dev/logs endpoint
+- [x] **API-017:** Implement file-based log storage (max 5000 entries)
+- [x] **API-018:** Add CORS support for DELETE method
+- [x] **WEB-051:** Implement backend health check on startup
+- [x] **WEB-052:** Enable auto-send logs every 30 seconds
+- [x] **WEB-053:** Implement graceful degradation for offline mode
+- [x] **E2E-001:** Install Playwright and Chromium browser
+- [x] **E2E-002:** Create playwright.config.ts with auto-server startup
+- [x] **E2E-003:** Write functional E2E tests (terrain.spec.ts)
+- [x] **E2E-004:** Create visual regression proof-of-concept (visual-poc.spec.ts)
+- [x] **E2E-005:** Generate baseline screenshots
+- [x] **E2E-006:** Configure diff tolerances for WebGL rendering
+- [x] **E2E-007:** Add Playwright test scripts to package.json
+- [x] **E2E-008:** Integrate E2E tests into CI pipeline (Step 2)
+- [x] **E2E-009:** Update .gitignore for Playwright artifacts
+- [x] **DOC-007:** Create LOGGING_SYSTEM.md documentation
+- [x] **DOC-008:** Create AGENT_DEBUGGING_WORKFLOW.md
+- [x] **DOC-009:** Create VISUAL_REGRESSION_TESTING.md
+- [x] **DOC-010:** Update TESTING_AND_DEBUGGING_IMPROVEMENTS.md roadmap
+
+**Success Criteria:**
+*   Test coverage exceeds 85% for critical frontend components.
+*   All console output uses structured logging with appropriate levels.
+*   AI agents can retrieve browser logs programmatically via HTTP API.
+*   E2E tests run successfully in CI pipeline.
+*   Visual regression tests detect unintended UI changes.
+*   CI pipeline includes 5 steps: (1) Frontend Tests, (2) E2E & Visual, (3) Backend Tests, (4) Build, (5) Deploy Check.
+
+---
+
 ### **Iteration 2: Procedural Noise Generation**
 **Goal:** Add parameterized noise functions for terrain generation.
 

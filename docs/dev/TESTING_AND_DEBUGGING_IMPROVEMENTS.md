@@ -498,13 +498,25 @@ logger.on('log', (level, message, data) => {
 - Comprehensive agent documentation in `AGENT_DEBUGGING_WORKFLOW.md`
 - Agents can now access browser logs programmatically without manual copy/paste
 
-### Phase 4: Long Term (Future)
+### Phase 4: Long Term (Future) ✅ **COMPLETE**
 **Focus: Visual regression**
 
-- [ ] Evaluate Playwright for E2E tests
-- [ ] Create proof-of-concept visual test
-- [ ] Set up visual diff infrastructure
-- [ ] Add visual tests to CI/CD
+- [x] Evaluate Playwright for E2E tests
+- [x] Install Playwright and configure project
+- [x] Create proof-of-concept visual test
+- [x] Set up visual diff infrastructure with baseline screenshots
+- [x] Add visual tests to CI/CD pipeline (Step 2 in CI script)
+- [x] Document visual testing workflow
+
+**Results achieved:**
+- Playwright installed with Chromium browser
+- E2E functional tests verify app loads, API works, no console errors
+- Visual regression test captures baseline screenshot of rendered terrain
+- Generous diff tolerances for WebGL/Three.js non-determinism
+- Integrated into CI pipeline as Step 2 (runs before backend tests)
+- Comprehensive documentation in `VISUAL_REGRESSION_TESTING.md`
+- Test scripts: `test:e2e`, `test:visual`, `test:e2e:ui`, `test:visual:update`
+- Snapshots stored in `e2e/*-snapshots/` and version controlled
 
 **Expected outcome:** Automated visual regression detection
 

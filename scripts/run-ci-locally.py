@@ -157,7 +157,7 @@ class CIRunner:
         - TypeScript type checking
         - Vitest unit tests
         """
-        self._print_step(1, 4, "Test Frontend")
+        self._print_step(1, 5, "Test Frontend")
 
         try:
             # Check if pnpm is installed
@@ -181,14 +181,44 @@ class CIRunner:
             self._print_error("Frontend tests failed!")
             return False
 
+    def step_test_e2e(self) -> bool:
+        """
+        Step 2: Test E2E & Visual Regression (CI workflow)
+        - Playwright E2E tests
+        - Visual regression tests
+        """
+        self._print_step(2, 5, "Test E2E & Visual Regression")
+
+        try:
+            # Check if pnpm is installed
+            if not self._check_command_exists('pnpm'):
+                self._print_error("pnpm is not installed. Please install it first.")
+                return False
+
+            # Run E2E tests (excluding slow visual tests)
+            print("Running E2E tests...")
+            self._run_command(['pnpm', 'exec', 'playwright', 'test', 'e2e/terrain.spec.ts'])
+            self._print_success("E2E tests passed")
+
+            # Run visual regression tests
+            print("\nRunning visual regression tests...")
+            self._run_command(['pnpm', 'exec', 'playwright', 'test', 'e2e/visual-poc.spec.ts'])
+            self._print_success("Visual regression tests passed")
+
+            return True
+
+        except subprocess.CalledProcessError:
+            self._print_error("E2E tests failed!")
+            return False
+
     def step_test_backend(self) -> bool:
         """
-        Step 2: Test Backend (CI workflow)
+        Step 3: Test Backend (CI workflow)
         - Configure CMake
         - Build C++ core library
         - Run CTest
         """
-        self._print_step(2, 4, "Test Backend (C++ Core)")
+        self._print_step(3, 5, "Test Backend (C++ Core)")
 
         try:
             # Check if CMake is installed
@@ -234,7 +264,7 @@ class CIRunner:
 
     def step_build(self) -> bool:
         """
-        Step 3: Build (Deploy workflow)
+        Step 4: Build (Deploy workflow)
         - Install dependencies
         - Build web app for production
         """
@@ -277,7 +307,7 @@ class CIRunner:
 
     def step_deploy_check(self) -> bool:
         """
-        Step 4: Deploy Check (Deploy workflow - dry run)
+        Step 5: Deploy Check (Deploy workflow - dry run)
         - Verify build artifacts exist
         - Show what would be deployed
         """
@@ -333,19 +363,20 @@ class CIRunner:
 
         step_functions = {
             1: ("Test Frontend", self.step_test_frontend),
-            2: ("Test Backend", self.step_test_backend),
-            3: ("Build", self.step_build),
-            4: ("Deploy Check", self.step_deploy_check),
+            2: ("Test E2E & Visual", self.step_test_e2e),
+            3: ("Test Backend", self.step_test_backend),
+            4: ("Build", self.step_build),
+            5: ("Deploy Check", self.step_deploy_check),
         }
 
         # Determine which steps to run
         if steps is None:
-            steps_to_run = [1, 2, 3, 4]
+            steps_to_run = [1, 2, 3, 4, 5]
         else:
             steps_to_run = steps
 
-        if skip_backend and 2 in steps_to_run:
-            steps_to_run.remove(2)
+        if skip_backend and 3 in steps_to_run:
+            steps_to_run.remove(3)
             print(self._colorize("⚠️  Skipping backend tests (--skip-backend)\n", Colors.YELLOW))
 
         # Run steps
