@@ -263,6 +263,7 @@ io.on('connection', (socket) => {
         width = 256,
         height = 256,
         seed = 0,
+        heightmapData = null, // Receive current heightmap from frontend
         numParticles = 5000,
         erosionParams = {},
         frameDelay = 150, // Delay between frames in ms (configurable)
@@ -275,11 +276,19 @@ io.on('connection', (socket) => {
         seed,
         numParticles,
         frameDelay,
-        particlesPerFrame
+        particlesPerFrame,
+        hasHeightmapData: !!heightmapData
       });
 
-      // Generate initial heightmap
-      const heightmap = generateFbm(width, height, seed, 4, 0.05, 1.0, 0.5, 2.0);
+      // Use provided heightmap or generate new one
+      let heightmap: Float32Array;
+      if (heightmapData && Array.isArray(heightmapData)) {
+        heightmap = new Float32Array(heightmapData);
+        console.log(`✅ Using provided heightmap (${heightmap.length} values)`);
+      } else {
+        heightmap = generateFbm(width, height, seed, 4, 0.05, 1.0, 0.5, 2.0);
+        console.log(`⚠️  No heightmap provided, generated new terrain`);
+      }
 
       // Send initial state
       socket.emit('terrain-frame', {

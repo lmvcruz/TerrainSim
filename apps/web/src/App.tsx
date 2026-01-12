@@ -251,10 +251,12 @@ function App() {
     const baseDelay = 150
     const frameDelay = Math.round(baseDelay / parameters.animationSpeed)
 
+    // Send CURRENT heightmap to backend for erosion
     socketRef.current.emit('simulate', {
       width,
       height,
-      seed: 42, // Use current terrain seed
+      seed: 42,
+      heightmapData: Array.from(heightmap), // Send current terrain!
       numParticles: parameters.numParticles,
       frameDelay,
       particlesPerFrame: parameters.particlesPerFrame,
@@ -337,8 +339,8 @@ function App() {
         {wireframe ? '◼ Solid' : '◻ Wireframe'}
       </button>
 
-      {/* Loading Overlay */}
-      {(loading || simulating) && (
+      {/* Loading Overlay - Only for terrain generation, NOT for erosion simulation */}
+      {loading && !simulating && (
         <div style={{
           position: 'absolute',
           top: 0,
@@ -368,17 +370,12 @@ function App() {
             <div className="spinner" style={{
               width: '40px',
               height: '40px',
-              border: simulating ? '4px solid rgba(255, 140, 66, 0.2)' : '4px solid rgba(74, 158, 255, 0.2)',
-              borderTop: simulating ? '4px solid #ff8c42' : '4px solid #4a9eff',
+              border: '4px solid rgba(74, 158, 255, 0.2)',
+              borderTop: '4px solid #4a9eff',
               borderRadius: '50%',
               animation: 'spin 1s linear infinite',
             }} />
-            <span>{simulating ? 'Simulating Erosion...' : 'Generating Terrain...'}</span>
-            {simulationProgress && (
-              <span style={{ fontSize: '14px', color: '#ccc' }}>
-                {simulationProgress.particlesSimulated.toLocaleString()} / {simulationProgress.totalParticles.toLocaleString()} particles
-              </span>
-            )}
+            <span>Generating Terrain...</span>
           </div>
         </div>
       )}
