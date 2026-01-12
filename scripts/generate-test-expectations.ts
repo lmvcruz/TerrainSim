@@ -3,6 +3,21 @@
  *
  * This script calls the backend API with specific parameter sets and
  * saves the resulting terrain properties to a JSON file for test validation.
+ *
+ * WHEN TO USE THIS SCRIPT:
+ * - After modifying the Perlin noise algorithm in the C++ core
+ * - After changing noise generation parameters (persistence, lacunarity)
+ * - When adding new test cases to integration tests
+ * - If test-expectations.json values become outdated
+ *
+ * HOW TO USE:
+ * 1. Start the API server: pnpm --filter @terrain-sim/api run dev
+ * 2. Run this script: cd apps/simulation-api && node ../../scripts/generate-test-expectations.ts
+ * 3. Verify the updated test-expectations.json looks correct
+ * 4. Commit the updated file
+ *
+ * NOTE: Only regenerate when intentionally changing the algorithm.
+ * Random regeneration will cause test failures!
  */
 
 interface TerrainParameters {
