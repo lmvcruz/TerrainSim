@@ -6,6 +6,6 @@ describe('Terrain Web App', () => {
   })
 
   it('should verify environment', () => {
-    expect(typeof window).toBe('undefined') // Running in Node during tests
+    expect(typeof window).toBe('object') // Running in jsdom during tests
   })
 })

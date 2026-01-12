@@ -1,0 +1,179 @@
+{
+  "gridSize": {
+    "width": 256,
+    "height": 256
+  },
+  "testCases": {
+    "frequencyVariation": [
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -9.317763328552246,
+          "statistics": {
+            "min": -37.29661560058594,
+            "max": 40.60508728027344,
+            "mean": 0.34591443787088194,
+            "range": 77.90170288085938
+          },
+          "stdDev": 13.804674808589986
+        }
+      },
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.08,
+          "amplitude": 50,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -11.380536079406738,
+          "statistics": {
+            "min": -39.34934997558594,
+            "max": 44.58351135253906,
+            "mean": -0.10897063187395556,
+            "range": 83.932861328125
+          },
+          "stdDev": 13.319067582912627
+        }
+      }
+    ],
+    "amplitudeVariation": [
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 30,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -5.590657711029053,
+          "statistics": {
+            "min": -22.37796974182129,
+            "max": 24.363052368164062,
+            "mean": 0.20754866304372238,
+            "range": 46.74102210998535
+          },
+          "stdDev": 8.282804882284779
+        }
+      },
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 70,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -13.044868469238281,
+          "statistics": {
+            "min": -52.21525955200195,
+            "max": 56.84712219238281,
+            "mean": 0.4842802119551106,
+            "range": 109.06238174438477
+          },
+          "stdDev": 19.326544724464213
+        }
+      }
+    ],
+    "octavesVariation": [
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 3
+        },
+        "measurements": {
+          "centerPoint": -9.317763328552246,
+          "statistics": {
+            "min": -37.29661560058594,
+            "max": 40.60508728027344,
+            "mean": 0.34591443787088194,
+            "range": 77.90170288085938
+          },
+          "stdDev": 13.804674808589986
+        }
+      },
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 8
+        },
+        "measurements": {
+          "centerPoint": -9.317763328552246,
+          "statistics": {
+            "min": -37.29661560058594,
+            "max": 40.60508728027344,
+            "mean": 0.34591443787088194,
+            "range": 77.90170288085938
+          },
+          "stdDev": 13.804674808589986
+        }
+      }
+    ],
+    "seedVariation": [
+      {
+        "parameters": {
+          "seed": 42,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -9.317763328552246,
+          "statistics": {
+            "min": -37.29661560058594,
+            "max": 40.60508728027344,
+            "mean": 0.34591443787088194,
+            "range": 77.90170288085938
+          },
+          "stdDev": 13.804674808589986
+        }
+      },
+      {
+        "parameters": {
+          "seed": 123,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": 21.461748123168945,
+          "statistics": {
+            "min": -39.59768295288086,
+            "max": 37.20869064331055,
+            "mean": 0.09198674135099838,
+            "range": 76.8063735961914
+          },
+          "stdDev": 13.325480974368059
+        }
+      },
+      {
+        "parameters": {
+          "seed": 999,
+          "frequency": 0.05,
+          "amplitude": 50,
+          "octaves": 6
+        },
+        "measurements": {
+          "centerPoint": -8.007370948791504,
+          "statistics": {
+            "min": -44.5162239074707,
+            "max": 40.60508728027344,
+            "mean": 0.05584736037336979,
+            "range": 85.12131118774414
+          },
+          "stdDev": 13.437700812129883
+        }
+      }
+    ]
+  },
+  "generatedAt": "2026-01-12T12:36:34.106Z"
+}

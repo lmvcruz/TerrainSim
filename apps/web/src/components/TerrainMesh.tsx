@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { Mesh, DataTexture, RGBAFormat, FloatType } from 'three'
 
 interface TerrainMeshProps {
@@ -150,9 +150,42 @@ export function TerrainMesh({
 }: TerrainMeshProps) {
   const meshRef = useRef<Mesh>(null)
 
+  // DEBUG: Log when component receives new props
+  useEffect(() => {
+    if (!heightmap || heightmap.length === 0) {
+      console.log(
+        '%c🎨 TerrainMesh Rendered',
+        'background: #9333ea; color: white; padding: 4px 8px;',
+        `\n  ⚠️  No heightmap data`
+      )
+      return
+    }
+
+    const centerIdx = Math.floor(heightmap.length / 2)
+    const sum = Array.from(heightmap).reduce((a, b) => a + b, 0)
+    const mean = sum / heightmap.length
+    const min = Math.min(...heightmap)
+    const max = Math.max(...heightmap)
+
+    console.log(
+      '%c🎨 TerrainMesh Rendered - RECEIVED HEIGHTMAP',
+      'background: #9333ea; color: white; font-weight: bold; padding: 4px 8px;',
+      `\n  Reference: Float32Array@${heightmap.byteOffset}`,
+      `\n  Length: ${heightmap.length}`,
+      `\n  Center value [${centerIdx}]: ${heightmap[centerIdx].toFixed(4)}`,
+      `\n  First 5: [${Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)).join(', ')}]`,
+      `\n  Statistics: min=${min.toFixed(2)}, max=${max.toFixed(2)}, mean=${mean.toFixed(2)}`,
+      `\n  Wireframe: ${wireframe}`
+    )
+  }, [heightmap, wireframe])
+
   // Convert heightmap Float32Array to DataTexture for GPU access
   const heightmapTexture = useMemo(() => {
     if (!heightmap) {
+      console.log(
+        '%c🖼️  Creating Flat Texture (no heightmap)',
+        'background: #dc2626; color: white; padding: 4px 8px;'
+      )
       // Create a flat heightmap if none provided
       const flatHeightmap = new Float32Array(width * height).fill(0)
       const data = new Float32Array(width * height * 4) // RGBA
@@ -168,6 +201,16 @@ export function TerrainMesh({
     }
 
     // Pack heightmap data into RGBA texture (elevation in red channel)
+    const centerIdx = Math.floor(heightmap.length / 2)
+
+    console.log(
+      '%c🖼️  Creating GPU Texture from Heightmap',
+      'background: #dc2626; color: white; font-weight: bold; padding: 4px 8px;',
+      `\n  Input heightmap center: ${heightmap[centerIdx].toFixed(4)}`,
+      `\n  Input first 5: [${Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)).join(', ')}]`,
+      `\n  Creating ${width}x${height} texture...`
+    )
+
     const data = new Float32Array(width * height * 4)
     for (let i = 0; i < heightmap.length; i++) {
       data[i * 4] = heightmap[i] // R channel = elevation
@@ -176,12 +219,20 @@ export function TerrainMesh({
       data[i * 4 + 3] = 1 // A channel = 1
     }
 
+    console.log(
+      '%c✅ Texture Data Packed',
+      'background: #16a34a; color: white; font-weight: bold; padding: 4px 8px;',
+      `\n  Texture center (R channel): ${data[centerIdx * 4].toFixed(4)}`,
+      `\n  First 5 R values: [${[0,1,2,3,4].map(i => data[i*4].toFixed(2)).join(', ')}]`,
+      `\n  Setting texture.needsUpdate = true`
+    )
+
     const texture = new DataTexture(data, width, height, RGBAFormat, FloatType)
     texture.needsUpdate = true
     return texture
   }, [heightmap, width, height])
 
-  // Shader uniforms
+  // Shader uniforms - include heightmap in dependencies so uniforms update when data changes
   const uniforms = useMemo(() => {
     // Calculate min and max elevation from heightmap
     let minElevation = 0
@@ -196,6 +247,14 @@ export function TerrainMesh({
         maxElevation = minElevation + 1
       }
     }
+
+    console.log(
+      '%c🎮 Uniforms Updated',
+      'background: #7c3aed; color: white; font-weight: bold; padding: 4px 8px;',
+      `\n  Texture version: ${heightmapTexture?.version ?? 'null'}`,
+      `\n  Min elevation: ${minElevation.toFixed(2)}`,
+      `\n  Max elevation: ${maxElevation.toFixed(2)}`
+    )
 
     return {
       heightmapTexture: { value: heightmapTexture },
@@ -220,6 +279,7 @@ export function TerrainMesh({
     >
       <planeGeometry args={[meshWidth, meshDepth, width - 1, height - 1]} />
       <shaderMaterial
+        key={heightmapTexture?.uuid ?? 'no-texture'} // Force remount when texture changes
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}

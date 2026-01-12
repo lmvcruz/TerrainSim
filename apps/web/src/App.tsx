@@ -5,6 +5,7 @@ import { TerrainMesh } from './components/TerrainMesh'
 import { NoiseParametersPanel } from './components/NoiseParametersPanel'
 import type { NoiseParameters } from './components/NoiseParametersPanel'
 import { StatisticsPanel } from './components/StatisticsPanel'
+import { trackGeneration } from './utils/terrainTracker'
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -65,8 +66,44 @@ function App() {
 
       const data = await response.json()
 
+      // Calculate statistics for comparison
+      const dataArray = data.data
+      const centerIdx = Math.floor(dataArray.length / 2)
+      const sum = dataArray.reduce((a: number, b: number) => a + b, 0)
+      const mean = sum / dataArray.length
+
+      // Track this generation for comparison
+      trackGeneration({
+        centerValue: dataArray[centerIdx],
+        firstFive: dataArray.slice(0, 5),
+        parameters: data.parameters,
+        min: data.statistics.min,
+        max: data.statistics.max,
+        mean: mean,
+      })
+
+      console.log(
+        '%c📥 API Response Received',
+        'background: #ea580c; color: white; font-weight: bold; padding: 4px 8px;',
+        `\n  Parameters: freq=${data.parameters.frequency}, amp=${data.parameters.amplitude}, octaves=${data.parameters.octaves}, seed=${data.parameters.seed}`,
+        `\n  Data length: ${dataArray.length}`,
+        `\n  Center value [${centerIdx}]: ${dataArray[centerIdx].toFixed(4)}`,
+        `\n  First 5: [${dataArray.slice(0, 5).map((v: number) => v.toFixed(2)).join(', ')}]`,
+        `\n  Statistics: min=${data.statistics.min.toFixed(2)}, max=${data.statistics.max.toFixed(2)}, mean=${mean.toFixed(2)}`
+      )
+
       // Convert the heightmap array to Float32Array
       const newHeightmap = new Float32Array(data.data)
+
+      console.log(
+        '%c🔄 Calling setHeightmap() with NEW Float32Array',
+        'background: #ea580c; color: white; font-weight: bold; padding: 4px 8px;',
+        `\n  Reference: Float32Array@${newHeightmap.byteOffset}`,
+        `\n  Length: ${newHeightmap.length}`,
+        `\n  Center value: ${newHeightmap[centerIdx].toFixed(4)}`,
+        `\n  ⚠️  WATCH: TerrainMesh should re-render with this data!`
+      )
+
       setHeightmap(newHeightmap)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
