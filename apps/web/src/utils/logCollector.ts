@@ -264,4 +264,20 @@ if (import.meta.env.DEV) {
   logger.info('Log collector initialized', {
     note: 'Use window.downloadLogs() to download logs as JSON',
   })
+
+  // Optionally enable auto-send to backend (tries silently)
+  // Check if backend is available first
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  fetch(`${apiUrl}/health`, { method: 'GET' })
+    .then(response => {
+      if (response.ok) {
+        // Backend is available, enable auto-send every 30 seconds
+        logCollector.startAutoSend(30000)
+        logger.debug('Auto-send to backend enabled', { interval: '30s' })
+      }
+    })
+    .catch(() => {
+      // Backend not available, that's fine - logs stay in localStorage
+      logger.debug('Backend not available, logs will stay in localStorage only')
+    })
 }

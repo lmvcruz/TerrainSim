@@ -480,16 +480,23 @@ logger.on('log', (level, message, data) => {
 - Easy log export via `window.downloadLogs()`
 - Foundation ready for agent log access (Phase 3)
 
-### Phase 3: Medium Term (Next Month)
+### Phase 3: Medium Term (Next Month) ✅ **COMPLETE**
 **Focus: Agent log access**
 
-- [ ] Implement /dev/logs endpoint in API
-- [ ] Add log capture in browser
-- [ ] Test agent can retrieve logs
-- [ ] Document workflow for agent debugging
-- [ ] Add log viewing UI in dev mode
+- [x] Implement /dev/logs endpoint in API
+- [x] Add log capture in browser
+- [x] Test agent can retrieve logs
+- [x] Document workflow for agent debugging
+- [ ] Add log viewing UI in dev mode (optional)
 
-**Expected outcome:** Agent can see browser logs without manual copy/paste
+**Results achieved:**
+- Backend API endpoints: POST/GET/DELETE `/dev/logs`
+- Log storage in `.dev-logs/browser-logs.json` (max 5000 entries)
+- Auto-send from browser every 30 seconds (if backend available)
+- Graceful degradation: logs stay in localStorage if backend unavailable
+- Query filtering: level, component, timestamp, limit
+- Comprehensive agent documentation in `AGENT_DEBUGGING_WORKFLOW.md`
+- Agents can now access browser logs programmatically without manual copy/paste
 
 ### Phase 4: Long Term (Future)
 **Focus: Visual regression**
