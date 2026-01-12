@@ -11,9 +11,12 @@
  * 4. Watch the console output
  */
 
+import { logger } from './utils/logger'
+
+const debugLogger = logger.withContext('DebugTerrainUpdates')
+
 // This module will be imported and executed when the app loads
-console.log('%c🔍 Terrain Update Debugger Loaded', 'background: #222; color: #4a9eff; font-size: 14px; padding: 4px 8px;')
-console.log('Watch this console for terrain update events...\n')
+debugLogger.info('🔍 Terrain Update Debugger Loaded - watching for terrain update events')
 
 // We'll monkey-patch Float32Array constructor to track when new heightmaps are created
 const OriginalFloat32Array = Float32Array
@@ -29,14 +32,11 @@ globalThis.Float32Array = class extends OriginalFloat32Array {
     if (this.length === 16384 || this.length === 65536) {
       heightmapCreationCount++
       const values = Array.from(this.slice(0, 5)).map(v => v.toFixed(2))
-      console.log(
-        `%c📊 Float32Array #${heightmapCreationCount} created`,
-        'color: #4a9eff',
-        `\n  Size: ${this.length} elements`,
-        `\n  First 5 values: [${values.join(', ')} ...]`,
-        `\n  Stack trace:`,
-        new Error().stack?.split('\n').slice(2, 5).join('\n')
-      )
+      debugLogger.debug(`📊 Float32Array #${heightmapCreationCount} created`, {
+        size: this.length,
+        firstFive: values,
+        stack: new Error().stack?.split('\n').slice(2, 5).join('\n'),
+      })
     }
   }
 }
@@ -56,24 +56,17 @@ if (typeof window !== 'undefined') {
         ? JSON.parse(args[1].body as string)
         : null
 
-      console.log(
-        `%c🌐 API Call #${apiCallCount} - /generate`,
-        'background: #2a7d44; color: white; font-weight: bold; padding: 4px 8px;',
-        `\n  Parameters:`,
-        body
-      )
+      debugLogger.info(`🌐 API Call #${apiCallCount} - /generate`, { parameters: body })
 
       const result = await originalFetch(...args)
       const clone = result.clone()
       const data = await clone.json()
 
-      console.log(
-        `%c✅ API Response #${apiCallCount}`,
-        'background: #2a7d44; color: white; padding: 4px 8px;',
-        `\n  Data length: ${data.data?.length || 0}`,
-        `\n  Statistics:`, data.statistics,
-        `\n  First 5 values: [${data.data?.slice(0, 5).map((v: number) => v.toFixed(2)).join(', ')} ...]`
-      )
+      debugLogger.info(`✅ API Response #${apiCallCount}`, {
+        dataLength: data.data?.length || 0,
+        statistics: data.statistics,
+        firstFive: data.data?.slice(0, 5).map((v: number) => v.toFixed(2)),
+      })
 
       return result
     }

@@ -1,5 +1,8 @@
 import { useRef, useMemo, useEffect } from 'react'
 import { Mesh, DataTexture, RGBAFormat, FloatType } from 'three'
+import { logger } from '../utils/logger'
+
+const componentLogger = logger.withContext('TerrainMesh')
 
 interface TerrainMeshProps {
   /**
@@ -153,11 +156,7 @@ export function TerrainMesh({
   // DEBUG: Log when component receives new props
   useEffect(() => {
     if (!heightmap || heightmap.length === 0) {
-      console.log(
-        '%c🎨 TerrainMesh Rendered',
-        'background: #9333ea; color: white; padding: 4px 8px;',
-        `\n  ⚠️  No heightmap data`
-      )
+      componentLogger.warn('Rendered without heightmap data')
       return
     }
 
@@ -167,25 +166,20 @@ export function TerrainMesh({
     const min = Math.min(...heightmap)
     const max = Math.max(...heightmap)
 
-    console.log(
-      '%c🎨 TerrainMesh Rendered - RECEIVED HEIGHTMAP',
-      'background: #9333ea; color: white; font-weight: bold; padding: 4px 8px;',
-      `\n  Reference: Float32Array@${heightmap.byteOffset}`,
-      `\n  Length: ${heightmap.length}`,
-      `\n  Center value [${centerIdx}]: ${heightmap[centerIdx].toFixed(4)}`,
-      `\n  First 5: [${Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)).join(', ')}]`,
-      `\n  Statistics: min=${min.toFixed(2)}, max=${max.toFixed(2)}, mean=${mean.toFixed(2)}`,
-      `\n  Wireframe: ${wireframe}`
-    )
+    componentLogger.debug('🎨 Rendered with heightmap', {
+      reference: `Float32Array@${heightmap.byteOffset}`,
+      length: heightmap.length,
+      centerValue: heightmap[centerIdx].toFixed(4),
+      firstFive: Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)),
+      statistics: { min: min.toFixed(2), max: max.toFixed(2), mean: mean.toFixed(2) },
+      wireframe,
+    })
   }, [heightmap, wireframe])
 
   // Convert heightmap Float32Array to DataTexture for GPU access
   const heightmapTexture = useMemo(() => {
     if (!heightmap) {
-      console.log(
-        '%c🖼️  Creating Flat Texture (no heightmap)',
-        'background: #dc2626; color: white; padding: 4px 8px;'
-      )
+      componentLogger.debug('🖼️ Creating flat texture (no heightmap)')
       // Create a flat heightmap if none provided
       const flatHeightmap = new Float32Array(width * height).fill(0)
       const data = new Float32Array(width * height * 4) // RGBA
@@ -203,14 +197,6 @@ export function TerrainMesh({
     // Pack heightmap data into RGBA texture (elevation in red channel)
     const centerIdx = Math.floor(heightmap.length / 2)
 
-    console.log(
-      '%c🖼️  Creating GPU Texture from Heightmap',
-      'background: #dc2626; color: white; font-weight: bold; padding: 4px 8px;',
-      `\n  Input heightmap center: ${heightmap[centerIdx].toFixed(4)}`,
-      `\n  Input first 5: [${Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)).join(', ')}]`,
-      `\n  Creating ${width}x${height} texture...`
-    )
-
     const data = new Float32Array(width * height * 4)
     for (let i = 0; i < heightmap.length; i++) {
       data[i * 4] = heightmap[i] // R channel = elevation
@@ -219,13 +205,19 @@ export function TerrainMesh({
       data[i * 4 + 3] = 1 // A channel = 1
     }
 
-    console.log(
-      '%c✅ Texture Data Packed',
-      'background: #16a34a; color: white; font-weight: bold; padding: 4px 8px;',
-      `\n  Texture center (R channel): ${data[centerIdx * 4].toFixed(4)}`,
-      `\n  First 5 R values: [${[0,1,2,3,4].map(i => data[i*4].toFixed(2)).join(', ')}]`,
-      `\n  Setting texture.needsUpdate = true`
-    )
+    componentLogger.group('🖼️ Creating GPU Texture', () => {
+      componentLogger.debug('Input heightmap', {
+        center: heightmap[centerIdx].toFixed(4),
+        firstFive: Array.from(heightmap.slice(0, 5)).map(v => v.toFixed(2)),
+        size: `${width}x${height}`,
+      })
+
+      componentLogger.debug('Texture data packed', {
+        centerR: data[centerIdx * 4].toFixed(4),
+        firstFiveR: [0,1,2,3,4].map(i => data[i*4].toFixed(2)),
+        needsUpdate: true,
+      })
+    }, true)
 
     const texture = new DataTexture(data, width, height, RGBAFormat, FloatType)
     texture.needsUpdate = true
@@ -248,13 +240,11 @@ export function TerrainMesh({
       }
     }
 
-    console.log(
-      '%c🎮 Uniforms Updated',
-      'background: #7c3aed; color: white; font-weight: bold; padding: 4px 8px;',
-      `\n  Texture version: ${heightmapTexture?.version ?? 'null'}`,
-      `\n  Min elevation: ${minElevation.toFixed(2)}`,
-      `\n  Max elevation: ${maxElevation.toFixed(2)}`
-    )
+    componentLogger.debug('🎮 Uniforms updated', {
+      textureVersion: heightmapTexture?.version ?? null,
+      minElevation: minElevation.toFixed(2),
+      maxElevation: maxElevation.toFixed(2),
+    })
 
     return {
       heightmapTexture: { value: heightmapTexture },
