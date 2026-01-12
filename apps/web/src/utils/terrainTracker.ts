@@ -66,6 +66,6 @@ export function trackGeneration(data: {
 
 // Log to window for easy debugging
 if (typeof window !== 'undefined') {
-  (window as any).terrainGenerationCount = () => generationCount
-  (window as any).lastTerrainData = () => lastGeneration
+  ;(window as any).terrainGenerationCount = () => generationCount
+  ;(window as any).lastTerrainData = () => lastGeneration
 }

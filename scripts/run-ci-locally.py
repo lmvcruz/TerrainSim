@@ -111,6 +111,8 @@ class CIRunner:
                 cwd=cwd,
                 capture_output=not self.verbose,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=check,
                 shell=use_shell,
                 env=env
@@ -133,13 +135,17 @@ class CIRunner:
                     f'{command} --version',
                     capture_output=True,
                     check=True,
-                    shell=True
+                    shell=True,
+                    encoding='utf-8',
+                    errors='replace'
                 )
             else:
                 subprocess.run(
                     [command, '--version'],
                     capture_output=True,
-                    check=True
+                    check=True,
+                    encoding='utf-8',
+                    errors='replace'
                 )
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):

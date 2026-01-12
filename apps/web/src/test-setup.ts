@@ -6,7 +6,7 @@ import * as matchers from '@testing-library/jest-dom/matchers'
 expect.extend(matchers)
 
 // Mock ResizeObserver for React Three Fiber
-global.ResizeObserver = class ResizeObserver {
+globalThis.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}

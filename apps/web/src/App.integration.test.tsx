@@ -12,7 +12,7 @@ describe('App Integration Tests - Visual Mesh Updates', () => {
   const mockFetch = vi.fn()
 
   beforeAll(() => {
-    global.fetch = mockFetch
+    globalThis.fetch = mockFetch as any
   })
 
   afterEach(() => {
@@ -89,7 +89,7 @@ describe('App Integration Tests - Visual Mesh Updates', () => {
 
     // Check that loading state appeared and disappeared
     await waitFor(() => {
-      expect(screen.queryByText(/generating terrain/i)).not.toBeInTheDocument()
+      expect(screen.queryByText(/generating terrain/i)).toBeNull()
     })
 
     console.log('✅ Test verified:')

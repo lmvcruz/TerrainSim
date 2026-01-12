@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 import './NoiseParametersPanel.css'
 

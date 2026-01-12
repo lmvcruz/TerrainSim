@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: process.env.BASE_PATH || '/',
+  // @ts-ignore - vitest types not in vite
   test: {
     globals: true,
     environment: 'jsdom',

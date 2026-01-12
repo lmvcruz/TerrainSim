@@ -61,7 +61,7 @@ describe('TerrainMesh', () => {
     it('should handle null heightmap gracefully', () => {
       const { container } = render(
         <TerrainMesh
-          heightmap={null}
+          heightmap={undefined}
           width={128}
           height={128}
           meshWidth={100}

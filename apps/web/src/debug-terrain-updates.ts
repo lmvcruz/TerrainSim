@@ -21,7 +21,8 @@ let heightmapCreationCount = 0
 
 // @ts-ignore
 globalThis.Float32Array = class extends OriginalFloat32Array {
-  constructor(...args: any[]) {
+  constructor(...args: ConstructorParameters<typeof OriginalFloat32Array>) {
+    // @ts-ignore - spread tuple for constructor
     super(...args)
 
     // Track heightmap-sized arrays (128x128 = 16384)
