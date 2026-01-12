@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei'
 import { TerrainMesh } from './components/TerrainMesh'
 import { NoiseParametersPanel } from './components/NoiseParametersPanel'
 import type { NoiseParameters } from './components/NoiseParametersPanel'
+import { StatisticsPanel } from './components/StatisticsPanel'
 import { generateSemiSphere } from './utils/terrainGenerators'
 import './App.css'
 
@@ -84,6 +85,12 @@ function App() {
         error={error}
       />
 
+      <StatisticsPanel
+        heightmap={heightmap}
+        width={width}
+        height={height}
+      />
+
       {/* Wireframe Toggle Button */}
       <button
         onClick={() => setWireframe(!wireframe)}
@@ -105,6 +112,47 @@ function App() {
       >
         {wireframe ? '◼ Solid' : '◻ Wireframe'}
       </button>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+          backdropFilter: 'blur(4px)',
+        }}>
+          <div style={{
+            background: 'rgba(30, 30, 30, 0.95)',
+            padding: '24px 40px',
+            borderRadius: '12px',
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 600,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div className="spinner" style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid rgba(74, 158, 255, 0.2)',
+              borderTop: '4px solid #4a9eff',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+            <span>Generating Terrain...</span>
+          </div>
+        </div>
+      )}
 
       <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
         <ambientLight intensity={0.5} />

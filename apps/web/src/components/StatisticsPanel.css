@@ -1,0 +1,123 @@
+.statistics-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(30, 30, 30, 0.95);
+  padding: 16px;
+  border-radius: 8px;
+  color: white;
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.statistics-panel h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 2px solid #4a9eff;
+  padding-bottom: 8px;
+}
+
+.no-data {
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a9eff;
+  font-family: 'Courier New', monospace;
+}
+
+.elevation-bar-container {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.elevation-bar-label {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.elevation-bar {
+  position: relative;
+  height: 32px;
+}
+
+.elevation-gradient {
+  width: 100%;
+  height: 24px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #2159a1 0%,
+    #3a7d44 33%,
+    #8c7854 66%,
+    #f2f2f2 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.elevation-markers {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #bbb;
+  font-family: 'Courier New', monospace;
+}
+
+.marker-min,
+.marker-max {
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-height: 700px) {
+  .statistics-panel {
+    bottom: 10px;
+    padding: 12px;
+  }
+
+  .stat-grid {
+    gap: 8px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+}
