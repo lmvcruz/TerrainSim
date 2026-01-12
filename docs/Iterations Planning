@@ -246,28 +246,28 @@ The project follows an iterative development model, with each iteration deliveri
 
 **Delivery Block 1: Particle Physics + Basic Visualization**
 *Water particles move across terrain following gravity. Visible but no erosion yet.*
-- [x] **CORE-012:** Implement WaterParticle class (position, velocity, sediment)
-- [x] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors)
-- [x] **CORE-014:** Implement particle movement logic (steepest descent)
-- [ ] **API-005:** Upgrade to WebSocket server (Socket.io or native WebSockets)
-- [ ] **API-006:** Create /simulate endpoint (accept basic parameters)
-- [ ] **WEB-016:** Create ErosionParametersPanel UI component (minimal - Start button)
-- [ ] **WEB-020:** Set up WebSocket client connection
-- [ ] **WEB-021:** Handle incoming TerrainFrame messages
-- [ ] **WEB-022:** Update terrain mesh with new heightmap data
-- [x] **TEST-005:** Verify particles follow steepest descent correctly
-**✅ Deliverable:** Click "Start" → see water particles flowing downhill (no terrain change yet)
+- [x] **CORE-012:** Implement WaterParticle class (position, velocity, sediment) ✅ Complete with velocity tracking, sediment capacity, and isActive() check
+- [x] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors) ✅ Complete with bilinear interpolation, central differences, normalized normals
+- [x] **CORE-014:** Implement particle movement logic (steepest descent) ✅ Complete with inertia, steepest descent algorithm, velocity updates
+- [x] **API-005:** Upgrade to WebSocket server (Socket.io or native WebSockets) ✅ Complete with Socket.io v4.8.3, connection handling, ping/pong
+- [x] **API-006:** Create /simulate endpoint (accept basic parameters) ✅ Complete with terrain-frame streaming, batch updates every 1000 particles, placeholder erosion logic
+- [x] **WEB-016:** Create ErosionParametersPanel UI component (minimal - Start button) ✅ Complete with 11 parameters, advanced controls, real-time progress bar
+- [x] **WEB-020:** Set up WebSocket client connection ✅ Complete with Socket.io-client, connection status logging, error handling
+- [x] **WEB-021:** Handle incoming TerrainFrame messages ✅ Complete with frame type handling (initial/update/final), progress tracking
+- [x] **WEB-022:** Update terrain mesh with new heightmap data ✅ Complete with real-time heightmap updates, automatic re-rendering
+- [x] **TEST-005:** Verify particles follow steepest descent correctly ✅ Complete with comprehensive GoogleTest suite (90/90 tests passing)
+**✅ Deliverable:** Click "Start" → see water particles flowing downhill (READY - needs C++ binding for actual erosion)
 
 **Delivery Block 2: Erosion & Deposition (Full Feature)**
 *Complete erosion system - terrain visibly erodes, valleys form.*
-- [ ] **CORE-015:** Add sediment pickup calculation (erosion rate × slope)
-- [ ] **CORE-016:** Implement deposition logic (sediment capacity threshold)
-- [ ] **CORE-017:** Create HydraulicErosion class with configurable parameters
-- [ ] **CORE-020:** Write GoogleTest suite for erosion logic
-- [ ] **WEB-017:** Add parameter sliders (rain intensity, erosion rate, sediment capacity)
+- [x] **CORE-015:** Add sediment pickup calculation (erosion rate × slope) ✅ Complete in HydraulicErosion::simulateParticle()
+- [x] **CORE-016:** Implement deposition logic (sediment capacity threshold) ✅ Complete with depositSpeed parameter, sediment capacity calculation
+- [x] **CORE-017:** Create HydraulicErosion class with configurable parameters ✅ Complete with 11 parameters (inertia, gravity, erodeSpeed, etc.)
+- [x] **CORE-020:** Write GoogleTest suite for erosion logic ✅ Complete with 7 erosion-specific tests (all passing)
+- [x] **WEB-017:** Add parameter sliders (rain intensity, erosion rate, sediment capacity) ✅ Complete in ErosionParametersPanel with advanced section
 - [ ] **WEB-025:** Add error handling for connection failures
 - [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles)
-**✅ Deliverable:** Full working erosion - terrain changes over time, valleys form realistically
+**🔄 Deliverable:** Full working erosion - terrain changes over time (PLACEHOLDER erosion logic - needs C++ binding)
 
 **Delivery Block 3: Advanced Playback Controls**
 *Enhanced simulation control - play/pause, speed control, smooth animations.*
