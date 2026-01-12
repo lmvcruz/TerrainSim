@@ -1,27 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { TerrainMesh } from './components/TerrainMesh'
 import { NoiseParametersPanel } from './components/NoiseParametersPanel'
 import type { NoiseParameters } from './components/NoiseParametersPanel'
 import { StatisticsPanel } from './components/StatisticsPanel'
-import { generateSemiSphere } from './utils/terrainGenerators'
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+// Default parameters for initial terrain generation
+const DEFAULT_PARAMETERS: NoiseParameters = {
+  seed: 42,
+  frequency: 0.05,
+  amplitude: 50,
+  octaves: 6,
+}
 
 function App() {
   const width = 128
   const height = 128
 
-  // Initial terrain: semi-sphere
+  // Initial terrain: flat (will be replaced by noise terrain on mount)
   const [heightmap, setHeightmap] = useState<Float32Array>(() =>
-    generateSemiSphere(width, height, 64, 64, 50)
+    new Float32Array(width * height).fill(0)
   )
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [wireframe, setWireframe] = useState(false)
+
+  // Generate default terrain on mount
+  useEffect(() => {
+    handleGenerate(DEFAULT_PARAMETERS)
+  }, []) // Empty dependency array = run once on mount
 
   const handleGenerate = async (parameters: NoiseParameters) => {
     setLoading(true)
@@ -80,6 +92,7 @@ function App() {
       </h1>
 
       <NoiseParametersPanel
+        initialParameters={DEFAULT_PARAMETERS}
         onGenerate={handleGenerate}
         loading={loading}
         error={error}
