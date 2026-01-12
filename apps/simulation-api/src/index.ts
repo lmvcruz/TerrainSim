@@ -264,14 +264,18 @@ io.on('connection', (socket) => {
         height = 256,
         seed = 0,
         numParticles = 5000,
-        erosionParams = {}
+        erosionParams = {},
+        frameDelay = 150, // Delay between frames in ms (configurable)
+        particlesPerFrame = 50 // Particles to simulate per frame
       } = params;
 
       console.log(`🌊 Starting erosion simulation for ${socket.id}:`, {
         width,
         height,
         seed,
-        numParticles
+        numParticles,
+        frameDelay,
+        particlesPerFrame
       });
 
       // Generate initial heightmap
@@ -287,35 +291,78 @@ io.on('connection', (socket) => {
         totalParticles: numParticles
       });
 
-      // Simulate erosion in batches
-      const batchSize = 100; // Process 100 particles before sending update
-      const updateInterval = 10; // Send update every 10 batches (1000 particles)
+      // Small delay after initial frame
+      await new Promise(resolve => setTimeout(resolve, frameDelay));
 
-      for (let i = 0; i < numParticles; i++) {
-        // Simulate one particle (placeholder - will be replaced with C++ binding)
-        // For now, just simulate the process with random drops
-        const x = Math.floor(Math.random() * width);
-        const y = Math.floor(Math.random() * height);
-        const idx = y * width + x;
+      // Simulate erosion with visible frame updates
+      let particlesSimulated = 0;
 
-        // Simple erosion simulation (placeholder)
-        const erodeAmount = 0.001;
-        heightmap[idx] = Math.max(0, heightmap[idx] - erodeAmount);
+      while (particlesSimulated < numParticles) {
+        // Process a batch of particles
+        const particlesToProcess = Math.min(particlesPerFrame, numParticles - particlesSimulated);
 
-        // Send periodic updates
-        if ((i + 1) % (batchSize * updateInterval) === 0) {
-          socket.emit('terrain-frame', {
-            frameType: 'update',
-            width,
-            height,
-            data: Array.from(heightmap),
-            particlesSimulated: i + 1,
-            totalParticles: numParticles
-          });
+        for (let i = 0; i < particlesToProcess; i++) {
+          // Simulate one particle (placeholder - will be replaced with C++ binding)
+          // Random starting position
+          const x = Math.floor(Math.random() * width);
+          const y = Math.floor(Math.random() * height);
 
-          // Small delay to prevent overwhelming the client
-          await new Promise(resolve => setTimeout(resolve, 10));
+          // Simulate particle path (simplified steepest descent)
+          let px = x;
+          let py = y;
+
+          for (let step = 0; step < 10; step++) {
+            const idx = py * width + px;
+
+            // Very gentle erosion amount (reduced by 10x)
+            const erodeAmount = 0.0001;
+            heightmap[idx] = Math.max(0, heightmap[idx] - erodeAmount);
+
+            // Move to lowest neighbor
+            let lowestHeight = heightmap[idx];
+            let nextX = px;
+            let nextY = py;
+
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                if (dx === 0 && dy === 0) continue;
+
+                const nx = px + dx;
+                const ny = py + dy;
+
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                  const nidx = ny * width + nx;
+                  if (heightmap[nidx] < lowestHeight) {
+                    lowestHeight = heightmap[nidx];
+                    nextX = nx;
+                    nextY = ny;
+                  }
+                }
+              }
+            }
+
+            // If no lower neighbor, stop
+            if (nextX === px && nextY === py) break;
+
+            px = nextX;
+            py = nextY;
+          }
         }
+
+        particlesSimulated += particlesToProcess;
+
+        // Send update frame
+        socket.emit('terrain-frame', {
+          frameType: 'update',
+          width,
+          height,
+          data: Array.from(heightmap),
+          particlesSimulated,
+          totalParticles: numParticles
+        });
+
+        // Delay between frames for visible animation
+        await new Promise(resolve => setTimeout(resolve, frameDelay));
       }
 
       // Send final state

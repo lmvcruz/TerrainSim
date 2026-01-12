@@ -243,11 +243,18 @@ function App() {
     setError(null)
     setSimulationProgress({ particlesSimulated: 0, totalParticles: parameters.numParticles })
 
+    // Calculate frame delay based on animation speed
+    // Base delay: 150ms at 1x speed
+    const baseDelay = 150
+    const frameDelay = Math.round(baseDelay / parameters.animationSpeed)
+
     socketRef.current.emit('simulate', {
       width,
       height,
       seed: 42, // Use current terrain seed
       numParticles: parameters.numParticles,
+      frameDelay,
+      particlesPerFrame: parameters.particlesPerFrame,
       erosionParams: {
         inertia: parameters.inertia,
         sedimentCapacityFactor: parameters.sedimentCapacityFactor,

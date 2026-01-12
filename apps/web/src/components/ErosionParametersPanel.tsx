@@ -15,6 +15,9 @@ interface ErosionParameters {
   maxDropletLifetime: number
   initialWaterVolume: number
   initialSpeed: number
+  // Animation control
+  animationSpeed: number // Multiplier: 0.5x, 1x, 2x, 5x
+  particlesPerFrame: number
 }
 
 interface ErosionParametersPanelProps {
@@ -40,6 +43,8 @@ const DEFAULT_PARAMETERS: ErosionParameters = {
   maxDropletLifetime: 30,
   initialWaterVolume: 1.0,
   initialSpeed: 1.0,
+  animationSpeed: 1.0,
+  particlesPerFrame: 50,
 }
 
 /**
@@ -167,6 +172,50 @@ export function ErosionParametersPanel({
 
           {showAdvanced && (
             <>
+              <div className="parameter-group">
+                <label htmlFor="animation-speed-slider">
+                  Animation Speed
+                  <span className="parameter-value">{parameters.animationSpeed}x</span>
+                </label>
+                <input
+                  id="animation-speed-slider"
+                  type="range"
+                  min="0.5"
+                  max="5.0"
+                  step="0.5"
+                  value={parameters.animationSpeed}
+                  onChange={(e) =>
+                    setParameters((prev) => ({ ...prev, animationSpeed: Number(e.target.value) }))
+                  }
+                  disabled={loading}
+                />
+                <p className="parameter-description">
+                  Simulation playback speed (0.5x = slower, 5x = faster)
+                </p>
+              </div>
+
+              <div className="parameter-group">
+                <label htmlFor="particles-per-frame-slider">
+                  Particles Per Frame
+                  <span className="parameter-value">{parameters.particlesPerFrame}</span>
+                </label>
+                <input
+                  id="particles-per-frame-slider"
+                  type="range"
+                  min="10"
+                  max="200"
+                  step="10"
+                  value={parameters.particlesPerFrame}
+                  onChange={(e) =>
+                    setParameters((prev) => ({ ...prev, particlesPerFrame: Number(e.target.value) }))
+                  }
+                  disabled={loading}
+                />
+                <p className="parameter-description">
+                  Erosion detail per frame (lower = smoother animation, higher = faster)
+                </p>
+              </div>
+
               <div className="parameter-group">
                 <label htmlFor="inertia-slider">
                   Inertia
