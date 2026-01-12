@@ -22,6 +22,10 @@ interface TerrainMeshProps {
    * Heightmap data as Float32Array (optional, defaults to flat terrain)
    */
   heightmap?: Float32Array
+  /**
+   * Enable wireframe rendering mode
+   */
+  wireframe?: boolean
 }
 
 // Vertex shader - displaces vertices based on heightmap texture
@@ -142,6 +146,7 @@ export function TerrainMesh({
   meshWidth = 10,
   meshDepth = 10,
   heightmap,
+  wireframe = false,
 }: TerrainMeshProps) {
   const meshRef = useRef<Mesh>(null)
 
@@ -218,6 +223,7 @@ export function TerrainMesh({
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
+        wireframe={wireframe}
       />
     </mesh>
   )

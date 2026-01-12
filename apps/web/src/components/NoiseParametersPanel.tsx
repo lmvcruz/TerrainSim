@@ -14,6 +14,8 @@ interface NoiseParameters {
 interface NoiseParametersPanelProps {
   onGenerate?: (parameters: NoiseParameters) => void
   initialParameters?: Partial<NoiseParameters>
+  loading?: boolean
+  error?: string | null
 }
 
 const DEFAULT_PARAMETERS: NoiseParameters = {
@@ -35,6 +37,8 @@ const DEFAULT_PARAMETERS: NoiseParameters = {
 export function NoiseParametersPanel({
   onGenerate,
   initialParameters = {},
+  loading = false,
+  error = null,
 }: NoiseParametersPanelProps) {
   const [parameters, setParameters] = useState<NoiseParameters>({
     ...DEFAULT_PARAMETERS,
@@ -187,10 +191,17 @@ export function NoiseParametersPanel({
       <button
         className="generate-button"
         onClick={handleGenerate}
-        disabled={!!seedError}
+        disabled={!!seedError || loading}
       >
-        Generate Terrain
+        {loading ? 'Generating...' : 'Generate Terrain'}
       </button>
+
+      {/* Error Message */}
+      {error && (
+        <div className="api-error-message">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
     </div>
   )
 }

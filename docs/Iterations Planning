@@ -102,10 +102,10 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **WEB-007:** Enhance material with elevation-based color gradient
 - [x] **WEB-008:** Create NoiseParametersPanel UI component
 - [x] **WEB-009:** Add seed input field with validation
-- [ ] **WEB-010:** Implement sliders (frequency, amplitude, octaves)
-- [ ] **WEB-011:** Wire "Generate" button to API call
-- [ ] **WEB-012:** Implement elevation-based color gradient shader
-- [ ] **WEB-013:** Add wireframe toggle button
+- [x] **WEB-010:** Implement sliders (frequency, amplitude, octaves)
+- [x] **WEB-011:** Wire "Generate" button to API call
+- [x] **WEB-012:** Implement elevation-based color gradient shader
+- [x] **WEB-013:** Add wireframe toggle button
 - [ ] **WEB-014:** Create StatisticsPanel component (min/max elevation)
 - [ ] **WEB-015:** Handle loading states and error messages
 - [ ] **TEST-003:** Verify same seed produces identical terrain

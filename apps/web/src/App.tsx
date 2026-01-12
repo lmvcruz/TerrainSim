@@ -7,6 +7,8 @@ import type { NoiseParameters } from './components/NoiseParametersPanel'
 import { generateSemiSphere } from './utils/terrainGenerators'
 import './App.css'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
 function App() {
   const width = 128
   const height = 128
@@ -16,12 +18,50 @@ function App() {
     generateSemiSphere(width, height, 64, 64, 50)
   )
 
-  const handleGenerate = (parameters: NoiseParameters) => {
-    console.log('Generate terrain with parameters:', parameters)
-    // TODO: Call API endpoint to generate noise-based terrain
-    // For now, regenerate the semi-sphere as a placeholder
-    const newHeightmap = generateSemiSphere(width, height, 64, 64, 50)
-    setHeightmap(newHeightmap)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [wireframe, setWireframe] = useState(false)
+
+  const handleGenerate = async (parameters: NoiseParameters) => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          method: 'fbm', // Use Fractional Brownian Motion
+          width,
+          height,
+          seed: parameters.seed,
+          frequency: parameters.frequency,
+          amplitude: parameters.amplitude,
+          octaves: parameters.octaves,
+          persistence: 0.5,
+          lacunarity: 2.0,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate terrain')
+      }
+
+      const data = await response.json()
+
+      // Convert the heightmap array to Float32Array
+      const newHeightmap = new Float32Array(data.heightmap)
+      setHeightmap(newHeightmap)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+      setError(errorMessage)
+      console.error('Error generating terrain:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -38,7 +78,33 @@ function App() {
         Hello Terrain
       </h1>
 
-      <NoiseParametersPanel onGenerate={handleGenerate} />
+      <NoiseParametersPanel
+        onGenerate={handleGenerate}
+        loading={loading}
+        error={error}
+      />
+
+      {/* Wireframe Toggle Button */}
+      <button
+        onClick={() => setWireframe(!wireframe)}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 10,
+          padding: '10px 20px',
+          background: wireframe ? '#4a9eff' : 'rgba(30, 30, 30, 0.9)',
+          color: 'white',
+          border: wireframe ? '2px solid #6bb3ff' : '2px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 600,
+          transition: 'all 0.2s',
+        }}
+      >
+        {wireframe ? '◼ Solid' : '◻ Wireframe'}
+      </button>
 
       <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
         <ambientLight intensity={0.5} />
@@ -49,6 +115,7 @@ function App() {
           meshWidth={10}
           meshDepth={10}
           heightmap={heightmap}
+          wireframe={wireframe}
         />
         <gridHelper args={[12, 12]} />
         <OrbitControls />
