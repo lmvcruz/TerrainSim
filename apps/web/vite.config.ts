@@ -9,5 +9,19 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test-setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/test-setup.ts',
+        '**/test-helpers.ts',
+        '**/debug-*.ts',
+        '**/*.config.ts',
+        '**/main.tsx', // Entry point
+      ],
+      reportsDirectory: './coverage',
+    },
   },
 })
