@@ -2,7 +2,9 @@ import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 import './NoiseParametersPanel.css'
 
-export interface NoiseParameters {
+export type { NoiseParameters }
+
+interface NoiseParameters {
   seed: number
   frequency: number
   amplitude: number

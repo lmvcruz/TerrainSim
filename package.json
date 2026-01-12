@@ -11,6 +11,7 @@
     "dev": "pnpm --filter \"*\" run dev",
     "build": "pnpm --filter \"*\" run build",
     "test": "pnpm --filter \"*\" run test",
-    "lint": "pnpm --filter \"*\" run lint"
+    "lint": "pnpm --filter \"*\" run lint",
+    "typecheck": "pnpm --filter \"*\" run typecheck"
   }
 }

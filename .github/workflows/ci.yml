@@ -19,6 +19,8 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install
+      - name: TypeScript Type Check
+        run: pnpm --filter @terrain/web run typecheck
       - name: Run Vitest
         run: pnpm --filter @terrain/web run test
 
