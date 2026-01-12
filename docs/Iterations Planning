@@ -243,35 +243,51 @@ The project follows an iterative development model, with each iteration deliveri
 *   Backend sends `TerrainFrame` objects (heightmap + metadata) to frontend.
 
 **Tasks:**
+
+**Delivery Block 1: Particle Physics + Basic Visualization**
+*Water particles move across terrain following gravity. Visible but no erosion yet.*
 - [ ] **CORE-012:** Implement WaterParticle class (position, velocity, sediment)
 - [ ] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors)
 - [ ] **CORE-014:** Implement particle movement logic (steepest descent)
-- [ ] **CORE-015:** Add sediment pickup calculation (erosion rate × slope)
-- [ ] **CORE-016:** Implement deposition logic (sediment capacity threshold)
-- [ ] **CORE-017:** Create HydraulicErosion class with configurable parameters
-- [ ] **CORE-018:** Implement simulation loop (multi-step iteration)
-- [ ] **CORE-019:** Add frame snapshot functionality (save intermediate states)
-- [ ] **CORE-020:** Write GoogleTest suite for erosion logic
-- [ ] **CORE-021:** Set up Google Benchmark for performance tracking
-- [ ] **CORE-022:** Add benchmark tests (cycles-per-cell, throughput)
 - [ ] **API-005:** Upgrade to WebSocket server (Socket.io or native WebSockets)
-- [ ] **API-006:** Create /simulate endpoint (accept erosion parameters)
-- [ ] **API-007:** Implement frame streaming (send TerrainFrame objects)
-- [ ] **API-008:** Add simulation control messages (start/stop/pause)
-- [ ] **WEB-016:** Create ErosionParametersPanel UI component
-- [ ] **WEB-017:** Add sliders (rain intensity, erosion rate, sediment capacity)
-- [ ] **WEB-018:** Implement PlaybackControls component (Play/Pause/Stop)
-- [ ] **WEB-019:** Add speed multiplier selector (1x, 2x, 5x, 10x)
+- [ ] **API-006:** Create /simulate endpoint (accept basic parameters)
+- [ ] **WEB-016:** Create ErosionParametersPanel UI component (minimal - Start button)
 - [ ] **WEB-020:** Set up WebSocket client connection
 - [ ] **WEB-021:** Handle incoming TerrainFrame messages
 - [ ] **WEB-022:** Update terrain mesh with new heightmap data
+- [ ] **TEST-005:** Verify particles follow steepest descent correctly
+**✅ Deliverable:** Click "Start" → see water particles flowing downhill (no terrain change yet)
+
+**Delivery Block 2: Erosion & Deposition (Full Feature)**
+*Complete erosion system - terrain visibly erodes, valleys form.*
+- [ ] **CORE-015:** Add sediment pickup calculation (erosion rate × slope)
+- [ ] **CORE-016:** Implement deposition logic (sediment capacity threshold)
+- [ ] **CORE-017:** Create HydraulicErosion class with configurable parameters
+- [ ] **CORE-020:** Write GoogleTest suite for erosion logic
+- [ ] **WEB-017:** Add parameter sliders (rain intensity, erosion rate, sediment capacity)
+- [ ] **WEB-025:** Add error handling for connection failures
+- [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles)
+**✅ Deliverable:** Full working erosion - terrain changes over time, valleys form realistically
+
+**Delivery Block 3: Advanced Playback Controls**
+*Enhanced simulation control - play/pause, speed control, smooth animations.*
+- [ ] **CORE-018:** Implement simulation loop (multi-step iteration)
+- [ ] **CORE-019:** Add frame snapshot functionality (save intermediate states)
+- [ ] **API-007:** Implement frame streaming (send TerrainFrame objects)
+- [ ] **API-008:** Add simulation control messages (start/stop/pause)
+- [ ] **WEB-018:** Implement PlaybackControls component (Play/Pause/Stop)
+- [ ] **WEB-019:** Add speed multiplier selector (1x, 2x, 5x, 10x)
 - [ ] **WEB-023:** Add frame interpolation for smooth transitions
 - [ ] **WEB-024:** Display simulation progress (iteration count, elapsed time)
-- [ ] **WEB-025:** Add error handling for connection failures
-- [ ] **TEST-005:** Verify erosion produces realistic valley formation
-- [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles)
+**✅ Deliverable:** Play/pause simulation, adjust speed, see smooth frame transitions
+
+**Delivery Block 4: Performance & Documentation**
+*Benchmark and optimize for production readiness.*
+- [ ] **CORE-021:** Set up Google Benchmark for performance tracking
+- [ ] **CORE-022:** Add benchmark tests (cycles-per-cell, throughput)
 - [ ] **TEST-007:** Performance test: 256×256 grid at 30+ FPS
 - [ ] **DOC-003:** Document hydraulic erosion algorithm and parameters
+**✅ Deliverable:** Performance validated, algorithm documented
 
 **Success Criteria:**
 *   User can start/stop erosion simulation with configurable parameters.
@@ -297,27 +313,47 @@ The project follows an iterative development model, with each iteration deliveri
     *   Total sediment moved, average slope, erosion rate graph.
 
 **Tasks:**
+
+**Delivery Block 1: Thermal Erosion (End-to-End Working Feature)**
+*Complete thermal erosion visible in the app - see sharp peaks smoothing over time.*
 - [ ] **CORE-023:** Implement talus angle calculation (angle of repose)
 - [ ] **CORE-024:** Add material transfer logic (neighbor height difference)
 - [ ] **CORE-025:** Create ThermalErosion class with parameters
-- [ ] **CORE-026:** Implement combined simulation orchestrator
-- [ ] **CORE-027:** Add MaterialProperties layer to Heightmap
-- [ ] **CORE-028:** Implement rock hardness coefficient system
 - [ ] **CORE-029:** Write unit tests for thermal erosion
-- [ ] **CORE-030:** Add integration tests (hydraulic + thermal combined)
-- [ ] **CORE-031:** Benchmark thermal erosion performance
+- [ ] **TEST-008:** Verify thermal erosion smooths sharp peaks
+- [ ] **API-009:** Extend /simulate endpoint for thermal erosion
 - [ ] **WEB-026:** Create ThermalErosionPanel UI component
-- [ ] **WEB-027:** Add simulation method selector (radio buttons/dropdown)
 - [ ] **WEB-028:** Implement talus angle slider
 - [ ] **WEB-029:** Add material transfer rate control
+**✅ Deliverable:** Thermal erosion working in app - see peaks erode smoothly
+
+**Delivery Block 2: Material Properties System**
+*Add heterogeneous terrain behavior - soft valleys vs hard peaks.*
+- [ ] **CORE-027:** Add MaterialProperties layer to Heightmap
+- [ ] **CORE-028:** Implement rock hardness coefficient system
+- [ ] **API-010:** Add material properties in TerrainFrame payload
+**✅ Deliverable:** Material properties affect erosion rates across terrain
+
+**Delivery Block 3: Combined Simulation**
+*Run hydraulic and thermal erosion together - realistic terrain aging.*
+- [ ] **CORE-026:** Implement combined simulation orchestrator
+- [ ] **CORE-030:** Add integration tests (hydraulic + thermal combined)
+- [ ] **TEST-009:** Test combined simulation produces realistic results
+- [ ] **WEB-027:** Add simulation method selector (Hydraulic/Thermal/Combined)
+**✅ Deliverable:** Switch between erosion methods, run both simultaneously
+
+**Delivery Block 4: Enhanced Statistics Dashboard**
+*Better metrics and visualization for analyzing erosion behavior.*
 - [ ] **WEB-030:** Expand StatisticsPanel with new metrics
 - [ ] **WEB-031:** Add sediment movement graph (real-time chart)
 - [ ] **WEB-032:** Display average slope calculation
-- [ ] **API-009:** Extend /simulate endpoint for combined simulations
-- [ ] **API-010:** Add material properties in TerrainFrame payload
-- [ ] **TEST-008:** Verify thermal erosion smooths sharp peaks
-- [ ] **TEST-009:** Test combined simulation produces realistic results
+**✅ Deliverable:** Rich statistics dashboard with real-time graphs
+
+**Delivery Block 5: Performance & Documentation**
+*Benchmark and document thermal erosion for production readiness.*
+- [ ] **CORE-031:** Benchmark thermal erosion performance
 - [ ] **DOC-004:** Document thermal erosion algorithm
+**✅ Deliverable:** Performance validated, comprehensive documentation
 
 **Success Criteria:**
 *   Both erosion methods work independently and in combination.
@@ -340,28 +376,48 @@ The project follows an iterative development model, with each iteration deliveri
 *   Performance profiler overlay (FPS, CPU usage, memory consumption).
 
 **Tasks:**
+
+**Delivery Block 1: Multi-threading + Resolution Control**
+*Parallel execution for faster simulations - see performance boost with resolution selector.*
 - [ ] **CORE-032:** Add OpenMP pragmas to main simulation loops
 - [ ] **CORE-033:** Implement grid partitioning for thread distribution
+- [ ] **TEST-010:** Verify linear scaling with thread count (1-8 cores)
+- [ ] **WEB-033:** Add resolution selector (256, 512, 1024)
+**✅ Deliverable:** Multi-threaded simulation, adjustable resolution in UI
+
+**Delivery Block 2: SIMD + Memory Optimizations**
+*Vectorized operations and optimized memory usage for maximum throughput.*
 - [ ] **CORE-034:** Add SIMD intrinsics for height calculations (AVX/SSE)
 - [ ] **CORE-035:** Optimize memory access patterns (cache locality)
+- [ ] **CORE-041:** Optimize particle allocation (object pools)
+- [ ] **CORE-040:** Profile with Valgrind/perf for hotspot identification
+- [ ] **TEST-012:** Validate SIMD calculations match scalar results
+**✅ Deliverable:** Significantly faster calculations, reduced memory overhead
+
+**Delivery Block 3: LOD System (Complete)**
+*Level-of-detail rendering for high-resolution terrains - 1024×1024 at interactive framerates.*
 - [ ] **CORE-036:** Implement quadtree LOD structure
 - [ ] **CORE-037:** Add distance-based resolution switching
-- [ ] **CORE-038:** Write scalability benchmarks (1-16 threads)
-- [ ] **CORE-039:** Add benchmark regression checks to CI
-- [ ] **CORE-040:** Profile with Valgrind/perf for hotspot identification
-- [ ] **CORE-041:** Optimize particle allocation (object pools)
-- [ ] **WEB-033:** Add resolution selector (256, 512, 1024)
 - [ ] **WEB-034:** Implement R3F LOD components
 - [ ] **WEB-035:** Add distance culling for far terrain chunks
+- [ ] **TEST-011:** Test 1024×1024 grid at 15+ FPS
+**✅ Deliverable:** High-resolution terrains render smoothly with dynamic LOD
+
+**Delivery Block 4: Performance Monitoring UI**
+*Real-time performance metrics overlay - FPS, CPU, memory usage visible during simulation.*
 - [ ] **WEB-036:** Create PerformanceProfiler overlay component
 - [ ] **WEB-037:** Display FPS counter (real-time)
 - [ ] **WEB-038:** Add CPU/GPU usage metrics (if available)
 - [ ] **WEB-039:** Show memory consumption tracker
 - [ ] **WEB-040:** Implement performance graph (historical data)
-- [ ] **TEST-010:** Verify linear scaling with thread count (1-8 cores)
-- [ ] **TEST-011:** Test 1024×1024 grid at 15+ FPS
-- [ ] **TEST-012:** Validate SIMD calculations match scalar results
+**✅ Deliverable:** Performance profiler overlay showing live metrics
+
+**Delivery Block 5: CI Integration & Documentation**
+*Automated performance regression tracking in CI pipeline.*
+- [ ] **CORE-038:** Write scalability benchmarks (1-16 threads)
+- [ ] **CORE-039:** Add benchmark regression checks to CI
 - [ ] **DOC-005:** Document performance tuning guidelines
+**✅ Deliverable:** CI validates performance, comprehensive tuning documentation
 
 **Success Criteria:**
 *   Simulation achieves near-linear scaling with thread count.
@@ -387,29 +443,53 @@ The project follows an iterative development model, with each iteration deliveri
     *   Share link generation (URL-encoded parameters).
 
 **Tasks:**
+
+**Delivery Block 1: PNG Export (Complete Feature)**
+*Download terrains as PNG images - instant export functionality.*
 - [ ] **CORE-042:** Implement Heightmap serialization to binary format
 - [ ] **CORE-043:** Add PNG export (heightmap as grayscale image)
-- [ ] **CORE-044:** Implement EXR export (HDR elevation data)
-- [ ] **CORE-045:** Create JSON schema for preset configurations
-- [ ] **CORE-046:** Add preset loader/validator
 - [ ] **CORE-047:** Write unit tests for serialization
 - [ ] **API-011:** Create /export endpoint (supports PNG/EXR/JSON)
+- [ ] **WEB-045:** Create ExportPanel UI component
+- [ ] **WEB-046:** Add format selector (PNG/EXR/JSON)
+- [ ] **WEB-047:** Implement download functionality
+- [ ] **TEST-013:** Verify exported heightmaps load correctly in Blender
+**✅ Deliverable:** Click "Export" → download PNG heightmap
+
+**Delivery Block 2: Preset Loading System**
+*One-click preset loading - instant terrain templates (Canyon, Mountain, Coastal).*
+- [ ] **CORE-045:** Create JSON schema for preset configurations
+- [ ] **CORE-046:** Add preset loader/validator
 - [ ] **API-012:** Add /presets endpoint (list available presets)
 - [ ] **API-013:** Implement /load-preset endpoint
 - [ ] **WEB-041:** Create PresetLibrary UI component
 - [ ] **WEB-042:** Design preset cards with thumbnails
-- [ ] **WEB-043:** Add preset search/filter functionality
 - [ ] **WEB-044:** Implement one-click load button
-- [ ] **WEB-045:** Create ExportPanel UI component
-- [ ] **WEB-046:** Add format selector (PNG/EXR/JSON)
-- [ ] **WEB-047:** Implement download functionality
+- [ ] **TEST-014:** Test JSON parameter round-trip (save → load)
+**✅ Deliverable:** Click preset card → terrain loads instantly
+
+**Delivery Block 3: Preset Management**
+*Save custom presets and search through preset library.*
+- [ ] **WEB-043:** Add preset search/filter functionality
+- [ ] **WEB-050:** Add preset saving dialog (user-created presets)
+**✅ Deliverable:** Save custom terrains, search preset library
+
+**Delivery Block 4: Advanced Export (EXR)**
+*HDR elevation data export for professional 3D tools.*
+- [ ] **CORE-044:** Implement EXR export (HDR elevation data)
+**✅ Deliverable:** Export high-precision EXR heightmaps
+
+**Delivery Block 5: Share Links**
+*Share terrains via URL - copy link, share with collaborators.*
 - [ ] **WEB-048:** Add share link generator (URL encoding)
 - [ ] **WEB-049:** Implement clipboard copy for share links
-- [ ] **WEB-050:** Add preset saving dialog (user-created presets)
-- [ ] **TEST-013:** Verify exported heightmaps load correctly in Blender
-- [ ] **TEST-014:** Test JSON parameter round-trip (save → load)
 - [ ] **TEST-015:** Validate share links restore exact simulation state
+**✅ Deliverable:** Generate shareable URLs, one-click copy to clipboard
+
+**Delivery Block 6: Documentation**
+*Comprehensive documentation for export formats and preset system.*
 - [ ] **DOC-006:** Document export formats and preset structure
+**✅ Deliverable:** Complete documentation for all export/preset features
 
 **Success Criteria:**
 *   User can save and restore simulation sessions.

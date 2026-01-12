@@ -9,6 +9,8 @@ add_library(terrain_core
     src/Heightmap.cpp
     src/TerrainGenerators.cpp
     src/PerlinNoise.cpp
+    src/WaterParticle.cpp
+    src/HydraulicErosion.cpp
 )
 target_include_directories(terrain_core PUBLIC include)
 
@@ -29,6 +31,9 @@ add_executable(terrain_core_tests
     tests/HeightmapTest.cpp
     tests/TerrainGeneratorsTest.cpp
     tests/PerlinNoiseTest.cpp
+    tests/WaterParticleTest.cpp
+    tests/HeightmapGradientTest.cpp
+    tests/HydraulicErosionTest.cpp
 )
 target_link_libraries(terrain_core_tests PRIVATE terrain_core gtest_main)
 

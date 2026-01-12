@@ -85,6 +85,42 @@ public:
      */
     void fill(float value);
 
+    /**
+     * @brief Calculate the gradient (slope) at a specific position using bilinear interpolation.
+     * @param x X-coordinate (can be fractional for interpolation)
+     * @param y Y-coordinate (can be fractional for interpolation)
+     * @param outGradX Output: gradient in X direction
+     * @param outGradY Output: gradient in Y direction
+     * @return True if the position is within bounds, false otherwise
+     *
+     * Uses central differences for interior points and forward/backward differences at boundaries.
+     */
+    bool getGradient(float x, float y, float& outGradX, float& outGradY) const;
+
+    /**
+     * @brief Get the interpolated height at a fractional position.
+     * @param x X-coordinate (can be fractional)
+     * @param y Y-coordinate (can be fractional)
+     * @return Interpolated height value
+     *
+     * Uses bilinear interpolation for fractional coordinates.
+     * Returns 0.0 if position is out of bounds.
+     */
+    float getHeightInterpolated(float x, float y) const;
+
+    /**
+     * @brief Calculate the normal vector at a specific position.
+     * @param x X-coordinate (integer grid position)
+     * @param y Y-coordinate (integer grid position)
+     * @param outNormalX Output: normal vector X component
+     * @param outNormalY Output: normal vector Y component
+     * @param outNormalZ Output: normal vector Z component
+     * @return True if the position is within bounds, false otherwise
+     *
+     * The normal is computed using cross product of tangent vectors.
+     */
+    bool getNormal(size_t x, size_t y, float& outNormalX, float& outNormalY, float& outNormalZ) const;
+
 private:
     size_t m_width;
     size_t m_height;
