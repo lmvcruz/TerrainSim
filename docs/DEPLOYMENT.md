@@ -1,914 +1,447 @@
-# Cloudflare Deployment Guide
+# TerrainSim Deployment Guide
 
-Complete guide for deploying TerrainSim to production using Cloudflare Pages (frontend) and a custom server (backend).
+## 🌐 Live URLs
 
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Cloudflare Network                       │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │         Cloudflare Pages (Frontend)                │     │
-│  │  • React + Vite static site                        │     │
-│  │  • CDN-distributed globally                        │     │
-│  │  • Auto SSL/TLS                                    │     │
-│  │  • https://terrainsim.yourdomain.com               │     │
-│  └────────────────────────────────────────────────────┘     │
-│                          │                                   │
-│                          │ HTTPS + WebSocket                │
-│                          ▼                                   │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │         Cloudflare DNS & Proxy                     │     │
-│  │  • DDoS protection                                 │     │
-│  │  • SSL/TLS termination                             │     │
-│  │  • Caching & optimization                          │     │
-│  └────────────────────────────────────────────────────┘     │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Your Server (VM/VPS/Cloud)                      │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │         Nginx Reverse Proxy                        │     │
-│  │  • HTTPS → Backend                                 │     │
-│  │  • WebSocket upgrade                               │     │
-│  │  • Let's Encrypt SSL                               │     │
-│  └────────────────────────────────────────────────────┘     │
-│                          │                                   │
-│                          ▼                                   │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │         Node.js API Server (PM2)                   │     │
-│  │  • Express + Socket.io                             │     │
-│  │  • C++ Native Addon (HydraulicErosion)             │     │
-│  │  • api.terrainsim.yourdomain.com:3001              │     │
-│  └────────────────────────────────────────────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Why not Cloudflare Workers for backend?**
-- Native Node-API addons (our C++ erosion engine) cannot run on Workers
-- Workers don't support native modules or system-level operations
-- Alternative: WebAssembly version (future enhancement)
+- **Frontend**: https://terrainsim.lmvcruz.work
+- **Backend API**: https://api.lmvcruz.work
+- **Health Check**: https://api.lmvcruz.work/health
 
 ---
 
-## Prerequisites
+## 📋 Overview
 
-### Required Accounts
-- ✅ **GitHub Account** - For repository and GitHub Actions
-- ✅ **Cloudflare Account** - For Pages and DNS (you have this)
-- ✅ **Domain Name** - Registered and added to Cloudflare (you have this)
-- ⚠️ **Server/VPS** - For backend (DigitalOcean, AWS, Hetzner, etc.)
+TerrainSim uses a split deployment architecture:
 
-### Local Development Tools
-- Node.js 20+
-- pnpm 8+
-- Git
-- SSH client
-
-### Server Requirements
-- **OS:** Ubuntu 22.04 LTS (recommended) or Debian 12
-- **CPU:** 2+ cores (4+ recommended)
-- **RAM:** 4GB minimum (8GB recommended)
-- **Storage:** 50GB SSD minimum
-- **Network:** Static IP address, ports 80/443/22 open
+- **Frontend** → Cloudflare Pages (automatic Git deployment)
+- **Backend** → AWS EC2 t3.micro (manual SSH deployment)
+- **CI/CD** → GitHub Actions (automated testing only)
 
 ---
 
-## Part 1: Frontend Deployment (Cloudflare Pages)
+## 🎨 Frontend Deployment (Cloudflare Pages)
 
-### Step 1: Prepare Cloudflare Pages Project
+### How It Works
+Cloudflare Pages is configured with **Git integration** - it automatically deploys on every push to `main`.
 
-1. **Login to Cloudflare Dashboard**
-   - Navigate to: https://dash.cloudflare.com
-   - Select your account
+### Setup (Already Configured)
+1. Cloudflare Pages project: `terrainsim`
+2. Connected to GitHub: `lmvcruz/TerrainSim`
+3. Build settings:
+   - Framework: None
+   - Build command: `pnpm install && pnpm --filter @terrain/web run build`
+   - Output directory: `apps/web/dist`
+4. Custom domain: `terrainsim.lmvcruz.work`
 
-2. **Create Pages Project**
-   - Go to **Workers & Pages** → **Pages**
-   - Click **Create application**
-   - Choose **Connect to Git**
-   - Authorize GitHub access
-   - Select repository: `lmvcruz/TerrainSim`
-   - Click **Begin setup**
+### To Deploy Frontend
+**Just push to `main` branch** - Cloudflare automatically:
+- Detects the push
+- Runs the build
+- Deploys to production
+- Updates https://terrainsim.lmvcruz.work
 
-3. **Configure Build Settings**
-   ```yaml
-   Project name: terrainsim (or your choice)
-   Production branch: main
-   Build command: pnpm install && pnpm --filter @terrain/web run build
-   Build output directory: apps/web/dist
-   Root directory: (leave empty)
-   ```
-
-4. **Environment Variables**
-   Click **Environment variables** and add:
-   ```
-   VITE_API_URL=https://api.yourdomain.com
-   VITE_WS_URL=wss://api.yourdomain.com
-   ```
-
-   ⚠️ **Replace `yourdomain.com` with your actual domain**
-
-5. **Advanced Settings**
-   - **Node.js version:** `20`
-   - **Environment:** `Production`
-
-6. **Save and Deploy**
-   - Click **Save and Deploy**
-   - Wait 2-5 minutes for first deployment
-   - You'll get a temporary URL: `https://terrainsim-xxx.pages.dev`
-
-### Step 2: Configure Custom Domain
-
-1. **Add Custom Domain**
-   - In your Pages project, go to **Custom domains**
-   - Click **Set up a custom domain**
-   - Enter: `terrainsim.yourdomain.com` (or your preferred subdomain)
-   - Click **Continue**
-
-2. **DNS Configuration (Automatic)**
-   - Cloudflare will automatically create DNS records
-   - Wait 1-5 minutes for DNS propagation
-   - SSL certificate provisions automatically (up to 24 hours, usually <15 minutes)
-
-3. **Verify Deployment**
-   ```bash
-   curl -I https://terrainsim.yourdomain.com
-   # Should return 200 OK with SSL
-   ```
-
-### Step 3: Update Frontend Code (if needed)
-
-If you need to configure the API URLs in code:
-
-```typescript
-// apps/web/src/config.ts (create if doesn't exist)
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-export const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
-```
-
-Use in your app:
-```typescript
-import { API_URL, WS_URL } from './config';
-const socket = io(WS_URL);
-```
+**No manual action needed!** ✨
 
 ---
 
-## Part 2: Backend Server Setup
+## 🖥️ Backend Deployment (AWS EC2)
 
-### Step 1: Provision Server
+### Server Details
+- **Instance**: AWS EC2 t3.micro
+- **OS**: Ubuntu 22.04 LTS
+- **IP**: 54.242.131.12
+- **SSH**: `ssh terrainsim` (alias configured)
+- **Path**: `/var/www/terrainsim`
 
-**Option A: DigitalOcean (Recommended for beginners)**
-1. Create account at https://digitalocean.com
-2. Create Droplet:
-   - **Image:** Ubuntu 22.04 LTS
-   - **Plan:** Basic ($24/mo) - 4GB RAM, 2 vCPUs
-   - **Region:** Choose closest to your users
-   - **Authentication:** SSH key (add your public key)
-3. Note the public IP address
+### Technology Stack
+- **Process Manager**: PM2 with systemd
+- **Web Server**: nginx (reverse proxy + SSL termination)
+- **Runtime**: Node.js 20.19.6
+- **Package Manager**: pnpm 10.28.0
+- **TypeScript**: tsx 4.21.0 (direct execution, no build step)
+- **SSL**: Let's Encrypt with auto-renewal
 
-**Option B: AWS EC2**
-1. Launch EC2 instance: `t3.medium` (2 vCPU, 4GB RAM)
-2. **AMI:** Ubuntu 22.04 LTS
-3. Configure security group: Allow ports 22, 80, 443
-4. Create/use SSH key pair
+### Manual Deployment Steps
 
-**Option C: Hetzner (Most cost-effective)**
-1. Create account at https://hetzner.com
-2. Order Cloud Server: CX32 (€12/mo) - 4GB RAM, 2 vCPUs
-3. **Image:** Ubuntu 22.04
-4. Add SSH key
-
-### Step 2: Initial Server Configuration
-
-SSH into your server:
+#### Quick Deployment (if only code changed)
 ```bash
-ssh root@YOUR_SERVER_IP
+ssh terrainsim "cd /var/www/terrainsim && git pull && pnpm install && pm2 restart terrainsim-api"
 ```
 
-**Update system:**
+#### Full Deployment Process
+
+**1. SSH into server**
 ```bash
-apt update && apt upgrade -y
+ssh terrainsim
 ```
 
-**Create deployment user:**
+**2. Navigate to project**
 ```bash
-adduser deploy
-usermod -aG sudo deploy
-# Set password when prompted
-```
-
-**Add SSH key for deploy user:**
-```bash
-mkdir -p /home/deploy/.ssh
-cp ~/.ssh/authorized_keys /home/deploy/.ssh/
-chown -R deploy:deploy /home/deploy/.ssh
-chmod 700 /home/deploy/.ssh
-chmod 600 /home/deploy/.ssh/authorized_keys
-```
-
-**Test deploy user:**
-```bash
-exit  # Exit root session
-ssh deploy@YOUR_SERVER_IP  # Should work without password
-```
-
-### Step 3: Install Dependencies
-
-As deploy user:
-
-```bash
-# Install Node.js 20
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Install build tools for C++ addon
-sudo apt install -y build-essential cmake g++ git
-
-# Install nginx
-sudo apt install -y nginx
-
-# Install certbot for SSL
-sudo apt install -y certbot python3-certbot-nginx
-
-# Install PM2 (Node.js process manager)
-sudo npm install -g pm2
-
-# Verify installations
-node --version    # Should be v20.x
-npm --version
-cmake --version
-nginx -v
-pm2 --version
-```
-
-### Step 4: Clone and Build Application
-
-```bash
-# Create application directory
-sudo mkdir -p /var/www/terrainsim
-sudo chown deploy:deploy /var/www/terrainsim
 cd /var/www/terrainsim
+```
 
-# Clone repository
-git clone https://github.com/lmvcruz/TerrainSim.git .
+**3. Pull latest code**
+```bash
+git pull origin main
+```
 
-# Install dependencies
-npm install -g pnpm
+**4. Install/update dependencies**
+```bash
 pnpm install
+```
 
-# Build C++ native addon
-cd libs/core/bindings/node
-npm install
-npm run build
-cd ../../../..
-
-# Build API (if needed)
-cd apps/simulation-api
-pnpm run build  # If you have a build step
+**5. Rebuild C++ addon (if core library changed)**
+```bash
+cd libs/core
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
 cd ../..
 ```
 
-**Verify native addon built:**
+**6. Restart backend**
 ```bash
-ls -lh libs/core/bindings/node/build/Release/terrain_erosion_native.node
-# Should show the compiled .node file
+pm2 restart terrainsim-api
 ```
 
-### Step 5: Configure Environment Variables
-
-Create environment file:
+**7. Verify deployment**
 ```bash
-nano /var/www/terrainsim/apps/simulation-api/.env
+pm2 status
+pm2 logs terrainsim-api --lines 20
+curl http://localhost:3001/health
 ```
 
-Add:
-```env
-NODE_ENV=production
-PORT=3001
-CORS_ORIGIN=https://terrainsim.yourdomain.com
-```
+---
 
-Save and exit (Ctrl+X, Y, Enter)
+## 🧪 CI/CD Pipeline
 
-### Step 6: Configure PM2
+### GitHub Actions Workflow: `ci.yml`
 
-Create PM2 ecosystem file:
-```bash
-nano /var/www/terrainsim/ecosystem.config.js
-```
+**Triggers**: Every push to `main` and all pull requests
 
-Add:
+**Frontend Tests:**
+- ✅ TypeScript type checking (`pnpm typecheck`)
+- ✅ Build validation (catches unused code)
+- ✅ Vitest unit tests
+
+**Backend Tests:**
+- ✅ CMake configuration
+- ✅ C++ compilation (Release mode)
+- ✅ CTest unit tests (Google Test)
+
+**No deployment** - GitHub Actions only runs tests. Deployment happens via:
+- Frontend: Cloudflare Pages (Git integration)
+- Backend: Manual SSH (see above)
+
+---
+
+## 🔧 Backend Architecture
+
+### PM2 Configuration
+
+**Config file**: `/var/www/terrainsim/ecosystem.config.cjs`
+
 ```javascript
 module.exports = {
   apps: [{
     name: 'terrainsim-api',
-    cwd: '/var/www/terrainsim/apps/simulation-api',
-    script: 'src/index.ts',
-    interpreter: 'node',
-    interpreter_args: '--loader tsx',
-    instances: 1,
-    exec_mode: 'cluster',
+    script: '/var/www/terrainsim/start-api.sh',
+    cwd: '/var/www/terrainsim',
+    exec_mode: 'fork',
     env: {
       NODE_ENV: 'production',
-      PORT: 3001,
+      PORT: 3001
     },
     error_file: '/var/log/terrainsim/error.log',
     out_file: '/var/log/terrainsim/out.log',
-    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-    merge_logs: true,
-    max_restarts: 10,
-    min_uptime: '10s',
+    time: true
   }]
 };
 ```
 
-Create log directory:
+**Start script**: `/var/www/terrainsim/start-api.sh`
 ```bash
-sudo mkdir -p /var/log/terrainsim
-sudo chown deploy:deploy /var/log/terrainsim
+#!/bin/bash
+cd /var/www/terrainsim/apps/simulation-api
+exec /var/www/terrainsim/node_modules/.bin/tsx src/index.ts
 ```
 
-Start application:
+**PM2 Commands:**
 ```bash
-cd /var/www/terrainsim
-pm2 start ecosystem.config.js
-pm2 save
-pm2 startup  # Follow the command it outputs
+pm2 status                    # Check status
+pm2 logs terrainsim-api       # View logs
+pm2 restart terrainsim-api    # Restart
+pm2 stop terrainsim-api       # Stop
+pm2 start ecosystem.config.cjs # Start
 ```
 
-Verify it's running:
+### nginx Configuration
+
+**Config file**: `/etc/nginx/sites-available/terrainsim`
+
+- Port 80: HTTP → HTTPS redirect
+- Port 443: HTTPS → proxy to `localhost:3001`
+- SSL: Let's Encrypt certificates
+- WebSocket: Special handling for `/socket.io/`
+
+**nginx Commands:**
 ```bash
-pm2 status
-pm2 logs terrainsim-api
-curl http://localhost:3001/health
-# Should return: {"status":"ok","timestamp":"..."}
+sudo nginx -t                 # Test config
+sudo systemctl reload nginx   # Reload config
+sudo systemctl status nginx   # Check status
 ```
 
-### Step 7: Configure Nginx Reverse Proxy
-
-Create nginx configuration:
-```bash
-sudo nano /etc/nginx/sites-available/terrainsim
-```
-
-Add:
-```nginx
-# HTTP - redirect to HTTPS
-server {
-    listen 80;
-    listen [::]:80;
-    server_name api.yourdomain.com;
-
-    location / {
-        return 301 https://$server_name$request_uri;
-    }
-}
-
-# HTTPS - API Server
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name api.yourdomain.com;
-
-    # SSL certificates (will be configured by certbot)
-    ssl_certificate /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api.yourdomain.com/privkey.pem;
-
-    # SSL configuration
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-    ssl_prefer_server_ciphers on;
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
-    # CORS headers (if needed, PM2 app handles this)
-    # add_header Access-Control-Allow-Origin "https://terrainsim.yourdomain.com" always;
-
-    # Proxy to Node.js app
-    location / {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # WebSocket support
-    location /socket.io/ {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 7d;
-        proxy_send_timeout 7d;
-        proxy_read_timeout 7d;
-    }
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-}
-```
-
-**⚠️ Replace `api.yourdomain.com` with your actual domain**
-
-Enable the site:
-```bash
-sudo ln -s /etc/nginx/sites-available/terrainsim /etc/nginx/sites-enabled/
-sudo nginx -t  # Test configuration
-```
-
-### Step 8: Configure DNS for Backend
-
-1. **Login to Cloudflare Dashboard**
-2. **Select your domain**
-3. **Go to DNS → Records**
-4. **Add A record:**
-   ```
-   Type: A
-   Name: api
-   IPv4 address: YOUR_SERVER_IP
-   Proxy status: Proxied (orange cloud)
-   TTL: Auto
-   ```
-5. **Click Save**
-
-Verify DNS propagation:
-```bash
-dig api.yourdomain.com
-# Should return your server IP
-```
-
-### Step 9: Configure SSL with Let's Encrypt
-
-**IMPORTANT:** Wait 5-10 minutes after DNS change before running certbot.
-
-```bash
-# Obtain SSL certificate
-sudo certbot --nginx -d api.yourdomain.com
-
-# Follow prompts:
-# - Enter email address
-# - Agree to terms
-# - Choose: 2 (Redirect HTTP to HTTPS)
-```
-
-Certbot will:
-- Obtain SSL certificate
-- Modify nginx config automatically
-- Set up auto-renewal
-
-**Test auto-renewal:**
-```bash
-sudo certbot renew --dry-run
-```
-
-**Reload nginx:**
-```bash
-sudo systemctl reload nginx
-```
-
-### Step 10: Verify Backend Deployment
-
-```bash
-# Test health endpoint
-curl https://api.yourdomain.com/health
-# Should return: {"status":"ok",...}
-
-# Test from browser
-# Navigate to: https://api.yourdomain.com/health
-
-# Check PM2 status
-pm2 status
-pm2 logs terrainsim-api --lines 50
-```
-
----
-
-## Part 3: GitHub Actions CI/CD
-
-### Step 1: Set Up GitHub Secrets
-
-1. **Go to your repository on GitHub**
-2. **Settings → Secrets and variables → Actions**
-3. **Click "New repository secret"**
-
-Add these secrets:
-
-**For Cloudflare Pages:**
-```
-CLOUDFLARE_API_TOKEN
-```
-- Get from: Cloudflare Dashboard → My Profile → API Tokens
-- Create token with permissions: "Cloudflare Pages — Edit"
-
-**For Server Deployment:**
-```
-SERVER_HOST = YOUR_SERVER_IP
-SERVER_USER = deploy
-SERVER_SSH_KEY = (your private SSH key content)
-SERVER_DEPLOY_PATH = /var/www/terrainsim
-```
-
-To get your SSH private key:
-```bash
-cat ~/.ssh/id_rsa
-# Copy entire output including BEGIN/END lines
-```
-
-### Step 2: Create Frontend Deployment Workflow
-
-Create file: `.github/workflows/deploy-frontend.yml`
-
-```yaml
-name: Deploy Frontend to Cloudflare Pages
-
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Pages
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build frontend
-        run: pnpm --filter @terrain/web run build
-        env:
-          VITE_API_URL: https://api.yourdomain.com
-          VITE_WS_URL: wss://api.yourdomain.com
-
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: terrainsim
-          directory: apps/web/dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Smoke Test
-        run: |
-          sleep 10
-          curl -f https://terrainsim.yourdomain.com || exit 1
-```
-
-### Step 3: Create Backend Deployment Workflow
-
-Create file: `.github/workflows/deploy-backend.yml`
-
-```yaml
-name: Deploy Backend to Server
-
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/simulation-api/**'
-      - 'libs/core/**'
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy to Production Server
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd ${{ secrets.SERVER_DEPLOY_PATH }}
-
-            # Pull latest code
-            git fetch origin
-            git reset --hard origin/main
-
-            # Install/update dependencies
-            pnpm install
-
-            # Rebuild C++ addon if core changed
-            cd libs/core/bindings/node
-            npm install
-            npm run build
-            cd ../../../..
-
-            # Restart application with zero downtime
-            pm2 reload ecosystem.config.js --update-env
-
-            # Wait for health check
-            sleep 5
-            curl -f http://localhost:3001/health || exit 1
-
-            echo "Deployment successful!"
-
-      - name: Health Check
-        run: |
-          sleep 10
-          curl -f https://api.yourdomain.com/health || exit 1
-```
-
-### Step 4: Test Automated Deployment
-
-```bash
-# Make a small change to trigger deployment
-echo "# Test deployment" >> README.md
-git add README.md
-git commit -m "test: trigger deployment"
-git push origin main
-```
-
-Watch the Actions tab on GitHub to see deployments in progress.
-
----
-
-## Part 4: Monitoring & Maintenance
-
-### Monitor Application Logs
-
-```bash
-# SSH into server
-ssh deploy@YOUR_SERVER_IP
-
-# Watch PM2 logs
-pm2 logs terrainsim-api
-
-# View specific lines
-pm2 logs terrainsim-api --lines 100
-
-# Monitor in real-time
-pm2 monit
-```
-
-### Check Application Status
-
-```bash
-pm2 status
-pm2 describe terrainsim-api
-```
-
-### Restart Application
-
-```bash
-pm2 restart terrainsim-api
-
-# Or reload with zero downtime
-pm2 reload terrainsim-api
-```
-
-### View Nginx Logs
-
+**Logs:**
 ```bash
 sudo tail -f /var/log/nginx/access.log
 sudo tail -f /var/log/nginx/error.log
 ```
 
-### SSL Certificate Renewal
+---
 
-Certificates auto-renew via cron. To manually renew:
+## 📊 Monitoring & Health Checks
+
+### Check Backend Status
 ```bash
-sudo certbot renew
-sudo systemctl reload nginx
+# PM2 status
+ssh terrainsim "pm2 status"
+
+# Recent logs
+ssh terrainsim "pm2 logs terrainsim-api --lines 50 --nostream"
+
+# Health check
+curl https://api.lmvcruz.work/health
+```
+
+### Check SSL Certificate
+```bash
+ssh terrainsim "sudo certbot certificates"
+```
+
+### Check nginx Logs
+```bash
+ssh terrainsim "sudo tail -50 /var/log/nginx/access.log"
+ssh terrainsim "sudo tail -50 /var/log/nginx/error.log"
 ```
 
 ---
 
-## Troubleshooting
+## 🚨 Troubleshooting
 
-### Frontend Issues
+### Backend Not Responding
 
-**Problem:** Frontend not updating after deployment
+**1. Check PM2 status**
 ```bash
-# Clear Cloudflare cache
-# Dashboard → Caching → Purge Everything
+ssh terrainsim "pm2 status"
 ```
 
-**Problem:** API connection errors in browser console
-- Check `VITE_API_URL` and `VITE_WS_URL` in Cloudflare Pages environment variables
-- Verify CORS settings in backend
-
-### Backend Issues
-
-**Problem:** PM2 app not starting
+**2. Check logs**
 ```bash
-pm2 logs terrainsim-api --err
-# Check for errors in output
+ssh terrainsim "pm2 logs terrainsim-api --err"
 ```
 
-**Problem:** Native addon build fails
+**3. Test locally**
 ```bash
-cd /var/www/terrainsim/libs/core/bindings/node
-npm run clean
-npm install
-npm run build
-# Check for C++ compiler errors
+ssh terrainsim "curl http://localhost:3001/health"
 ```
 
-**Problem:** WebSocket connections failing
-- Check nginx WebSocket configuration
-- Verify `proxy_set_header Upgrade` and `Connection 'upgrade'` headers
-- Check firewall allows port 443
-
-### DNS/SSL Issues
-
-**Problem:** SSL certificate not provisioning
+**4. Restart backend**
 ```bash
-# Check DNS propagation
-dig api.yourdomain.com
-
-# Manual certbot
-sudo certbot certonly --nginx -d api.yourdomain.com
+ssh terrainsim "pm2 restart terrainsim-api"
 ```
 
-**Problem:** Mixed content warnings
-- Ensure all API calls use HTTPS
-- Check browser console for specific URLs
-
----
-
-## Performance Optimization
-
-### Enable Cloudflare Features
-
-1. **Speed → Optimization**
-   - Auto Minify: HTML, CSS, JS ✅
-   - Brotli: ✅
-   - Early Hints: ✅
-
-2. **Caching → Configuration**
-   - Caching Level: Standard
-   - Browser Cache TTL: 4 hours
-
-3. **Speed → Performance**
-   - HTTP/2: ✅
-   - HTTP/3 (QUIC): ✅
-   - 0-RTT Connection Resumption: ✅
-
-### Nginx Performance Tuning
+### Port 3001 Already in Use
 
 ```bash
-sudo nano /etc/nginx/nginx.conf
+ssh terrainsim "lsof -ti:3001 | xargs kill -9 && pm2 restart terrainsim-api"
 ```
 
-Add in `http` block:
-```nginx
-# Worker processes
-worker_processes auto;
-worker_rlimit_nofile 65535;
+### CORS Errors in Browser
 
-events {
-    worker_connections 4096;
-    use epoll;
-    multi_accept on;
-}
+Backend CORS is configured for:
+- `http://localhost:5173` (local development)
+- `https://terrainsim.lmvcruz.work` (production)
+- `https://*.terrainsim.pages.dev` (Cloudflare preview URLs)
 
-http {
-    # ... existing config ...
+Check [apps/simulation-api/src/index.ts](../apps/simulation-api/src/index.ts) for `isAllowedOrigin()` function.
 
-    # Keep-alive connections
-    keepalive_timeout 65;
-    keepalive_requests 100;
+### SSL Certificate Expired
 
-    # Client body buffer
-    client_body_buffer_size 128k;
-    client_max_body_size 10m;
-}
-```
-
-Reload nginx:
 ```bash
-sudo systemctl reload nginx
+ssh terrainsim "sudo certbot renew && sudo systemctl reload nginx"
+```
+
+### C++ Addon Fails to Load
+
+```bash
+ssh terrainsim "cd /var/www/terrainsim/libs/core && rm -rf build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release"
 ```
 
 ---
 
-## Rollback Procedure
+## 💰 Cost Breakdown
 
-### Frontend Rollback
+### Year 1 (AWS Free Tier)
+- **EC2 t3.micro**: Free for 12 months (750 hours/month)
+- **30 GiB EBS Storage**: Free for 12 months
+- **Cloudflare Pages**: Free forever (unlimited)
+- **Domain (lmvcruz.work)**: ~$12/year
+- **Total Year 1**: ~$12/year
 
-1. Go to Cloudflare Pages → Your Project
-2. Click **Deployments**
-3. Find previous successful deployment
-4. Click **⋯ → Rollback to this deployment**
+### Year 2+ (After Free Tier Expires)
+- **EC2 t3.micro**: ~$7.50/month = $90/year
+- **30 GiB EBS Storage**: ~$3/year
+- **Data Transfer**: ~$1/month = $12/year
+- **Cloudflare Pages**: Free forever
+- **Domain**: ~$12/year
+- **Total Year 2+**: ~$117/year (~$10/month)
 
-### Backend Rollback
+---
 
-```bash
-ssh deploy@YOUR_SERVER_IP
-cd /var/www/terrainsim
+## 🔄 Future Improvements
 
-# Find previous commit
-git log --oneline -n 10
+### 1. Automate Backend Deployment
 
-# Rollback to specific commit
-git reset --hard COMMIT_HASH
+**Current State**: Manual SSH deployment
 
-# Rebuild if needed
-cd libs/core/bindings/node
-npm run build
-cd ../../../..
+**Options to Automate**:
 
-# Restart
-pm2 reload terrainsim-api
+**Option A: Fix GitHub Actions SSH Deployment**
+- Use `webfactory/ssh-agent` action
+- Base64-encode SSH key in GitHub Secret
+- Auto-deploy on push to `main`
+
+**Option B: AWS CodeDeploy**
+- Native AWS CI/CD service
+- Integrates with GitHub
+- More complex setup
+
+**Option C: Docker + AWS ECS**
+- Containerize application
+- Use Elastic Container Service
+- Better scalability (higher cost)
+
+### 2. Scaling Recommendations
+
+**When traffic increases:**
+
+**Level 1: PM2 Cluster Mode**
+```javascript
+// ecosystem.config.cjs
+exec_mode: 'cluster',
+instances: 'max', // Use all CPU cores
+```
+
+**Level 2: Larger EC2 Instance**
+- Upgrade from t3.micro (1 vCPU, 1GB RAM)
+- To t3.small (2 vCPU, 2GB RAM) or t3.medium (2 vCPU, 4GB RAM)
+
+**Level 3: Load Balancer + Multiple Instances**
+- AWS Application Load Balancer
+- Multiple EC2 instances
+- Auto-scaling group
+
+**Level 4: Serverless**
+- AWS Lambda for API (if C++ addon can be removed)
+- S3 + CloudFront for frontend
+- DynamoDB for data storage
+
+---
+
+## 📝 Important Notes
+
+### tsx Dependency
+- **Must be in `dependencies`, NOT `devDependencies`**
+- PM2 needs it in production to run TypeScript files
+- See [apps/simulation-api/package.json](../apps/simulation-api/package.json)
+
+### C++ Native Addon
+- Must be rebuilt on the server (platform-specific binary)
+- Cannot be copied from local machine
+- Requires cmake and build-essential on server
+
+### PM2 Systemd Integration
+- PM2 auto-starts on server reboot
+- Configured via: `pm2 startup systemd && pm2 save`
+- Status: `systemctl status pm2-ubuntu`
+
+### Let's Encrypt SSL
+- Auto-renewal configured via certbot
+- Runs twice daily via systemd timer
+- Certificates valid for 90 days
+- Check: `sudo certbot certificates`
+
+### Cloudflare Proxy
+- DNS record for `api.lmvcruz.work` is **proxied** (orange cloud)
+- Provides DDoS protection and caching
+- Traffic goes: Client → Cloudflare → nginx → PM2
+
+---
+
+## 🏗️ Architecture Diagram
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    Cloudflare Network                         │
+│                                                               │
+│  ┌─────────────────────────┐  ┌────────────────────────┐    │
+│  │  Cloudflare Pages       │  │  Cloudflare Proxy      │    │
+│  │  (Frontend)             │  │  (DNS + DDoS)          │    │
+│  │  terrainsim.lmvcruz.work│  │  api.lmvcruz.work      │    │
+│  │  [Auto Git Deploy]      │  │  [Orange Cloud]        │    │
+│  └─────────────────────────┘  └────────┬───────────────┘    │
+│                                         │                     │
+└─────────────────────────────────────────┼─────────────────────┘
+                                          │ HTTPS
+                                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    AWS EC2 (54.242.131.12)                    │
+│                                                               │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  nginx (Reverse Proxy + SSL)                         │   │
+│  │  • Port 80 → 443 redirect                            │   │
+│  │  • Port 443 → localhost:3001                         │   │
+│  │  • Let's Encrypt SSL                                 │   │
+│  └────────────────────┬─────────────────────────────────┘   │
+│                       │                                      │
+│  ┌────────────────────▼─────────────────────────────────┐   │
+│  │  PM2 Process Manager                                 │   │
+│  │  • terrainsim-api (PID: dynamic)                     │   │
+│  │  • Auto-restart on crash                             │   │
+│  │  • Systemd integration                               │   │
+│  └────────────────────┬─────────────────────────────────┘   │
+│                       │                                      │
+│  ┌────────────────────▼─────────────────────────────────┐   │
+│  │  tsx (TypeScript Runtime)                            │   │
+│  │  • Direct .ts execution                              │   │
+│  │  • No build step needed                              │   │
+│  └────────────────────┬─────────────────────────────────┘   │
+│                       │                                      │
+│  ┌────────────────────▼─────────────────────────────────┐   │
+│  │  Express + Socket.IO Server                          │   │
+│  │  • Port 3001                                         │   │
+│  │  • REST API: /health, /generate                      │   │
+│  │  • WebSocket: /socket.io                             │   │
+│  │  • Loads C++ addon                                   │   │
+│  └────────────────────┬─────────────────────────────────┘   │
+│                       │                                      │
+│  ┌────────────────────▼─────────────────────────────────┐   │
+│  │  terrain_erosion_native.node                         │   │
+│  │  • C++ Native Addon (Node-API)                       │   │
+│  │  • Hydraulic Erosion Simulation                      │   │
+│  │  • Built with cmake                                  │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Cost Estimate
+## 📚 Related Documentation
 
-| Service | Plan | Monthly Cost |
-|---------|------|--------------|
-| **Cloudflare Pages** | Free tier | $0 (500 builds/mo) |
-| **Cloudflare DNS** | Free | $0 |
-| **DigitalOcean Droplet** | 4GB RAM, 2 vCPU | $24 |
-| **Let's Encrypt SSL** | Free | $0 |
-| **GitHub Actions** | 2000 min/mo free | $0 |
-| **Total** | | **~$24/month** |
-
-Alternative cheaper servers:
-- **Hetzner CX32:** €12/mo (~$13/mo)
-- **Contabo VPS:** €7/mo (~$8/mo)
+- [AWS EC2 Setup Guide](./AWS_DEPLOYMENT_GUIDE.md) - Full EC2 server setup
+- [C++ Integration](./CPP_EROSION_INTEGRATION_SUMMARY.md) - Native addon details
+- [API Documentation](../apps/simulation-api/README.md) - Backend endpoints
 
 ---
 
-## Security Checklist
-
-- [ ] Server firewall configured (UFW or iptables)
-- [ ] SSH key authentication only (disable password login)
-- [ ] Fail2ban installed and configured
-- [ ] Regular security updates enabled
-- [ ] PM2 logs reviewed regularly
-- [ ] HTTPS enforced everywhere
-- [ ] CORS properly configured
-- [ ] Rate limiting enabled (optional: nginx limit_req)
-- [ ] Database credentials secured (if applicable)
-- [ ] GitHub secrets properly set
-
----
-
-## Next Steps
-
-After successful deployment:
-1. Set up monitoring (UptimeRobot, Pingdom)
-2. Configure error tracking (Sentry)
-3. Set up automated backups
-4. Add custom error pages
-5. Implement rate limiting
-6. Set up application metrics (Prometheus + Grafana)
-
----
-
-## Support
-
-- **Cloudflare Pages Docs:** https://developers.cloudflare.com/pages/
-- **Nginx Docs:** https://nginx.org/en/docs/
-- **PM2 Docs:** https://pm2.keymetrics.io/docs/
-- **Let's Encrypt:** https://letsencrypt.org/docs/
-
-For project-specific issues, check the repository's issue tracker.
+**Last Updated**: January 13, 2026  
+**Status**: ✅ Production Deployment Live
