@@ -13,7 +13,7 @@ import { logger } from './utils/logger'
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-const IS_PRODUCTION = window.location.hostname.includes('github.io')
+const WS_URL = import.meta.env.VITE_WS_URL || API_BASE_URL
 
 // Default parameters for initial terrain generation
 const DEFAULT_PARAMETERS: NoiseParameters = {
@@ -41,13 +41,10 @@ function App() {
     totalParticles: number
   } | null>(null)
   const socketRef = useRef<Socket | null>(null)
-  const apiAvailable = !IS_PRODUCTION
 
   // Setup WebSocket connection
   useEffect(() => {
-    if (!apiAvailable) return
-
-    const socket = io(API_BASE_URL)
+    const socket = io(WS_URL)
     socketRef.current = socket
 
     socket.on('connect', () => {
@@ -95,18 +92,12 @@ function App() {
     return () => {
       socket.disconnect()
     }
-  }, [apiAvailable])
+  }, [])
 
-  // Generate default terrain on mount (only if API is available)
+  // Generate default terrain on mount
   useEffect(() => {
-    if (apiAvailable) {
-      handleGenerate(DEFAULT_PARAMETERS)
-    } else {
-      // In production without backend, generate a simple demo terrain
-      logger.warn('Running in production mode without backend API. Using demo terrain.')
-      generateDemoTerrain()
-    }
-  }, [apiAvailable]) // Re-run if apiAvailable changes
+    handleGenerate(DEFAULT_PARAMETERS)
+  }, [])
 
   const generateDemoTerrain = (parameters: NoiseParameters = DEFAULT_PARAMETERS) => {
     logger.info('Generating demo terrain (no API)', parameters)
@@ -150,11 +141,6 @@ function App() {
   }
 
   const handleGenerate = async (parameters: NoiseParameters) => {
-    if (!apiAvailable) {
-      generateDemoTerrain(parameters)
-      return
-    }
-
     setLoading(true)
     setError(null)
 
@@ -235,7 +221,7 @@ function App() {
   }
 
   const handleSimulate = (parameters: ErosionParameters) => {
-    if (!apiAvailable || !socketRef.current) {
+    if (!socketRef.current) {
       setError('Erosion simulation requires API server connection')
       return
     }
