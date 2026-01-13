@@ -11,11 +11,32 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const IS_DEV = process.env.NODE_ENV !== 'production';
 
+// CORS origin configuration - support multiple domains
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://terrainsim.lmvcruz.work',
+];
+
+// Allow Cloudflare Pages preview deployments
+const isAllowedOrigin = (origin: string | undefined) => {
+  if (!origin) return true; // Allow requests with no origin (e.g., mobile apps, curl)
+  if (allowedOrigins.includes(origin)) return true;
+  // Allow Cloudflare Pages preview URLs: *.terrainsim.pages.dev
+  if (origin.match(/^https:\/\/[a-z0-9-]+\.terrainsim\.pages\.dev$/)) return true;
+  return false;
+};
+
 // Create HTTP server and Socket.IO instance
 const httpServer = createServer(app);
 const io = new SocketServer(httpServer, {
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -37,7 +58,13 @@ if (IS_DEV) {
 
 // API-004: CORS support for local development
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'DELETE'],
   credentials: true
 }));
