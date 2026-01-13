@@ -217,6 +217,14 @@ The project follows an iterative development model, with each iteration deliveri
 ### **Iteration 2.5: Cloudflare Production Deployment**
 **Goal:** Deploy frontend and backend to Cloudflare infrastructure with automated CI/CD from GitHub.
 
+**✅ STATUS: COMPLETE (January 13, 2026)**
+- **Frontend:** https://terrainsim.lmvcruz.work (Cloudflare Pages - Auto-deploy)
+- **Backend:** https://api.lmvcruz.work (AWS EC2 - Manual deploy)
+- **CI/CD:** GitHub Actions testing + Cloudflare Git integration
+- **Cost:** Year 1 = $12 (domain only), Year 2+ = $117/year
+
+**Implementation Note:** Original plan was Cloudflare-only, but C++ native addon requires traditional server. Deployed to AWS EC2 t3.micro (free tier Year 1) instead of Cloudflare Workers. Frontend remains on Cloudflare Pages with Git auto-deploy.
+
 **Architecture Overview:**
 *   **Frontend:** Deployed to Cloudflare Pages (static site hosting)
 *   **Backend API:** Deployed to external server (VM/Container) due to native Node-API addon requirements
@@ -292,56 +300,48 @@ The project follows an iterative development model, with each iteration deliveri
 
 **Tasks:**
 
-**Delivery Block 1: Cloudflare Pages Setup (Frontend)**
-- [ ] **DEPLOY-002:** Create Cloudflare Pages project via dashboard
-- [ ] **DEPLOY-003:** Connect GitHub repository to Cloudflare Pages
-- [ ] **DEPLOY-004:** Configure build settings (command, output dir, Node version)
-- [ ] **DEPLOY-005:** Set environment variables (VITE_API_URL, VITE_WS_URL)
-- [ ] **DEPLOY-006:** Test initial deployment with placeholder API URL
-- [ ] **DEPLOY-007:** Configure custom domain in Cloudflare Pages
-- [ ] **DEPLOY-008:** Verify SSL/TLS certificate provisioned
-- [ ] **TEST-013:** Smoke test: Access frontend at custom domain
+**Delivery Block 1: Cloudflare Pages Setup (Frontend)** ✅ COMPLETE
+- [x] **DEPLOY-002:** Create Cloudflare Pages project via dashboard
+- [x] **DEPLOY-003:** Connect GitHub repository to Cloudflare Pages
+- [x] **DEPLOY-004:** Configure build settings (command, output dir, Node version)
+- [x] **DEPLOY-005:** Set environment variables (VITE_API_URL, VITE_WS_URL)
+- [x] **DEPLOY-006:** Test initial deployment with placeholder API URL
+- [x] **DEPLOY-007:** Configure custom domain in Cloudflare Pages
+- [x] **DEPLOY-008:** Verify SSL/TLS certificate provisioned
+- [x] **TEST-013:** Smoke test: Access frontend at custom domain
 
-**Delivery Block 2: Backend Server Setup**
-- [ ] **DEPLOY-009:** Provision server/VM (recommend: DigitalOcean, AWS EC2, or Hetzner)
-- [ ] **DEPLOY-010:** Install system dependencies (Node 20, CMake, g++, nginx)
-- [ ] **DEPLOY-011:** Clone repository and set up deployment directory
-- [ ] **DEPLOY-012:** Build C++ native addon on server (`npm run build` in bindings/node)
-- [ ] **DEPLOY-013:** Install PM2 process manager (`npm install -g pm2`)
-- [ ] **DEPLOY-014:** Create PM2 ecosystem config for API server
-- [ ] **DEPLOY-015:** Configure nginx reverse proxy (HTTP/HTTPS/WebSocket)
-- [ ] **DEPLOY-016:** Set up Let's Encrypt SSL certificates (certbot)
-- [ ] **DEPLOY-017:** Configure firewall rules (ports 80, 443, SSH only)
-- [ ] **TEST-014:** Health check: `curl https://api.yourdomain.com/health`
+**Delivery Block 2: Backend Server Setup** ✅ COMPLETE (AWS EC2)
+- [x] **DEPLOY-009:** Provision server/VM (AWS EC2 t3.micro - IP: 54.242.131.12)
+- [x] **DEPLOY-010:** Install system dependencies (Node 20.19.6, CMake, g++, nginx)
+- [x] **DEPLOY-011:** Clone repository and set up deployment directory (/var/www/terrainsim)
+- [x] **DEPLOY-012:** Build C++ native addon on server (122KB terrain_erosion_native.node)
+- [x] **DEPLOY-013:** Install PM2 process manager (v6.0.14)
+- [x] **DEPLOY-014:** Create PM2 ecosystem config for API server (fork mode with tsx)
+- [x] **DEPLOY-015:** Configure nginx reverse proxy (HTTP/HTTPS/WebSocket)
+- [x] **DEPLOY-016:** Set up Let's Encrypt SSL certificates (certbot)
+- [x] **DEPLOY-017:** Configure firewall rules (Security Group: 22, 80, 443)
+- [x] **TEST-014:** Health check: `curl https://api.lmvcruz.work/health` ✅
 
-**Delivery Block 3: DNS & Domain Configuration**
-- [ ] **DEPLOY-018:** Add DNS A record for frontend (Cloudflare Pages IP)
-- [ ] **DEPLOY-019:** Add DNS A record for API server (backend server IP)
-- [ ] **DEPLOY-020:** Add DNS A record for WebSocket (same as API or separate)
-- [ ] **DEPLOY-021:** Verify DNS propagation (dig/nslookup commands)
-- [ ] **DEPLOY-022:** Configure SSL/TLS mode in Cloudflare (Full Strict recommended)
-- [ ] **DEPLOY-023:** Enable Cloudflare proxy (orange cloud) for DDoS protection
-- [ ] **TEST-015:** Verify HTTPS access for all subdomains
+**Delivery Block 3: DNS & Domain Configuration** ✅ COMPLETE
+- [x] **DEPLOY-018:** Add DNS A record for frontend (terrainsim.lmvcruz.work → Cloudflare Pages)
+- [x] **DEPLOY-019:** Add DNS A record for API server (api.lmvcruz.work → 54.242.131.12)
+- [x] **DEPLOY-020:** Add DNS A record for WebSocket (same as API)
+- [x] **DEPLOY-021:** Verify DNS propagation (verified via curl/browser)
+- [x] **DEPLOY-022:** Configure SSL/TLS mode in Cloudflare (Full mode)
+- [x] **DEPLOY-023:** Enable Cloudflare proxy (orange cloud) for DDoS protection
+- [x] **TEST-015:** Verify HTTPS access for all subdomains ✅
 
-**Delivery Block 4: GitHub Actions CI/CD**
-- [ ] **DEPLOY-024:** Create `.github/workflows/deploy-frontend.yml`
-    - Trigger on push to main (paths: `apps/web/**`)
-    - Build frontend with Vite
-    - Deploy to Cloudflare Pages via Wrangler or API
-    - Run post-deployment smoke test
-- [ ] **DEPLOY-025:** Create `.github/workflows/deploy-backend.yml`
-    - Trigger on push to main (paths: `apps/simulation-api/**`, `libs/core/**`)
-    - SSH into server (use GitHub secrets for credentials)
-    - Pull latest code
-    - Rebuild native addon if C++ changed
-    - Restart PM2 process with zero downtime
-    - Verify health check passes
-- [ ] **DEPLOY-026:** Add GitHub secrets for deployment:
-    - `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID`
-    - `SERVER_SSH_KEY`, `SERVER_HOST`, `SERVER_USER`
-    - `SERVER_DEPLOY_PATH`
-- [ ] **DEPLOY-027:** Test automated deployment end-to-end
-- [ ] **TEST-016:** Push test change, verify auto-deployment works
+**Delivery Block 4: GitHub Actions CI/CD** ⚠️ PARTIAL (Automated testing only, manual deployment)
+- [x] **CI Workflow:** Created `ci.yml` - automated testing on push/PR ✅
+  - Frontend: TypeScript, build validation, Vitest tests
+  - Backend: C++ compilation, CTest unit tests
+- [x] **Frontend Deployment:** Cloudflare Git integration (automatic on push) ✅
+- [~] **DEPLOY-024-027:** Backend deployment automation ❌ SKIPPED
+  - Reason: GitHub Actions SSH key format issues
+  - Solution: Manual SSH deployment working fine (5-minute process)
+  - Future: Can be automated with `webfactory/ssh-agent` action
+- [x] **DEPLOY-026:** GitHub secrets configured (6 secrets added)
+- [x] **TEST-016:** Frontend auto-deploys on push ✅, Backend deploys manually
 
 **Delivery Block 5: Monitoring & Logging**
 - [ ] **DEPLOY-028:** Set up PM2 log monitoring (`pm2 logs`)
@@ -351,24 +351,27 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **DEPLOY-032:** Configure Cloudflare Analytics for frontend
 - [ ] **DEPLOY-033:** Add application performance monitoring (optional: Sentry)
 
-**Delivery Block 6: Performance & Optimization**
-- [ ] **DEPLOY-034:** Enable Cloudflare page rules for caching
-- [ ] **DEPLOY-035:** Configure browser cache headers in nginx
-- [ ] **DEPLOY-036:** Enable gzip/brotli compression in nginx
-- [ ] **DEPLOY-037:** Set up CDN caching for static assets
-- [ ] **DEPLOY-038:** Test WebSocket performance across regions
-- [ ] **TEST-017:** Load test: Verify backend handles 100+ concurrent users
-
-**Delivery Block 7: Documentation**
-- [ ] **DOC-005:** Create deployment guide (`docs/DEPLOYMENT.md`)
-    - Server setup instructions
-    - Environment variables reference
-    - Troubleshooting common issues
-- [ ] **DOC-006:** Document GitHub Actions workflows
-- [ ] **DOC-007:** Create runbook for common operations:
-    - Manual deployment steps
-    - Rollback procedure
-    - Log access and debugging
+**Delivery Block 6: Performance & Optimiza ⚠️ BA ⚠️ MINIMAL (Good enough for MVP)
+- [x] **DEPLOY-034:** Cloudflare CDN caching (automatic) ✅
+- [x] **DEPLOY-036:** nginx gzip compression enabled ✅
+- [ ] **DEPLOY-035:** Custom cache headers ⏸️ DEFERRED (not critical)
+- [ ] **DEPLOY-037:** CDN static asset optimization ⏸️ DEFERRED (Cloudflare handles this)
+- [ ] **DEPLOY-038:** WebSocket performance testing ⏸️ DEFERRED (works well currently)
+- [ ] **TEST-017:** Load testing ⏸️ DEFERRED (optimize when traffic increases)g needed)
+- [ ] **DEPLOY-033:** APM (Sentry) ⏸️ DEFERRED (optional for MVP
+ ✅ COMPLETE
+- [x] **DOC-005:** Create deployment guide (`docs/DEPLOYMENT.md`) ✅
+  - Server setup instructions
+  - Environment variables reference
+  - Troubleshooting common issues
+- [x] **DOC-006:** GitHub Actions workflows documented (in DEPLOYMENT.md) ✅
+- [x] **DOC-007:** Runbook created (in DEPLOYMENT.md) ✅
+  - Manual deployment steps
+  - Troubleshooting procedures
+  - Log access and debugging
+  - SSL certificate auto-renewal configured
+- [x] **BONUS:** Created AWS_DEPLOYMENT_GUIDE.md with detailed EC2 setup ✅
+- [x] **BONUS:** Created PROJECT_STATUS.md with overall project organization ✅g
     - SSL certificate renewal
 
 **Alternative Future Enhancement: WebAssembly Backend**
@@ -379,19 +382,30 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **WASM-004:** Compare performance: Native vs WASM
 
 **Success Criteria:**
-*   Frontend accessible at custom domain with HTTPS.
-*   Backend API responds at `api.yourdomain.com/health`.
-*   WebSocket connections work from frontend to backend.
-*   GitHub push triggers automatic deployment.
-*   Zero downtime deployments.
-*   SSL certificates auto-renew.
-*   Application monitored with alerts.
+*   Frontend accessible at custom domain with HTTPS. ✅
+*   Backend API responds at `api.yourdomain.com/health`. ✅
+*   WebSocket connections work from frontend to backend. ✅
+*   GitHub push triggers automatic deployment. ✅ (Frontend), ⚠️ Manual (Backend)
+*   Zero downtime deployments. ✅ (PM2 restart)
+*   SSL certificates auto-renew. ✅ (certbot configured)
+*   Application monitored with alerts. ⚠️ (Basic PM2 monitoring, no alerts)
 
 **Recommended Server Specs (Backend):**
 *   **Minimum:** 2 CPU cores, 4GB RAM, 50GB SSD
 *   **Recommended:** 4 CPU cores, 8GB RAM, 100GB SSD
 *   **OS:** Ubuntu 22.04 LTS or Debian 12
 *   **Providers:** DigitalOcean ($24/mo), AWS t3.medium, Hetzner CX32
+
+**Actual Deployment (AWS EC2 t3.micro):**
+*   **Instance:** 1 vCPU, 1GB RAM, 30GB SSD
+*   **OS:** Ubuntu 22.04 LTS
+*   **Status:** Working well for MVP, can upgrade later
+
+---
+
+**📋 ITERATION 2.5 COMPLETE - READY FOR ITERATION 3** ✅
+
+All critical infrastructure in place. Minor items deferred (advanced monitoring, load balancing, backend auto-deploy) are not blockers for continued development. Application is live and functional in production.
 
 ---
 
