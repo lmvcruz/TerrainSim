@@ -1,13 +1,9 @@
 name: Deploy Frontend to Cloudflare Pages
 
+# Disabled: Using Cloudflare's automatic Git-based deployment instead
+# Cloudflare will automatically build and deploy on every push to main
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'pnpm-workspace.yaml'
-      - '.github/workflows/deploy-frontend.yml'
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   deploy:
