@@ -99,47 +99,6 @@ function App() {
     handleGenerate(DEFAULT_PARAMETERS)
   }, [])
 
-  const generateDemoTerrain = (parameters: NoiseParameters = DEFAULT_PARAMETERS) => {
-    logger.info('Generating demo terrain (no API)', parameters)
-    const demo = new Float32Array(width * height)
-
-    // Simple pseudo-random noise based on seed and parameters
-    const { seed, frequency, amplitude } = parameters
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const nx = x * frequency
-        const ny = y * frequency
-
-        // Simple hash-based pseudo-random function using seed
-        const hash = (n: number) => {
-          let h = seed + n
-          h = ((h >> 16) ^ h) * 0x45d9f3b
-          h = ((h >> 16) ^ h) * 0x45d9f3b
-          h = (h >> 16) ^ h
-          return (h & 0xff) / 255.0 - 0.5
-        }
-
-        // Multi-octave noise
-        let value = 0
-        let amp = amplitude
-        let freq = 1
-
-        for (let o = 0; o < 4; o++) {
-          const sx = Math.floor(nx * freq)
-          const sy = Math.floor(ny * freq)
-          value += hash(sx + sy * 1000 + o * 10000) * amp
-          amp *= 0.5
-          freq *= 2
-        }
-
-        demo[y * width + x] = value
-      }
-    }
-
-    setHeightmap(demo)
-  }
-
   const handleGenerate = async (parameters: NoiseParameters) => {
     setLoading(true)
     setError(null)
