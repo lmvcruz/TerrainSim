@@ -214,6 +214,187 @@ The project follows an iterative development model, with each iteration deliveri
 
 ---
 
+### **Iteration 2.5: Cloudflare Production Deployment**
+**Goal:** Deploy frontend and backend to Cloudflare infrastructure with automated CI/CD from GitHub.
+
+**Architecture Overview:**
+*   **Frontend:** Deployed to Cloudflare Pages (static site hosting)
+*   **Backend API:** Deployed to external server (VM/Container) due to native Node-API addon requirements
+    *   Native C++ binding cannot run on Cloudflare Workers (no native module support)
+    *   Options: Cloudflare-compatible VM service, cloud VM (AWS/GCP/Azure), or dedicated server
+*   **CI/CD:** GitHub Actions workflows for automated deployment
+*   **Domain:** Custom domain configured through Cloudflare DNS
+
+**Frontend Deliverables (Cloudflare Pages):**
+*   Configure Cloudflare Pages project for React + Vite app.
+*   Set up build configuration:
+    *   Build command: `pnpm --filter @terrain/web run build`
+    *   Output directory: `apps/web/dist`
+    *   Node.js version: 20.x
+*   Configure environment variables:
+    *   `VITE_API_URL`: Backend API endpoint
+    *   `VITE_WS_URL`: WebSocket server endpoint
+*   Set up custom domain with SSL/TLS.
+*   Configure caching and performance optimization.
+
+**Backend Deliverables:**
+*   Set up server infrastructure:
+    *   Choose deployment platform (VM with Node.js + C++ compiler support)
+    *   Install system dependencies: Node.js 20+, CMake 3.15+, C++ compiler (gcc/g++)
+    *   Set up process manager (PM2) for Node.js app
+*   Build and deploy process:
+    *   Build C++ native addon during deployment
+    *   Install Node.js dependencies
+    *   Configure environment variables
+    *   Set up SSL/TLS certificates (Let's Encrypt)
+*   Configure reverse proxy (nginx):
+    *   HTTP → redirect to HTTPS
+    *   WebSocket upgrade headers
+    *   CORS configuration for Cloudflare Pages domain
+*   Set up monitoring and logging:
+    *   Application logs
+    *   Error tracking
+    *   Health check endpoint monitoring
+
+**GitHub Actions Workflows:**
+*   Create deployment workflow for frontend (Cloudflare Pages):
+    *   Trigger: Push to `main` branch (frontend changes)
+    *   Deploy via Cloudflare API or Wrangler CLI
+    *   Run build and deploy steps
+    *   Post-deployment smoke tests
+*   Create deployment workflow for backend:
+    *   Trigger: Push to `main` branch (backend changes)
+    *   SSH deploy to server or container registry push
+    *   Build native addon on server
+    *   Restart application with zero downtime
+    *   Health check validation
+
+**Domain & DNS Configuration:**
+*   Configure Cloudflare DNS:
+    *   A record for frontend (e.g., `terrainsim.yourdomain.com` → Cloudflare Pages)
+    *   A/CNAME record for API (e.g., `api.terrainsim.yourdomain.com` → Backend server IP)
+    *   A/CNAME record for WebSocket (e.g., `ws.terrainsim.yourdomain.com` → Backend server IP)
+*   Enable Cloudflare features:
+    *   SSL/TLS encryption (Full or Full Strict mode)
+    *   Auto minify (HTML, CSS, JS)
+    *   Brotli compression
+    *   HTTP/2 and HTTP/3 support
+    *   DDoS protection (automatic)
+
+**Security & Performance:**
+*   Set up security headers:
+    *   Content Security Policy (CSP)
+    *   HSTS (HTTP Strict Transport Security)
+    *   X-Frame-Options, X-Content-Type-Options
+*   Configure rate limiting (Cloudflare or backend)
+*   Set up CDN caching rules
+*   Enable WebSocket compression
+
+**Tasks:**
+
+**Delivery Block 1: Cloudflare Pages Setup (Frontend)**
+- [ ] **DEPLOY-002:** Create Cloudflare Pages project via dashboard
+- [ ] **DEPLOY-003:** Connect GitHub repository to Cloudflare Pages
+- [ ] **DEPLOY-004:** Configure build settings (command, output dir, Node version)
+- [ ] **DEPLOY-005:** Set environment variables (VITE_API_URL, VITE_WS_URL)
+- [ ] **DEPLOY-006:** Test initial deployment with placeholder API URL
+- [ ] **DEPLOY-007:** Configure custom domain in Cloudflare Pages
+- [ ] **DEPLOY-008:** Verify SSL/TLS certificate provisioned
+- [ ] **TEST-013:** Smoke test: Access frontend at custom domain
+
+**Delivery Block 2: Backend Server Setup**
+- [ ] **DEPLOY-009:** Provision server/VM (recommend: DigitalOcean, AWS EC2, or Hetzner)
+- [ ] **DEPLOY-010:** Install system dependencies (Node 20, CMake, g++, nginx)
+- [ ] **DEPLOY-011:** Clone repository and set up deployment directory
+- [ ] **DEPLOY-012:** Build C++ native addon on server (`npm run build` in bindings/node)
+- [ ] **DEPLOY-013:** Install PM2 process manager (`npm install -g pm2`)
+- [ ] **DEPLOY-014:** Create PM2 ecosystem config for API server
+- [ ] **DEPLOY-015:** Configure nginx reverse proxy (HTTP/HTTPS/WebSocket)
+- [ ] **DEPLOY-016:** Set up Let's Encrypt SSL certificates (certbot)
+- [ ] **DEPLOY-017:** Configure firewall rules (ports 80, 443, SSH only)
+- [ ] **TEST-014:** Health check: `curl https://api.yourdomain.com/health`
+
+**Delivery Block 3: DNS & Domain Configuration**
+- [ ] **DEPLOY-018:** Add DNS A record for frontend (Cloudflare Pages IP)
+- [ ] **DEPLOY-019:** Add DNS A record for API server (backend server IP)
+- [ ] **DEPLOY-020:** Add DNS A record for WebSocket (same as API or separate)
+- [ ] **DEPLOY-021:** Verify DNS propagation (dig/nslookup commands)
+- [ ] **DEPLOY-022:** Configure SSL/TLS mode in Cloudflare (Full Strict recommended)
+- [ ] **DEPLOY-023:** Enable Cloudflare proxy (orange cloud) for DDoS protection
+- [ ] **TEST-015:** Verify HTTPS access for all subdomains
+
+**Delivery Block 4: GitHub Actions CI/CD**
+- [ ] **DEPLOY-024:** Create `.github/workflows/deploy-frontend.yml`
+    - Trigger on push to main (paths: `apps/web/**`)
+    - Build frontend with Vite
+    - Deploy to Cloudflare Pages via Wrangler or API
+    - Run post-deployment smoke test
+- [ ] **DEPLOY-025:** Create `.github/workflows/deploy-backend.yml`
+    - Trigger on push to main (paths: `apps/simulation-api/**`, `libs/core/**`)
+    - SSH into server (use GitHub secrets for credentials)
+    - Pull latest code
+    - Rebuild native addon if C++ changed
+    - Restart PM2 process with zero downtime
+    - Verify health check passes
+- [ ] **DEPLOY-026:** Add GitHub secrets for deployment:
+    - `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID`
+    - `SERVER_SSH_KEY`, `SERVER_HOST`, `SERVER_USER`
+    - `SERVER_DEPLOY_PATH`
+- [ ] **DEPLOY-027:** Test automated deployment end-to-end
+- [ ] **TEST-016:** Push test change, verify auto-deployment works
+
+**Delivery Block 5: Monitoring & Logging**
+- [ ] **DEPLOY-028:** Set up PM2 log monitoring (`pm2 logs`)
+- [ ] **DEPLOY-029:** Configure log rotation (PM2 or logrotate)
+- [ ] **DEPLOY-030:** Add uptime monitoring (UptimeRobot or similar)
+- [ ] **DEPLOY-031:** Set up error alerting (email/Slack/Discord webhook)
+- [ ] **DEPLOY-032:** Configure Cloudflare Analytics for frontend
+- [ ] **DEPLOY-033:** Add application performance monitoring (optional: Sentry)
+
+**Delivery Block 6: Performance & Optimization**
+- [ ] **DEPLOY-034:** Enable Cloudflare page rules for caching
+- [ ] **DEPLOY-035:** Configure browser cache headers in nginx
+- [ ] **DEPLOY-036:** Enable gzip/brotli compression in nginx
+- [ ] **DEPLOY-037:** Set up CDN caching for static assets
+- [ ] **DEPLOY-038:** Test WebSocket performance across regions
+- [ ] **TEST-017:** Load test: Verify backend handles 100+ concurrent users
+
+**Delivery Block 7: Documentation**
+- [ ] **DOC-005:** Create deployment guide (`docs/DEPLOYMENT.md`)
+    - Server setup instructions
+    - Environment variables reference
+    - Troubleshooting common issues
+- [ ] **DOC-006:** Document GitHub Actions workflows
+- [ ] **DOC-007:** Create runbook for common operations:
+    - Manual deployment steps
+    - Rollback procedure
+    - Log access and debugging
+    - SSL certificate renewal
+
+**Alternative Future Enhancement: WebAssembly Backend**
+*For truly serverless Cloudflare Workers deployment (no native addon limitations):*
+- [ ] **WASM-001:** Compile C++ erosion engine to WebAssembly (Emscripten)
+- [ ] **WASM-002:** Create JavaScript wrapper for WASM module
+- [ ] **WASM-003:** Deploy to Cloudflare Workers
+- [ ] **WASM-004:** Compare performance: Native vs WASM
+
+**Success Criteria:**
+*   Frontend accessible at custom domain with HTTPS.
+*   Backend API responds at `api.yourdomain.com/health`.
+*   WebSocket connections work from frontend to backend.
+*   GitHub push triggers automatic deployment.
+*   Zero downtime deployments.
+*   SSL certificates auto-renew.
+*   Application monitored with alerts.
+
+**Recommended Server Specs (Backend):**
+*   **Minimum:** 2 CPU cores, 4GB RAM, 50GB SSD
+*   **Recommended:** 4 CPU cores, 8GB RAM, 100GB SSD
+*   **OS:** Ubuntu 22.04 LTS or Debian 12
+*   **Providers:** DigitalOcean ($24/mo), AWS t3.medium, Hetzner CX32
+
+---
+
 ### **Iteration 3: Hydraulic Erosion Simulation**
 **Goal:** Implement physics-based hydraulic erosion as the first dynamic simulation method.
 
