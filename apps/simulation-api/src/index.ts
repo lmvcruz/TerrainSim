@@ -5,6 +5,7 @@ import path from 'path';
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { generatePerlinNoise, generateFbm } from './generators/heightmapGenerators.js';
+import { simulateParticle } from './erosion-binding.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -311,50 +312,26 @@ io.on('connection', (socket) => {
         const particlesToProcess = Math.min(particlesPerFrame, numParticles - particlesSimulated);
 
         for (let i = 0; i < particlesToProcess; i++) {
-          // Simulate one particle (placeholder - will be replaced with C++ binding)
-          // Random starting position
-          const x = Math.floor(Math.random() * width);
-          const y = Math.floor(Math.random() * height);
+          // Random starting position for particle
+          const startX = Math.random() * (width - 1);
+          const startY = Math.random() * (height - 1);
 
-          // Simulate particle path (simplified steepest descent)
-          let px = x;
-          let py = y;
-
-          for (let step = 0; step < 10; step++) {
-            const idx = py * width + px;
-
-            // More visible erosion - increased 100x from 0.0001 to 0.01
-            const erodeAmount = 0.01;
-            heightmap[idx] = Math.max(0, heightmap[idx] - erodeAmount);
-
-            // Move to lowest neighbor
-            let lowestHeight = heightmap[idx];
-            let nextX = px;
-            let nextY = py;
-
-            for (let dy = -1; dy <= 1; dy++) {
-              for (let dx = -1; dx <= 1; dx++) {
-                if (dx === 0 && dy === 0) continue;
-
-                const nx = px + dx;
-                const ny = py + dy;
-
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                  const nidx = ny * width + nx;
-                  if (heightmap[nidx] < lowestHeight) {
-                    lowestHeight = heightmap[nidx];
-                    nextX = nx;
-                    nextY = ny;
-                  }
-                }
-              }
-            }
-
-            // If no lower neighbor, stop
-            if (nextX === px && nextY === py) break;
-
-            px = nextX;
-            py = nextY;
+          // Use C++ physics engine for realistic erosion
+          try {
+            simulateParticle(heightmap, width, height, startX, startY, {
+              maxIterations: erosionParams.maxDropletLifetime || 30,
+              inertia: erosionParams.inertia || 0.05,
+              sedimentCapacityFactor: erosionParams.sedimentCapacityFactor || 4.0,
+              erodeSpeed: erosionParams.erodeSpeed || 0.3,
+              depositSpeed: erosionParams.depositSpeed || 0.3,
+              evaporateSpeed: erosionParams.evaporateSpeed || 0.01,
+              gravity: erosionParams.gravity || 4.0,
+              maxDropletSpeed: 10.0,
+              erosionRadius: erosionParams.erosionRadius || 3
+            });
+          } catch (error) {
+            console.error('❌ C++ erosion error:', error);
+            // Fall back gracefully if C++ binding fails
           }
         }
 

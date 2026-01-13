@@ -1,0 +1,18 @@
+{
+  "name": "terrain-erosion-native",
+  "version": "1.0.0",
+  "description": "Node-API binding for TerrainSim hydraulic erosion",
+  "main": "index.js",
+  "scripts": {
+    "build": "cmake-js compile",
+    "clean": "cmake-js clean",
+    "rebuild": "cmake-js rebuild"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.0.0"
+  },
+  "devDependencies": {
+    "cmake-js": "^7.3.0"
+  },
+  "gypfile": false
+}
