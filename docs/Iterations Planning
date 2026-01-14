@@ -327,12 +327,12 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **DOC-003:** Hydraulic erosion algorithm documentation
 
 **Delivery Block 2: Monitoring & Observability**
-- [ ] **DEPLOY-028:** PM2 log monitoring with structured output
-- [ ] **DEPLOY-029:** Log rotation (PM2 + logrotate)
-- [ ] **DEPLOY-030:** Uptime monitoring (UptimeRobot → https://api.lmvcruz.work/health)
-- [ ] **DEPLOY-031:** Error alerting (Discord/Slack webhook)
-- [ ] **DEPLOY-032:** Cloudflare Analytics
-- [ ] **DEPLOY-033:** APM (Sentry)
+- [x] **DEPLOY-028:** PM2 log monitoring with structured output (human-readable with timestamps)
+- [x] **DEPLOY-029:** Log rotation (90 days retention, 100MB max, gzip compression)
+- [x] **DEPLOY-030:** Uptime monitoring (UptimeRobot → /health, /generate, WebSocket, frontend + response times + multiple regions)
+- [x] **DEPLOY-031:** Error alerting (Email to lmvcruz@gmail.com via UptimeRobot with flood prevention)
+- [x] **DEPLOY-032:** Cloudflare Analytics (automatically enabled, documentation provided)
+- [~] **DEPLOY-033:** APM (Sentry) - SKIPPED (focusing on free tools: PM2, UptimeRobot, Cloudflare)
 
 **Delivery Block 3: Backend CI/CD Automation**
 - [ ] **DEPLOY-024:** Fix GitHub Actions SSH key (webfactory/ssh-agent)
