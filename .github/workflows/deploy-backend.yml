@@ -38,7 +38,7 @@ jobs:
             cd /var/www/terrainsim
             echo "📥 Pulling latest code from main branch..."
             git pull origin main
-            
+
             echo "📦 Installing/updating dependencies..."
             pnpm install
           '

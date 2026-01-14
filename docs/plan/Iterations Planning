@@ -345,13 +345,7 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **CORE-022:** Benchmark tests for all C++ operations (hydraulic erosion particle simulation, Perlin noise generation, fBm layering, heightmap operations)
 - [x] **TEST-007:** Performance baseline documentation (create docs/infra/PERFORMANCE_METRICS.md with current FPS, latency, throughput, bottleneck analysis, end-to-end pipeline metrics)
 
-**Delivery Block 5: WebAssembly Exploration** (Optional)
-- [ ] **WASM-001:** Compile C++ erosion to WebAssembly (Emscripten)
-- [ ] **WASM-002:** JavaScript wrapper for WASM module
-- [ ] **WASM-003:** Deploy to Cloudflare Workers
-- [ ] **WASM-004:** Performance comparison: Native vs WASM
-
-**Delivery Block 6: Documentation Reorganization**
+**Delivery Block 5: Documentation Reorganization**
 - [ ] **DOC-100:** Scan and inventory all files in docs/ folder
 - [ ] **DOC-101:** Create new documentation structure:
   - `docs/planning/` - Main plan and specifications (Iterations Planning, System Spec)
@@ -536,7 +530,13 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **PERF-002:** CDN asset optimization (compression, cache strategies, static asset fingerprinting)
 - [ ] **PERF-003:** WebSocket performance testing (concurrent connections, message throughput, latency profiling)
 
-**Delivery Block 4: Preset Library UI**
+**Delivery Block 5: WebAssembly Exploration** (Optional - Deferred from Iteration 3.5)
+- [ ] **WASM-001:** Compile C++ erosion to WebAssembly (Emscripten)
+- [ ] **WASM-002:** JavaScript wrapper for WASM module
+- [ ] **WASM-003:** Deploy to Cloudflare Workers
+- [ ] **WASM-004:** Performance comparison: Native vs WASM
+
+**Delivery Block 6: Preset Library UI**
 - [ ] **WEB-041:** Create PresetLibrary UI component
 - [ ] **WEB-042:** Design preset cards with thumbnails
 - [ ] **WEB-043:** Add preset search/filter functionality

@@ -241,7 +241,7 @@ View Monitor: https://uptimerobot.com/dashboard#<monitor_id>
 | Re-alert Interval | 360 minutes (6 hours) | Prevents email flood |
 | Alert on Recovery | Yes | Single email when restored |
 
-**Maximum alert frequency**: 
+**Maximum alert frequency**:
 - Initial down: 1 email after 10 minutes
 - Re-alerts: 1 email every 6 hours while down
 - Recovery: 1 email when back up

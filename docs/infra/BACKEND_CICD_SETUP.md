@@ -1,7 +1,7 @@
 # Backend CI/CD Setup Guide
 
-**Delivery Block 3: Backend CI/CD Automation**  
-**Date:** January 14, 2026  
+**Delivery Block 3: Backend CI/CD Automation**
+**Date:** January 14, 2026
 **Status:** Implementation Complete
 
 ---
@@ -35,7 +35,7 @@ This guide explains how to set up automated backend deployment for TerrainSim us
 2. **Click "New repository secret"**
 
 3. **Add SSH_PRIVATE_KEY:**
-   
+
    **On Windows PowerShell:**
    ```powershell
    # Display the private key content
@@ -384,6 +384,6 @@ ssh terrainsim "cd /var/www/terrainsim && git status"
 
 ---
 
-**Documentation Status:** ✅ Complete  
-**Last Updated:** January 14, 2026  
+**Documentation Status:** ✅ Complete
+**Last Updated:** January 14, 2026
 **Next Review:** Iteration 4, Block 7 (Deployment Resilience Discussion)
