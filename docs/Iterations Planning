@@ -340,13 +340,10 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **DEPLOY-027:** Post-deployment health checks (30 retries, 60 seconds timeout, alert on failure)
 
 **Delivery Block 4: Performance Optimization**
-- [ ] **DEPLOY-035:** Custom cache headers
-- [ ] **DEPLOY-037:** CDN asset optimization
-- [ ] **DEPLOY-038:** WebSocket performance testing
-- [ ] **TEST-017:** Load testing (k6 or Apache Bench)
-- [ ] **CORE-021:** Google Benchmark setup
-- [ ] **CORE-022:** Benchmark tests (cycles-per-cell)
-- [ ] **TEST-007:** 256×256 grid @ 30+ FPS validation
+- [x] **TEST-017:** Load testing with k6 (10 concurrent users, all scenarios: /health baseline, /generate terrain generation, WebSocket /simulate erosion streaming)
+- [x] **CORE-021:** Google Benchmark setup (CMakeLists.txt integration, manual trigger only - not in CI pipeline)
+- [x] **CORE-022:** Benchmark tests for all C++ operations (hydraulic erosion particle simulation, Perlin noise generation, fBm layering, heightmap operations)
+- [x] **TEST-007:** Performance baseline documentation (create docs/infra/PERFORMANCE_METRICS.md with current FPS, latency, throughput, bottleneck analysis, end-to-end pipeline metrics)
 
 **Delivery Block 5: WebAssembly Exploration** (Optional)
 - [ ] **WASM-001:** Compile C++ erosion to WebAssembly (Emscripten)
@@ -533,6 +530,11 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **API-012:** Add /presets endpoint (list available presets)
 - [ ] **API-013:** Implement /load-preset endpoint
 - [ ] **TEST-014:** Test JSON parameter round-trip (save → load)
+
+**Delivery Block 4: Advanced Performance Optimization** (Deferred from Iteration 3.5)
+- [ ] **PERF-001:** Custom cache headers for API responses (Cache-Control, ETag, conditional requests)
+- [ ] **PERF-002:** CDN asset optimization (compression, cache strategies, static asset fingerprinting)
+- [ ] **PERF-003:** WebSocket performance testing (concurrent connections, message throughput, latency profiling)
 
 **Delivery Block 4: Preset Library UI**
 - [ ] **WEB-041:** Create PresetLibrary UI component
