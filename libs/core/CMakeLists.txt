@@ -14,8 +14,20 @@ add_library(terrain_core
     src/PerlinNoise.cpp
     src/WaterParticle.cpp
     src/HydraulicErosion.cpp
+    src/JobValidator.cpp
+    src/JobExecutor.cpp
+    src/ConfigParser.cpp
 )
 target_include_directories(terrain_core PUBLIC include)
+
+# Add nlohmann/json dependency for ConfigParser
+include(FetchContent)
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
+target_link_libraries(terrain_core PUBLIC nlohmann_json::nlohmann_json)
 
 # Testing Setup
 include(FetchContent)
@@ -37,6 +49,9 @@ add_executable(terrain_core_tests
     tests/WaterParticleTest.cpp
     tests/HeightmapGradientTest.cpp
     tests/HydraulicErosionTest.cpp
+    tests/JobValidatorTest.cpp
+    tests/JobExecutorTest.cpp
+    tests/ConfigParserTest.cpp
 )
 target_link_libraries(terrain_core_tests PRIVATE terrain_core gtest_main)
 

@@ -377,58 +377,117 @@ The project follows an iterative development model, with each iteration deliveri
 ### **Iteration 3.6: Job-Based Pipeline System**
 **Goal:** Implement job-based simulation pipeline with full coverage validation and integrated UI.
 
-**Backend Deliverables:**
-- Job data model (SimulationJob, SimulationStep structures)
-- JobValidator class with full coverage checking and gap detection
-- JobExecutor for frame-by-frame execution with sequential job application
-- JSON configuration parser for pipeline configs (Step 0, steps, jobs)
-- Schema validation (required fields, valid ranges)
-
-**API Deliverables:**
-- POST /config/validate endpoint (coverage validation)
-- POST /config/save endpoint (save config to file)
-- GET /config/load/:id endpoint (load saved config)
-- Update POST /simulate to accept job-based configs
-- WebSocket events: frame:complete, job:start, job:end, validation:error
-
-**Frontend Deliverables:**
-- Integrated 4-panel UI layout (Pipeline Builder, 3D Viewer, Job Manager, Timeline)
-- Pipeline Builder panel (add/remove/toggle steps, configure Step 0)
-- Job Manager panel (CRUD operations, enable/disable jobs)
-- Configuration Timeline (color-coded coverage bars, gap visualization)
-- Create/Edit Job modal with validation
-- Real-time validation with visual feedback
-- Save/load buttons with file picker
-- 1-2 job templates per step type (Heavy/Light erosion, Aggressive/Gentle thermal)
-
-**Integration:**
-- Client-side validation before API calls
-- Red timeline segments for gaps (blocks execution)
-- Yellow indicators for overlapping jobs
-- Auto-save to localStorage (draft recovery)
-
 **Tasks:**
-- [ ] **CORE-012:** Job Data Model & Validation (SimulationJob class, JobValidator with gap detection)
-- [ ] **CORE-013:** Job Execution Engine (JobExecutor with sequential frame-by-frame execution)
-- [ ] **CORE-014:** Configuration Parser (JSON parser with schema validation)
-- [ ] **API-005:** Job Management Endpoints (validate, save, load configs)
-- [ ] **API-006:** WebSocket Progress Events (frame:complete, job:start/end, validation:error)
-- [ ] **WEB-004:** Integrated UI Layout (4-panel design with resize/collapse)
-- [ ] **WEB-005:** Pipeline Builder Panel (step management, Step 0 config)
-- [ ] **WEB-006:** Job Manager Panel (list, create, edit, delete, enable/disable)
-- [ ] **WEB-007:** Configuration Timeline (coverage visualization with color coding)
-- [ ] **WEB-008:** Create/Edit Job Modal (validation, templates, preview)
-- [ ] **INT-002:** Configuration Persistence (save/load, localStorage, recent configs)
-- [ ] **INT-003:** Validation & Error Handling (coverage errors, warnings, blocking UI)
-- [ ] **INT-004:** Job Templates (2 presets per step: hydraulic, thermal)
-- [ ] **TEST-201:** JobValidator unit tests (10+ cases: gaps, overlaps, edge cases)
-- [ ] **TEST-202:** JobExecutor unit tests (8+ cases: single/multiple jobs, ordering)
-- [ ] **TEST-203:** Config Parser unit tests (6+ cases: valid/invalid JSON)
-- [ ] **TEST-204:** API integration tests (end-to-end: create → validate → execute)
-- [ ] **TEST-205:** Frontend E2E tests (build pipeline → create jobs → validate → run)
-- [ ] **DOC-011:** API endpoint documentation (all new endpoints)
-- [ ] **DOC-012:** User guide for job system
-- [ ] **DOC-013:** Developer architecture notes
+
+**Delivery Block 1: Backend Foundation (Data Model & Validation)**
+- [x] **CORE-012:** Implement SimulationJob and SimulationStep data structures
+- [x] **CORE-013:** Create JobValidator class with coverage checking
+  - Validate full frame coverage (no gaps allowed)
+  - Detect overlapping jobs
+  - Return structured validation results (errors, warnings)
+- [x] **CORE-014:** Implement JobExecutor class
+  - Frame-by-frame execution loop
+  - Apply jobs sequentially to frame ranges
+  - Handle multiple jobs per step (last wins)
+- [x] **CORE-015:** Create JSON configuration parser
+  - Parse Step 0 (modeling configuration)
+  - Parse steps and jobs arrays
+  - Schema validation (required fields, valid ranges)
+- [x] **TEST-201:** Write JobValidator unit tests (12 cases: gaps, overlaps, edge cases)
+- [x] **TEST-202:** Write JobExecutor unit tests (9 cases: single/multiple jobs, ordering)
+- [x] **TEST-203:** Write Config Parser unit tests (15 cases: valid/invalid JSON)
+
+**Delivery Block 2: API Layer**
+- [ ] **API-007:** Create POST /config/validate endpoint
+  - Input: Pipeline configuration JSON
+  - Output: Validation result (isValid, uncoveredFrames, warnings)
+- [ ] **API-008:** Create POST /config/save endpoint (save config to file)
+- [ ] **API-009:** Create GET /config/load/:id endpoint (load saved config)
+- [ ] **API-010:** Update POST /simulate to accept job-based configs
+  - Maintain backward compatibility with old format
+  - Add migration helper to convert old → new format
+- [ ] **API-011:** Implement WebSocket progress events
+  - Emit frame:complete when each frame finishes
+  - Emit job:start / job:end for tracking
+  - Emit validation:error for coverage gaps
+- [ ] **TEST-204:** Write API integration tests (end-to-end: create → validate → execute)
+
+**Delivery Block 3: Frontend Foundation (UI Layout & Panels)**
+- [ ] **WEB-054:** Create integrated 4-panel layout
+  - Left: Pipeline Builder (collapsible)
+  - Center: 3D Viewer with playback scrubber
+  - Right: Job Manager (collapsible)
+  - Bottom: Configuration Timeline
+  - Implement panel resize/collapse functionality
+- [ ] **WEB-055:** Create Pipeline Builder panel
+  - Display available steps (Hydraulic, Thermal)
+  - Toggle steps enabled/disabled
+  - Configure Step 0 (noise method, parameters)
+- [ ] **WEB-056:** Create Job Manager panel
+  - List all jobs with key info (name, step, frame range)
+  - Create job button → opens modal
+  - Edit/delete job actions
+  - Enable/disable jobs
+  - Visual indicators for job status
+- [ ] **WEB-057:** Create Configuration Timeline component
+  - Horizontal timeline from frame 0 to totalFrames
+  - Render color-coded bars for job assignments
+  - Green fill: Covered frames
+  - Red fill: Uncovered frames (error state)
+  - Yellow outline: Overlapping jobs
+  - Display current frame indicator
+  - Click to jump to frame
+  - Hover tooltips showing job details
+
+**Delivery Block 4: Job Creation & Configuration**
+- [ ] **WEB-058:** Create Create/Edit Job modal
+  - Job name input
+  - Step selection dropdown
+  - Frame range inputs (start, end)
+  - Step-specific configuration form
+  - Real-time validation feedback
+  - Preview how job affects coverage
+- [ ] **INT-005:** Implement job templates system
+  - Create 1-2 preset templates per step type:
+    - Hydraulic: "Heavy Erosion", "Light Smoothing"
+    - Thermal: "Aggressive Collapse", "Gentle Settling"
+  - "Create from Template" option in UI
+  - Template parameter preview
+
+**Delivery Block 5: Validation & Error Handling**
+- [ ] **INT-006:** Implement client-side validation
+  - Validate before API calls
+  - Display coverage errors in UI
+  - Red timeline segments for gaps
+  - Error banner listing uncovered frame ranges
+  - Disable "Run Simulation" button when invalid
+- [ ] **INT-007:** Add warning messages for edge cases
+  - Overlapping jobs (show which jobs conflict)
+  - Extreme parameter values
+  - Very short/long frame ranges
+- [ ] **TEST-205:** Write frontend E2E tests
+  - Build pipeline → Create jobs → Validate → Run → View results
+  - Test error states (attempt to run with gaps)
+
+**Delivery Block 6: Configuration Persistence**
+- [ ] **INT-008:** Implement configuration save/load
+  - Save button → download .terrainconfig.json
+  - Load button → file picker → parse and populate UI
+  - Auto-save to browser localStorage (draft recovery)
+  - Recent configurations menu
+- [ ] **TEST-206:** Write save/load round-trip tests
+
+**Delivery Block 7: Documentation**
+- [ ] **DOC-014:** Document all new API endpoints (validate, save, load)
+- [ ] **DOC-015:** Create user guide for job system
+  - How to create jobs
+  - Understanding coverage validation
+  - Using templates
+  - Save/load workflows
+- [ ] **DOC-016:** Write developer architecture notes
+  - Job execution model
+  - Validation algorithms
+  - UI state management
 
 **Success Criteria:**
 - User can create 3-job simulation in < 2 minutes
