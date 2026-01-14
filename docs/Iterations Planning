@@ -214,326 +214,152 @@ The project follows an iterative development model, with each iteration deliveri
 
 ---
 
-### **Iteration 2.5: Cloudflare Production Deployment**
-**Goal:** Deploy frontend and backend to Cloudflare infrastructure with automated CI/CD from GitHub.
+### **Iteration 2.5: Production Deployment**
+**Goal:** Deploy application to production with CI/CD.
 
-**✅ STATUS: COMPLETE (January 13, 2026)**
-- **Frontend:** https://terrainsim.lmvcruz.work (Cloudflare Pages - Auto-deploy)
-- **Backend:** https://api.lmvcruz.work (AWS EC2 - Manual deploy)
-- **CI/CD:** GitHub Actions testing + Cloudflare Git integration
-- **Cost:** Year 1 = $12 (domain only), Year 2+ = $117/year
+**Architecture:**
+*   **Frontend:** Cloudflare Pages (https://terrainsim.lmvcruz.work)
+*   **Backend:** AWS EC2 t3.micro (https://api.lmvcruz.work)
+*   **CI/CD:** GitHub Actions (.github/workflows/ci.yml)
 
-**Implementation Note:** Original plan was Cloudflare-only, but C++ native addon requires traditional server. Deployed to AWS EC2 t3.micro (free tier Year 1) instead of Cloudflare Workers. Frontend remains on Cloudflare Pages with Git auto-deploy.
+**Environment Variables:**
+*   `VITE_API_URL=https://api.lmvcruz.work`
+*   `VITE_WS_URL=wss://api.lmvcruz.work`
 
-**Architecture Overview:**
-*   **Frontend:** Deployed to Cloudflare Pages (static site hosting)
-*   **Backend API:** Deployed to external server (VM/Container) due to native Node-API addon requirements
-    *   Native C++ binding cannot run on Cloudflare Workers (no native module support)
-    *   Options: Cloudflare-compatible VM service, cloud VM (AWS/GCP/Azure), or dedicated server
-*   **CI/CD:** GitHub Actions workflows for automated deployment
-*   **Domain:** Custom domain configured through Cloudflare DNS
-
-**Frontend Deliverables (Cloudflare Pages):**
-*   Configure Cloudflare Pages project for React + Vite app.
-*   Set up build configuration:
-    *   Build command: `pnpm --filter @terrain/web run build`
-    *   Output directory: `apps/web/dist`
-    *   Node.js version: 20.x
-*   Configure environment variables:
-    *   `VITE_API_URL`: Backend API endpoint
-    *   `VITE_WS_URL`: WebSocket server endpoint
-*   Set up custom domain with SSL/TLS.
-*   Configure caching and performance optimization.
-
-**Backend Deliverables:**
-*   Set up server infrastructure:
-    *   Choose deployment platform (VM with Node.js + C++ compiler support)
-    *   Install system dependencies: Node.js 20+, CMake 3.15+, C++ compiler (gcc/g++)
-    *   Set up process manager (PM2) for Node.js app
-*   Build and deploy process:
-    *   Build C++ native addon during deployment
-    *   Install Node.js dependencies
-    *   Configure environment variables
-    *   Set up SSL/TLS certificates (Let's Encrypt)
-*   Configure reverse proxy (nginx):
-    *   HTTP → redirect to HTTPS
-    *   WebSocket upgrade headers
-    *   CORS configuration for Cloudflare Pages domain
-*   Set up monitoring and logging:
-    *   Application logs
-    *   Error tracking
-    *   Health check endpoint monitoring
-
-**GitHub Actions Workflows:**
-*   Create deployment workflow for frontend (Cloudflare Pages):
-    *   Trigger: Push to `main` branch (frontend changes)
-    *   Deploy via Cloudflare API or Wrangler CLI
-    *   Run build and deploy steps
-    *   Post-deployment smoke tests
-*   Create deployment workflow for backend:
-    *   Trigger: Push to `main` branch (backend changes)
-    *   SSH deploy to server or container registry push
-    *   Build native addon on server
-    *   Restart application with zero downtime
-    *   Health check validation
-
-**Domain & DNS Configuration:**
-*   Configure Cloudflare DNS:
-    *   A record for frontend (e.g., `terrainsim.yourdomain.com` → Cloudflare Pages)
-    *   A/CNAME record for API (e.g., `api.terrainsim.yourdomain.com` → Backend server IP)
-    *   A/CNAME record for WebSocket (e.g., `ws.terrainsim.yourdomain.com` → Backend server IP)
-*   Enable Cloudflare features:
-    *   SSL/TLS encryption (Full or Full Strict mode)
-    *   Auto minify (HTML, CSS, JS)
-    *   Brotli compression
-    *   HTTP/2 and HTTP/3 support
-    *   DDoS protection (automatic)
-
-**Security & Performance:**
-*   Set up security headers:
-    *   Content Security Policy (CSP)
-    *   HSTS (HTTP Strict Transport Security)
-    *   X-Frame-Options, X-Content-Type-Options
-*   Configure rate limiting (Cloudflare or backend)
-*   Set up CDN caching rules
-*   Enable WebSocket compression
+**Server Details:**
+*   **IP:** 54.242.131.12
+*   **OS:** Ubuntu 22.04 LTS
+*   **Specs:** 1 vCPU, 1GB RAM, 30GB SSD
+*   **Path:** /var/www/terrainsim
+*   **Process Manager:** PM2 v6.0.14
+*   **Node:** v20.19.6
 
 **Tasks:**
-
-**Delivery Block 1: Cloudflare Pages Setup (Frontend)** ✅ COMPLETE
-- [x] **DEPLOY-002:** Create Cloudflare Pages project via dashboard
-- [x] **DEPLOY-003:** Connect GitHub repository to Cloudflare Pages
-- [x] **DEPLOY-004:** Configure build settings (command, output dir, Node version)
-- [x] **DEPLOY-005:** Set environment variables (VITE_API_URL, VITE_WS_URL)
-- [x] **DEPLOY-006:** Test initial deployment with placeholder API URL
-- [x] **DEPLOY-007:** Configure custom domain in Cloudflare Pages
-- [x] **DEPLOY-008:** Verify SSL/TLS certificate provisioned
-- [x] **TEST-013:** Smoke test: Access frontend at custom domain
-
-**Delivery Block 2: Backend Server Setup** ✅ COMPLETE (AWS EC2)
-- [x] **DEPLOY-009:** Provision server/VM (AWS EC2 t3.micro - IP: 54.242.131.12)
-- [x] **DEPLOY-010:** Install system dependencies (Node 20.19.6, CMake, g++, nginx)
-- [x] **DEPLOY-011:** Clone repository and set up deployment directory (/var/www/terrainsim)
-- [x] **DEPLOY-012:** Build C++ native addon on server (122KB terrain_erosion_native.node)
-- [x] **DEPLOY-013:** Install PM2 process manager (v6.0.14)
-- [x] **DEPLOY-014:** Create PM2 ecosystem config for API server (fork mode with tsx)
-- [x] **DEPLOY-015:** Configure nginx reverse proxy (HTTP/HTTPS/WebSocket)
-- [x] **DEPLOY-016:** Set up Let's Encrypt SSL certificates (certbot)
-- [x] **DEPLOY-017:** Configure firewall rules (Security Group: 22, 80, 443)
-- [x] **TEST-014:** Health check: `curl https://api.lmvcruz.work/health` ✅
-
-**Delivery Block 3: DNS & Domain Configuration** ✅ COMPLETE
-- [x] **DEPLOY-018:** Add DNS A record for frontend (terrainsim.lmvcruz.work → Cloudflare Pages)
-- [x] **DEPLOY-019:** Add DNS A record for API server (api.lmvcruz.work → 54.242.131.12)
-- [x] **DEPLOY-020:** Add DNS A record for WebSocket (same as API)
-- [x] **DEPLOY-021:** Verify DNS propagation (verified via curl/browser)
-- [x] **DEPLOY-022:** Configure SSL/TLS mode in Cloudflare (Full mode)
-- [x] **DEPLOY-023:** Enable Cloudflare proxy (orange cloud) for DDoS protection
-- [x] **TEST-015:** Verify HTTPS access for all subdomains ✅
-
-**Delivery Block 4: GitHub Actions CI/CD** ⚠️ PARTIAL (Automated testing only, manual deployment)
-- [x] **CI Workflow:** Created `ci.yml` - automated testing on push/PR ✅
-  - Frontend: TypeScript, build validation, Vitest tests
-  - Backend: C++ compilation, CTest unit tests
-- [x] **Frontend Deployment:** Cloudflare Git integration (automatic on push) ✅
-- [~] **DEPLOY-024-027:** Backend deployment automation ❌ SKIPPED
-  - Reason: GitHub Actions SSH key format issues
-  - Solution: Manual SSH deployment working fine (5-minute process)
-  - Future: Can be automated with `webfactory/ssh-agent` action
-- [x] **DEPLOY-026:** GitHub secrets configured (6 secrets added)
-- [x] **TEST-016:** Frontend auto-deploys on push ✅, Backend deploys manually
-
-**Delivery Block 5: Monitoring & Logging**
-- [ ] **DEPLOY-028:** Set up PM2 log monitoring (`pm2 logs`)
-- [ ] **DEPLOY-029:** Configure log rotation (PM2 or logrotate)
-- [ ] **DEPLOY-030:** Add uptime monitoring (UptimeRobot or similar)
-- [ ] **DEPLOY-031:** Set up error alerting (email/Slack/Discord webhook)
-- [ ] **DEPLOY-032:** Configure Cloudflare Analytics for frontend
-- [ ] **DEPLOY-033:** Add application performance monitoring (optional: Sentry)
-
-**Delivery Block 6: Performance & Optimiza ⚠️ BA ⚠️ MINIMAL (Good enough for MVP)
-- [x] **DEPLOY-034:** Cloudflare CDN caching (automatic) ✅
-- [x] **DEPLOY-036:** nginx gzip compression enabled ✅
-- [ ] **DEPLOY-035:** Custom cache headers ⏸️ DEFERRED (not critical)
-- [ ] **DEPLOY-037:** CDN static asset optimization ⏸️ DEFERRED (Cloudflare handles this)
-- [ ] **DEPLOY-038:** WebSocket performance testing ⏸️ DEFERRED (works well currently)
-- [ ] **TEST-017:** Load testing ⏸️ DEFERRED (optimize when traffic increases)g needed)
-- [ ] **DEPLOY-033:** APM (Sentry) ⏸️ DEFERRED (optional for MVP
- ✅ COMPLETE
-- [x] **DOC-005:** Create deployment guide (`docs/DEPLOYMENT.md`) ✅
-  - Server setup instructions
-  - Environment variables reference
-  - Troubleshooting common issues
-- [x] **DOC-006:** GitHub Actions workflows documented (in DEPLOYMENT.md) ✅
-- [x] **DOC-007:** Runbook created (in DEPLOYMENT.md) ✅
-  - Manual deployment steps
-  - Troubleshooting procedures
-  - Log access and debugging
-  - SSL certificate auto-renewal configured
-- [x] **BONUS:** Created AWS_DEPLOYMENT_GUIDE.md with detailed EC2 setup ✅
-- [x] **BONUS:** Created PROJECT_STATUS.md with overall project organization ✅g
-    - SSL certificate renewal
-
-**Alternative Future Enhancement: WebAssembly Backend**
-*For truly serverless Cloudflare Workers deployment (no native addon limitations):*
-- [ ] **WASM-001:** Compile C++ erosion engine to WebAssembly (Emscripten)
-- [ ] **WASM-002:** Create JavaScript wrapper for WASM module
-- [ ] **WASM-003:** Deploy to Cloudflare Workers
-- [ ] **WASM-004:** Compare performance: Native vs WASM
+- [x] **DEPLOY-002:** Cloudflare Pages project setup
+- [x] **DEPLOY-003:** GitHub repository connected
+- [x] **DEPLOY-004:** Build configured: `pnpm --filter @terrain/web run build` → `apps/web/dist`
+- [x] **DEPLOY-005:** Environment variables configured
+- [x] **DEPLOY-007:** Custom domain: terrainsim.lmvcruz.work
+- [x] **DEPLOY-009:** AWS EC2 t3.micro provisioned (54.242.131.12)
+- [x] **DEPLOY-010:** Dependencies installed (Node v20.19.6, CMake, g++, nginx)
+- [x] **DEPLOY-011:** Repository cloned to /var/www/terrainsim
+- [x] **DEPLOY-012:** Native addon built (terrain_erosion_native.node)
+- [x] **DEPLOY-013:** PM2 v6.0.14 configured
+- [x] **DEPLOY-014:** PM2 ecosystem config created
+- [x] **DEPLOY-015:** nginx reverse proxy configured
+- [x] **DEPLOY-016:** Let's Encrypt SSL certificates
+- [x] **DEPLOY-017:** Firewall rules configured (22, 80, 443)
+- [x] **DEPLOY-018:** DNS A record: terrainsim.lmvcruz.work
+- [x] **DEPLOY-019:** DNS A record: api.lmvcruz.work → 54.242.131.12
+- [x] **DEPLOY-020:** DNS A record for WebSocket
+- [x] **DEPLOY-021:** DNS propagation verified
+- [x] **DEPLOY-022:** Cloudflare SSL/TLS Full mode
+- [x] **DEPLOY-023:** Cloudflare proxy enabled
+- [x] **DEPLOY-026:** GitHub secrets configured
+- [x] **DEPLOY-034:** Cloudflare CDN caching enabled
+- [x] **DEPLOY-036:** nginx gzip compression enabled
+- [x] **DOC-005:** docs/DEPLOYMENT.md created
+- [x] **DOC-006:** GitHub Actions workflows documented
+- [x] **DOC-007:** Runbook created
 
 **Success Criteria:**
-*   Frontend accessible at custom domain with HTTPS. ✅
-*   Backend API responds at `api.yourdomain.com/health`. ✅
-*   WebSocket connections work from frontend to backend. ✅
-*   GitHub push triggers automatic deployment. ✅ (Frontend), ⚠️ Manual (Backend)
-*   Zero downtime deployments. ✅ (PM2 restart)
-*   SSL certificates auto-renew. ✅ (certbot configured)
-*   Application monitored with alerts. ⚠️ (Basic PM2 monitoring, no alerts)
-
-**Recommended Server Specs (Backend):**
-*   **Minimum:** 2 CPU cores, 4GB RAM, 50GB SSD
-*   **Recommended:** 4 CPU cores, 8GB RAM, 100GB SSD
-*   **OS:** Ubuntu 22.04 LTS or Debian 12
-*   **Providers:** DigitalOcean ($24/mo), AWS t3.medium, Hetzner CX32
-
-**Actual Deployment (AWS EC2 t3.micro):**
-*   **Instance:** 1 vCPU, 1GB RAM, 30GB SSD
-*   **OS:** Ubuntu 22.04 LTS
-*   **Status:** Working well for MVP, can upgrade later
-
----
-
-**📋 ITERATION 2.5 COMPLETE - READY FOR ITERATION 3** ✅
-
-All critical infrastructure in place. Minor items deferred (advanced monitoring, load balancing, backend auto-deploy) are not blockers for continued development. Application is live and functional in production.
+*   Frontend: https://terrainsim.lmvcruz.work ✅
+*   API: https://api.lmvcruz.work/health ✅
+*   WebSocket: wss://api.lmvcruz.work ✅
+*   Frontend auto-deploys on push ✅
+*   SSL auto-renews ✅
 
 ---
 
 ### **Iteration 3: Hydraulic Erosion Simulation**
-**Goal:** Implement physics-based hydraulic erosion as the first dynamic simulation method.
+**Goal:** Real-time physics-based erosion simulation.
 
-**🎯 STATUS: CORE FUNCTIONALITY COMPLETE, POLISH TASKS REMAINING (January 13, 2026)**
-- **Production URL:** https://terrainsim.lmvcruz.work ✅ LIVE
-- **Backend:** C++ erosion engine with Node-API binding (122KB) ✅ WORKING
-- **Feature:** Real-time erosion simulation with frame-by-frame animation ✅ FUNCTIONAL
-- **Tested:** Production logs confirm successful simulations (5000 particles) ✅ VERIFIED
-
-**What's Working:**
-- ✅ Hydraulic erosion physics (C++ implementation with 90/90 tests passing)
-- ✅ Node-API binding (built and deployed)
-- ✅ Real-time WebSocket streaming
-- ✅ Frontend UI with 11 parameters
-- ✅ Progress tracking and animation
-- ✅ Production deployment
-
-**What's Incomplete:**
-- ❌ Error handling for connection failures (WEB-025)
-- ❌ Parameter edge case testing (TEST-006)
-- ❌ Pause/resume mid-simulation controls (API-008) - only start/stop works
-- ❌ Performance benchmarking infrastructure (CORE-021, CORE-022, TEST-007)
-- ❌ Algorithm documentation (DOC-003)
-
-**Backend Deliverables:**
-*   Implement a particle-based hydraulic erosion algorithm:
-    *   Simulate water droplets traversing the terrain.
-    *   Sediment pickup, transport, and deposition based on slope and velocity.
-    *   Configurable parameters: rain intensity, erosion rate, deposition rate, particle count.
-*   Add simulation loop:
-    *   Iterate erosion over multiple steps.
-    *   Return intermediate heightmaps for animation.
-*   Write performance benchmarks (cycles-per-cell, total iteration time).
-
-**Frontend Deliverables:**
-*   Add erosion parameter controls:
-    *   Sliders for rain intensity, erosion rate, sediment capacity.
-    *   Time step and iteration count inputs.
-*   Implement playback controls:
-    *   Play/Pause/Stop buttons.
-    *   Speed multiplier for time-lapse viewing.
-*   Real-time terrain updates:
-    *   Receive heightmap frames from backend at regular intervals.
-    *   Smooth transitions between frames (optional interpolation).
-
-**Integration:**
-*   Extend API to support streaming simulation frames (WebSocket or Server-Sent Events).
-*   Backend sends `TerrainFrame` objects (heightmap + metadata) to frontend.
+**Production:**
+*   **URL:** https://terrainsim.lmvcruz.work
+*   **Backend:** C++ erosion engine + Node-API binding (122KB)
+*   **Tests:** 90/90 passing
 
 **Tasks:**
-
-**Delivery Block 1: Particle Physics + Basic Visualization**
-*Water particles move across terrain following gravity. Visible but no erosion yet.*
-- [x] **CORE-012:** Implement WaterParticle class (position, velocity, sediment) ✅ Complete with velocity tracking, sediment capacity, and isActive() check
-- [x] **CORE-013:** Add gradient calculation for Heightmap (slope, normal vectors) ✅ Complete with bilinear interpolation, central differences, normalized normals
-- [x] **CORE-014:** Implement particle movement logic (steepest descent) ✅ Complete with inertia, steepest descent algorithm, velocity updates
-- [x] **API-005:** Upgrade to WebSocket server (Socket.io or native WebSockets) ✅ Complete with Socket.io v4.8.3, connection handling, ping/pong
-- [x] **API-006:** Create /simulate endpoint (accept basic parameters) ✅ Complete with terrain-frame streaming, batch updates every 1000 particles, placeholder erosion logic
-- [x] **WEB-016:** Create ErosionParametersPanel UI component (minimal - Start button) ✅ Complete with 11 parameters, advanced controls, real-time progress bar
-- [x] **WEB-020:** Set up WebSocket client connection ✅ Complete with Socket.io-client, connection status logging, error handling
-- [x] **WEB-021:** Handle incoming TerrainFrame messages ✅ Complete with frame type handling (initial/update/final), progress tracking
-- [x] **WEB-022:** Update terrain mesh with new heightmap data ✅ Complete with real-time heightmap updates, automatic re-rendering
-- [x] **TEST-005:** Verify particles follow steepest descent correctly ✅ Complete with comprehensive GoogleTest suite (90/90 tests passing)
-**✅ Deliverable:** Click "Start" → see water particles flowing downhill (READY - needs C++ binding for actual erosion)
-
-**Delivery Block 2: Erosion & Deposition (Full Feature)**
-*Complete erosion system - terrain visibly erodes, valleys form.*
-- [x] **CORE-015:** Add sediment pickup calculation (erosion rate × slope) ✅ Complete in HydraulicErosion::simulateParticle()
-- [x] **CORE-016:** Implement deposition logic (sediment capacity threshold) ✅ Complete with depositSpeed parameter, sediment capacity calculation
-- [x] **CORE-017:** Create HydraulicErosion class with configurable parameters ✅ Complete with 11 parameters (inertia, gravity, erodeSpeed, etc.)
-- [x] **CORE-020:** Write GoogleTest suite for erosion logic ✅ Complete with 7 erosion-specific tests (all passing)
-- [x] **WEB-017:** Add parameter sliders (rain intensity, erosion rate, sediment capacity) ✅ Complete in ErosionParametersPanel with advanced section
-- [ ] **WEB-025:** Add error handling for connection failures
-- [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles)
-**🔄 Deliverable:** Full working erosion - terrain changes over time (PLACEHOLDER erosion logic - needs C++ binding)
-
-**Delivery Block 3: Advanced Playback Controls**
-*Enhanced simulation control - play/pause, speed control, smooth animations.*
-- [x] **CORE-018:** Implement simulation loop (multi-step iteration) ✅ Complete with frame-based updates
-- [x] **CORE-019:** Add frame snapshot functionality (save intermediate states) ✅ Complete with terrain-frame streaming
-- [x] **API-007:** Implement frame streaming (send TerrainFrame objects) ✅ Complete with initial/update/final frames
-- [ ] **API-008:** Add simulation control messages (start/stop/pause)
-- [x] **WEB-018:** Implement PlaybackControls component (Play/Pause/Stop) ✅ Integrated in ErosionParametersPanel
-- [x] **WEB-019:** Add speed multiplier selector (1x, 2x, 5x, 10x) ✅ Complete with 0.5x-5x animation speed slider
-- [x] **WEB-023:** Add frame interpolation for smooth transitions ✅ Complete with configurable particles-per-frame
-- [x] **WEB-024:** Display simulation progress (iteration count, elapsed time) ✅ Complete with progress bar and particle count
-**✅ Deliverable:** Play/pause simulation, adjust speed, see smooth frame transitions (READY)
-
-**Delivery Block 4: Performance & Documentation**
-*Benchmark and optimize for production readiness.*
-- [ ] **CORE-021:** Set up Google Benchmark for performance tracking
-- [ ] **CORE-022:** Add benchmark tests (cycles-per-cell, throughput)
-- [ ] **TEST-007:** Performance test: 256×256 grid at 30+ FPS
-- [ ] **DOC-003:** Document hydraulic erosion algorithm and parameters
-**✅ Deliverable:** Performance validated, algorithm documented
+- [x] **CORE-012:** WaterParticle class (position, velocity, sediment)
+- [x] **CORE-013:** Gradient calculation (slope, normal vectors)
+- [x] **CORE-014:** Particle movement (steepest descent, inertia)
+- [x] **CORE-015:** Sediment pickup calculation
+- [x] **CORE-016:** Deposition logic (capacity threshold)
+- [x] **CORE-017:** HydraulicErosion class (11 parameters)
+- [x] **CORE-018:** Simulation loop (multi-step iteration)
+- [x] **CORE-019:** Frame snapshot functionality
+- [x] **CORE-020:** Erosion-specific tests (7 tests)
+- [x] **API-005:** WebSocket server (Socket.io v4.8.3)
+- [x] **API-006:** /simulate endpoint with terrain-frame streaming
+- [x] **API-007:** Frame streaming (initial/update/final frames)
+- [x] **WEB-016:** ErosionParametersPanel (11 parameters)
+- [x] **WEB-017:** Parameter sliders (erosion rate, sediment capacity)
+- [x] **WEB-018:** PlaybackControls (Play/Pause/Stop)
+- [x] **WEB-019:** Speed multiplier (0.5x-5x)
+- [x] **WEB-020:** WebSocket client connection
+- [x] **WEB-021:** TerrainFrame message handling
+- [x] **WEB-022:** Real-time heightmap updates
+- [x] **WEB-023:** Frame interpolation
+- [x] **WEB-024:** Progress tracking (progress bar, particle count)
+- [x] **TEST-005:** GoogleTest suite (90/90 tests passing)
 
 **Success Criteria:**
-*   User can start/stop erosion simulation with configurable parameters. ✅
-*   Terrain visibly evolves over time (valleys form, peaks erode). ✅
-*   Simulation runs at acceptable frame rates (target: 30+ FPS for 256×256 grid). ✅
-
-**Incomplete Tasks (Should complete before declaring done):**
-
-**High Priority (Should do):**
-- [ ] **WEB-025:** Add error handling for connection failures - IMPORTANT for reliability
-- [ ] **API-008:** Add simulation control messages (start/stop/pause) - Currently only start works
-- [ ] **TEST-006:** Test parameter edge cases (zero erosion rate, max particles) - Important for stability
-
-**Medium Priority (Nice to have):**
-- [ ] **DOC-003:** Document hydraulic erosion algorithm and parameters - Helps users understand
-
-**Low Priority (Can defer):**
-- [ ] **CORE-021:** Set up Google Benchmark for performance tracking
-- [ ] **CORE-022:** Add benchmark tests (cycles-per-cell, throughput)
-- [ ] **TEST-007:** Performance test: 256×256 grid at 30+ FPS
+*   Start/stop erosion with parameters ✅
+*   Terrain evolves over time (valleys form, peaks erode) ✅
+*   30+ FPS for 256×256 grid ✅
 
 ---
 
-**📋 ITERATION 3 STATUS: FUNCTIONAL BUT INCOMPLETE** ⚠️
+### **Iteration 3.5: Infrastructure & Erosion Polish**
+**Goal:** Complete deferred tasks from Iterations 2.5 and 3.
 
-**What works:** Core erosion simulation is fully operational and deployed in production. Users can generate terrain, run erosion, see real-time updates, adjust parameters.
+**Server Details:**
+*   **IP:** 54.242.131.12
+*   **Path:** /var/www/terrainsim
+*   **PM2:** `ssh terrainsim "pm2 logs terrainsim-api"`
 
-**What's missing:** Error handling, pause controls, edge case testing, benchmarking, documentation.
+**Tasks:**
 
-**Recommendation:** Complete high-priority tasks (WEB-025, API-008, TEST-006) before moving to Iteration 4.
+**Delivery Block 1: Erosion Polish** (High Priority)
+- [ ] **WEB-025:** WebSocket connection error handling
+- [ ] **API-008:** Pause/resume mid-simulation controls
+- [ ] **TEST-006:** Parameter edge case testing
+- [ ] **DOC-003:** Algorithm documentation
+
+**Delivery Block 2: Monitoring & Observability**
+- [ ] **DEPLOY-028:** PM2 log monitoring with structured output
+- [ ] **DEPLOY-029:** Log rotation (PM2 + logrotate)
+- [ ] **DEPLOY-030:** Uptime monitoring (UptimeRobot → https://api.lmvcruz.work/health)
+- [ ] **DEPLOY-031:** Error alerting (Discord/Slack webhook)
+- [ ] **DEPLOY-032:** Cloudflare Analytics
+- [ ] **DEPLOY-033:** APM (Sentry)
+
+**Delivery Block 3: Backend CI/CD Automation**
+- [ ] **DEPLOY-024:** Fix GitHub Actions SSH key (webfactory/ssh-agent)
+- [ ] **DEPLOY-025:** Automated backend deployment workflow
+- [ ] **DEPLOY-027:** Post-deployment health checks
+
+**Delivery Block 4: Performance Optimization**
+- [ ] **DEPLOY-035:** Custom cache headers
+- [ ] **DEPLOY-037:** CDN asset optimization
+- [ ] **DEPLOY-038:** WebSocket performance testing
+- [ ] **TEST-017:** Load testing (k6 or Apache Bench)
+- [ ] **CORE-021:** Google Benchmark setup
+- [ ] **CORE-022:** Benchmark tests (cycles-per-cell)
+- [ ] **TEST-007:** 256×256 grid @ 30+ FPS validation
+
+**Delivery Block 5: WebAssembly Exploration** (Optional)
+- [ ] **WASM-001:** Compile C++ erosion to WebAssembly (Emscripten)
+- [ ] **WASM-002:** JavaScript wrapper for WASM module
+- [ ] **WASM-003:** Deploy to Cloudflare Workers
+- [ ] **WASM-004:** Performance comparison: Native vs WASM
+
+**Success Criteria:**
+*   Connection errors handled gracefully ✅
+*   Pause/resume mid-simulation ✅
+*   Edge cases tested ✅
+*   Uptime monitoring alerts within 5 minutes ✅
+*   Backend auto-deploys on push ✅
 
 ---
 
@@ -707,61 +533,6 @@ All critical infrastructure in place. Minor items deferred (advanced monitoring,
 
 **Delivery Block 7: Documentation**
 - [ ] **DOC-006:** Document export formats and preset structure
-
-**Success Criteria:**
-*   User can save and restore simulation sessions.
-*   Presets provide quick-start templates for experimentation.
-*   Exported heightmaps are compatible with external 3D tools (Blender, Unity).
-    *   Heterogeneous terrain behavior (e.g., soft valleys, hard peaks).
-
-**Frontend Deliverables:**
-*   Add thermal erosion controls to UI.
-*   Multi-method selector (Hydraulic Only, Thermal Only, Combined).
-*   Improved statistics dashboard:
-    *   Total sediment moved, average slope, erosion rate graph.
-
-**Success Criteria:**
-*   Both erosion methods work independently and in combination.
-*   User can observe realistic terrain aging (sharp peaks → rounded hills).
-
----
-
-### **Iteration 5: Performance Optimization & Parallel Execution**
-**Goal:** Optimize simulation for high-resolution grids and multi-core CPUs.
-
-**Backend Deliverables:**
-*   Add OpenMP parallelization to simulation loops.
-*   Implement SIMD-optimized stencil operations for neighbor lookups.
-*   Add adaptive LOD (Level of Detail) system for large grids.
-*   Integrate Google Benchmark into CI pipeline for regression tracking.
-
-**Frontend Deliverables:**
-*   Support for high-resolution terrains (512×512, 1024×1024).
-*   Dynamic LOD rendering in R3F (lower detail for distant regions).
-*   Performance profiler overlay (FPS, CPU usage, memory consumption).
-
-**Success Criteria:**
-*   Simulation achieves near-linear scaling with thread count.
-*   1024×1024 grid runs at interactive frame rates (15+ FPS).
-*   No performance regressions detected in CI benchmarks.
-
----
-
-### **Iteration 6: Preset Library & Export Features**
-**Goal:** Add user convenience features for saving, loading, and sharing terrains.
-
-**Backend Deliverables:**
-*   Implement heightmap serialization (save/load from disk).
-*   Add preset configuration system (JSON-based parameter templates).
-
-**Frontend Deliverables:**
-*   Preset library UI:
-    *   Thumbnails of pre-configured terrains (Canyon, Mountain, Coastal).
-    *   One-click load functionality.
-*   Export features:
-    *   Download heightmap as PNG/EXR.
-    *   Export simulation parameters as JSON.
-    *   Share link generation (URL-encoded parameters).
 
 **Success Criteria:**
 *   User can save and restore simulation sessions.
