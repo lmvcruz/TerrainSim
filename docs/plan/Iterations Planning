@@ -355,7 +355,7 @@ The project follows an iterative development model, with each iteration deliveri
   - `docs/doc/` - How-to guides and API documentation
 - [x] **DOC-102:** Move existing documentation to appropriate folders
 - [x] **DOC-103:** Delete temporary/outdated documentation files (removed 10 files)
-- [ ] **DOC-104:** Update README.md with new documentation structure (main project README not yet updated)
+- [x] **DOC-104:** Update README.md with new documentation structure (added documentation section with links to docs/README.md and category folders)
 - [x] **DOC-105:** Create index files for each documentation category (docs/README.md created)
 
 **Success Criteria:**

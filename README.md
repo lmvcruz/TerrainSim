@@ -76,8 +76,25 @@ TerrainSim/
 │       ├── ci.yml              # CI pipeline (tests)
 │       └── deploy.yml          # GitHub Pages deployment
 └── docs/
-    └── Iterations Planning     # Development roadmap
+    ├── README.md               # Documentation index
+    ├── plan/                   # Project planning & architecture
+    ├── algorithms/             # Algorithm theory & models
+    ├── infra/                  # Infrastructure & deployment
+    ├── doc/                    # How-to guides & API docs
+    └── temp/                   # Miscellaneous/temporary files
 ```
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the [docs/](./docs) folder, organized by category:
+
+- **[Documentation Index](./docs/README.md)** - Complete navigation guide
+- **[Project Planning](./docs/plan/)** - Development roadmap and system specifications
+- **[Algorithms](./docs/algorithms/)** - Hydraulic erosion physics and noise generation
+- **[Infrastructure](./docs/infra/)** - Deployment guides, CI/CD, monitoring, and performance metrics
+- **[Guides & API](./docs/doc/)** - How-to guides and API documentation
+
+For details on the current iteration and upcoming features, see [Iterations Planning](./docs/plan/Iterations%20Planning).
 
 ## 🌐 Deployment
 
@@ -131,7 +148,7 @@ pnpm --filter @terrain/web run build
 - 🔄 **Material System**: Rock hardness and heterogeneous terrain behavior
 - 🔄 **Performance Optimization**: SIMD, OpenMP parallelization
 
-See [docs/Iterations Planning](./docs/Iterations%20Planning) for the complete roadmap.
+See [Iterations Planning](./docs/plan/Iterations%20Planning) for the complete roadmap.
 
 ## 🛠️ Technology Stack
 
