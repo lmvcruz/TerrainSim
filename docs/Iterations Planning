@@ -321,10 +321,10 @@ The project follows an iterative development model, with each iteration deliveri
 **Tasks:**
 
 **Delivery Block 1: Erosion Polish** (High Priority)
-- [ ] **WEB-025:** WebSocket connection error handling (connection failures, disconnections, automatic reconnection)
-- [ ] **WEB-025a:** Remove pause button from UI (rethinking simulation controls for future iteration)
-- [ ] **TEST-006:** Parameter edge case testing (zero values, negative parameters, boundary conditions)
-- [ ] **DOC-003:** Hydraulic erosion algorithm documentation
+- [x] **WEB-025:** WebSocket connection error handling (connection failures, disconnections, automatic reconnection)
+- [x] **WEB-025a:** Remove pause button from UI (rethinking simulation controls for future iteration)
+- [x] **TEST-006:** Parameter edge case testing (zero values, negative parameters, boundary conditions)
+- [x] **DOC-003:** Hydraulic erosion algorithm documentation
 
 **Delivery Block 2: Monitoring & Observability**
 - [ ] **DEPLOY-028:** PM2 log monitoring with structured output
