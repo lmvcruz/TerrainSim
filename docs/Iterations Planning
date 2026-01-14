@@ -321,10 +321,10 @@ The project follows an iterative development model, with each iteration deliveri
 **Tasks:**
 
 **Delivery Block 1: Erosion Polish** (High Priority)
-- [ ] **WEB-025:** WebSocket connection error handling
-- [ ] **API-008:** Pause/resume mid-simulation controls
-- [ ] **TEST-006:** Parameter edge case testing
-- [ ] **DOC-003:** Algorithm documentation
+- [ ] **WEB-025:** WebSocket connection error handling (connection failures, disconnections, automatic reconnection)
+- [ ] **WEB-025a:** Remove pause button from UI (rethinking simulation controls for future iteration)
+- [ ] **TEST-006:** Parameter edge case testing (zero values, negative parameters, boundary conditions)
+- [ ] **DOC-003:** Hydraulic erosion algorithm documentation
 
 **Delivery Block 2: Monitoring & Observability**
 - [ ] **DEPLOY-028:** PM2 log monitoring with structured output
@@ -354,10 +354,23 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **WASM-003:** Deploy to Cloudflare Workers
 - [ ] **WASM-004:** Performance comparison: Native vs WASM
 
+**Delivery Block 6: Documentation Reorganization**
+- [ ] **DOC-100:** Scan and inventory all files in docs/ folder
+- [ ] **DOC-101:** Create new documentation structure:
+  - `docs/planning/` - Main plan and specifications (Iterations Planning, System Spec)
+  - `docs/temp/` - Temporary documents (delete after use)
+  - `docs/infra/` - Infrastructure documentation (deployment, CI/CD, monitoring)
+  - `docs/algorithms/` - Algorithm documentation (erosion, noise generation, etc.)
+- [ ] **DOC-102:** Move existing documentation to appropriate folders
+- [ ] **DOC-103:** Delete temporary/outdated documentation files
+- [ ] **DOC-104:** Update README.md with new documentation structure
+- [ ] **DOC-105:** Create index files for each documentation category
+
 **Success Criteria:**
 *   Connection errors handled gracefully ✅
-*   Pause/resume mid-simulation ✅
+*   WebSocket auto-reconnection working ✅
 *   Edge cases tested ✅
+*   Documentation organized and accessible ✅
 *   Uptime monitoring alerts within 5 minutes ✅
 *   Backend auto-deploys on push ✅
 
