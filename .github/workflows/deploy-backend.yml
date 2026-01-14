@@ -1,0 +1,105 @@
+name: Deploy Backend to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: 'Rebuild C++ addon?'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - incremental
+          - full
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to AWS EC2
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Server to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 54.242.131.12 >> ~/.ssh/known_hosts
+
+      - name: Deploy - Pull Latest Code
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            cd /var/www/terrainsim
+            echo "📥 Pulling latest code from main branch..."
+            git pull origin main
+            
+            echo "📦 Installing/updating dependencies..."
+            pnpm install
+          '
+
+      - name: Deploy - Rebuild C++ Addon (Incremental)
+        if: ${{ inputs.rebuild == 'incremental' }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            cd /var/www/terrainsim/libs/core
+            echo "🔨 Rebuilding C++ addon (incremental)..."
+            cmake --build build --config Release
+          '
+
+      - name: Deploy - Rebuild C++ Addon (Full Clean Build)
+        if: ${{ inputs.rebuild == 'full' }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            cd /var/www/terrainsim/libs/core
+            echo "🔨 Rebuilding C++ addon (full clean build)..."
+            rm -rf build
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --config Release
+          '
+
+      - name: Deploy - Restart PM2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            echo "🔄 Restarting PM2 process..."
+            pm2 restart terrainsim-api
+          '
+
+      - name: Wait for PM2 Restart
+        run: |
+          echo "⏳ Waiting 10 seconds for PM2 to restart..."
+          sleep 10
+
+      - name: Health Check
+        run: |
+          echo "🏥 Running health check (30 attempts, 60 seconds timeout)..."
+          for i in {1..30}; do
+            if curl -f -s https://api.lmvcruz.work/health > /dev/null 2>&1; then
+              echo "✅ Health check passed!"
+              echo "🎉 Deployment successful!"
+              exit 0
+            fi
+            echo "⏳ Attempt $i/30 - Service not ready yet..."
+            sleep 2
+          done
+          echo "❌ Health check failed after 60 seconds"
+          echo "🚨 Deployment failed - service did not respond"
+          exit 1
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "📊 Deployment Summary:"
+          echo "  - Repository: ${{ github.repository }}"
+          echo "  - Branch: ${{ github.ref_name }}"
+          echo "  - Commit: ${{ github.sha }}"
+          echo "  - Rebuild: ${{ inputs.rebuild }}"
+          echo "  - Server: 54.242.131.12"
+          echo "  - Health: https://api.lmvcruz.work/health"
+          echo ""
+          echo "✅ Backend is live and healthy!"

@@ -335,9 +335,9 @@ The project follows an iterative development model, with each iteration deliveri
 - [~] **DEPLOY-033:** APM (Sentry) - SKIPPED (focusing on free tools: PM2, UptimeRobot, Cloudflare)
 
 **Delivery Block 3: Backend CI/CD Automation**
-- [ ] **DEPLOY-024:** Fix GitHub Actions SSH key (webfactory/ssh-agent)
-- [ ] **DEPLOY-025:** Automated backend deployment workflow
-- [ ] **DEPLOY-027:** Post-deployment health checks
+- [x] **DEPLOY-024:** Setup GitHub Actions SSH authentication (webfactory/ssh-agent + SSH_PRIVATE_KEY secret)
+- [x] **DEPLOY-025:** Create manual-trigger backend deployment workflow (workflow_dispatch with rebuild parameter: none/incremental/full)
+- [x] **DEPLOY-027:** Post-deployment health checks (30 retries, 60 seconds timeout, alert on failure)
 
 **Delivery Block 4: Performance Optimization**
 - [ ] **DEPLOY-035:** Custom cache headers
@@ -372,7 +372,8 @@ The project follows an iterative development model, with each iteration deliveri
 *   Edge cases tested ✅
 *   Documentation organized and accessible ✅
 *   Uptime monitoring alerts within 5 minutes ✅
-*   Backend auto-deploys on push ✅
+*   Backend deploys via GitHub Actions with manual trigger ✅
+*   Health checks validate deployment success ✅
 
 ---
 
@@ -427,9 +428,15 @@ The project follows an iterative development model, with each iteration deliveri
 - [ ] **CORE-031:** Benchmark thermal erosion performance
 - [ ] **DOC-004:** Document thermal erosion algorithm
 
+**Delivery Block 7: Deployment Resilience Discussion**
+- [ ] **DEPLOY-039:** Evaluate deployment failure strategies (rollback, retry, alert-only)
+- [ ] **DEPLOY-040:** Document recommended approach for production resilience
+- [ ] **DEPLOY-041:** Implement chosen strategy in backend deployment workflow
+
 **Success Criteria:**
 *   Both erosion methods work independently and in combination.
 *   User can observe realistic terrain aging (sharp peaks → rounded hills).
+*   Deployment failure strategy documented and implemented.
 
 ---
 
