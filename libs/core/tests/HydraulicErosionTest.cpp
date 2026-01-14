@@ -151,3 +151,249 @@ TEST(HydraulicErosionTest, SimulateParticle_ParticleFollowsSteepestDescent) {
     // Just verify that simulation completed (no crashes)
     EXPECT_GE(centerSum, 0.0f);
 }
+
+// ============================================================================
+// EDGE CASE TESTS (TEST-006)
+// ============================================================================
+
+TEST(HydraulicErosionTest, EdgeCase_ZeroErosionRate) {
+    Heightmap hm(20, 20);
+
+    // Create a simple slope
+    for (size_t y = 0; y < 20; ++y) {
+        for (size_t x = 0; x < 20; ++x) {
+            hm.set(x, y, 10.0f - static_cast<float>(y) * 0.5f);
+        }
+    }
+
+    // Store initial state
+    std::vector<float> initialData = hm.data();
+
+    // Set erosion rate to zero
+    HydraulicErosionParams params;
+    params.erodeSpeed = 0.0f;
+    params.depositSpeed = 0.3f;  // Normal deposition
+
+    HydraulicErosion erosion(params);
+    erosion.erode(hm, 50);
+
+    // With zero erosion, terrain should be mostly unchanged
+    // (might have tiny changes due to initial deposition, but no major erosion)
+    float maxDiff = 0.0f;
+    for (size_t i = 0; i < hm.size(); ++i) {
+        float diff = std::abs(hm.data()[i] - initialData[i]);
+        maxDiff = std::max(maxDiff, diff);
+    }
+
+    // Max difference should be small
+    EXPECT_LT(maxDiff, 0.5f);
+}
+
+TEST(HydraulicErosionTest, EdgeCase_ZeroDepositSpeed) {
+    Heightmap hm(20, 20);
+
+    // Create a simple peak
+    for (size_t y = 0; y < 20; ++y) {
+        for (size_t x = 0; x < 20; ++x) {
+            float distX = static_cast<float>(x) - 10.0f;
+            float distY = static_cast<float>(y) - 10.0f;
+            float dist = std::sqrt(distX * distX + distY * distY);
+            hm.set(x, y, std::max(0.0f, 10.0f - dist * 0.5f));
+        }
+    }
+
+    // Set deposit speed to zero
+    HydraulicErosionParams params;
+    params.erodeSpeed = 0.3f;  // Normal erosion
+    params.depositSpeed = 0.0f;
+
+    HydraulicErosion erosion(params);
+    erosion.erode(hm, 50);
+
+    // With zero deposition, terrain should only be eroded (heights should decrease)
+    // Peak should be lower than before
+    float centerHeight = hm.at(10, 10);
+    EXPECT_LT(centerHeight, 10.0f);
+}
+
+TEST(HydraulicErosionTest, EdgeCase_VeryHighGravity) {
+    Heightmap hm(30, 30);
+
+    // Create a slope
+    for (size_t y = 0; y < 30; ++y) {
+        for (size_t x = 0; x < 30; ++x) {
+            hm.set(x, y, 20.0f - static_cast<float>(y));
+        }
+    }
+
+    // Set very high gravity
+    HydraulicErosionParams params;
+    params.gravity = 100.0f;
+
+    HydraulicErosion erosion(params);
+
+    // Should not crash with extreme gravity
+    EXPECT_NO_THROW(erosion.erode(hm, 20));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_ZeroParticles) {
+    Heightmap hm(10, 10);
+    hm.fill(5.0f);
+
+    std::vector<float> initialData = hm.data();
+
+    HydraulicErosion erosion;
+    erosion.erode(hm, 0);  // Zero particles
+
+    // Terrain should be unchanged
+    for (size_t i = 0; i < hm.size(); ++i) {
+        EXPECT_FLOAT_EQ(hm.data()[i], initialData[i]);
+    }
+}
+
+TEST(HydraulicErosionTest, EdgeCase_SingleParticle) {
+    Heightmap hm(15, 15);
+
+    // Create a simple slope
+    for (size_t y = 0; y < 15; ++y) {
+        for (size_t x = 0; x < 15; ++x) {
+            hm.set(x, y, 10.0f - static_cast<float>(y) * 0.5f);
+        }
+    }
+
+    HydraulicErosion erosion;
+
+    // Should handle single particle without crashing
+    EXPECT_NO_THROW(erosion.erode(hm, 1));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_VeryLargeParticleCount) {
+    Heightmap hm(50, 50);
+
+    // Create a simple terrain
+    for (size_t y = 0; y < 50; ++y) {
+        for (size_t x = 0; x < 50; ++x) {
+            hm.set(x, y, 5.0f + static_cast<float>(x + y) * 0.1f);
+        }
+    }
+
+    HydraulicErosion erosion;
+
+    // Should handle large particle count (performance test)
+    EXPECT_NO_THROW(erosion.erode(hm, 10000));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_MaxDropletLifetimeZero) {
+    Heightmap hm(20, 20);
+    hm.fill(5.0f);
+
+    HydraulicErosionParams params;
+    params.maxIterations = 0;  // Zero lifetime
+
+    HydraulicErosion erosion(params);
+
+    // Should not crash with zero lifetime
+    EXPECT_NO_THROW(erosion.erode(hm, 50));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_VerySmallGrid) {
+    Heightmap hm(3, 3);
+
+    for (size_t y = 0; y < 3; ++y) {
+        for (size_t x = 0; x < 3; ++x) {
+            hm.set(x, y, 5.0f);
+        }
+    }
+
+    HydraulicErosion erosion;
+
+    // Should handle very small grids without out-of-bounds access
+    EXPECT_NO_THROW(erosion.erode(hm, 10));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_NegativeHeights) {
+    Heightmap hm(15, 15);
+
+    // Create terrain with negative heights
+    for (size_t y = 0; y < 15; ++y) {
+        for (size_t x = 0; x < 15; ++x) {
+            hm.set(x, y, -5.0f + static_cast<float>(y) * 0.5f);
+        }
+    }
+
+    HydraulicErosion erosion;
+
+    // Should handle negative heights without issues
+    EXPECT_NO_THROW(erosion.erode(hm, 30));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_ExtremeSedimentCapacity) {
+    Heightmap hm(20, 20);
+
+    // Create a slope
+    for (size_t y = 0; y < 20; ++y) {
+        for (size_t x = 0; x < 20; ++x) {
+            hm.set(x, y, 15.0f - static_cast<float>(y) * 0.7f);
+        }
+    }
+
+    // Test very low capacity
+    {
+        HydraulicErosionParams params;
+        params.sedimentCapacityFactor = 0.01f;
+        params.minSedimentCapacity = 0.0f;
+
+        HydraulicErosion erosion(params);
+        EXPECT_NO_THROW(erosion.erode(hm, 20));
+    }
+
+    // Test very high capacity
+    {
+        HydraulicErosionParams params;
+        params.sedimentCapacityFactor = 100.0f;
+
+        HydraulicErosion erosion(params);
+        EXPECT_NO_THROW(erosion.erode(hm, 20));
+    }
+}
+
+TEST(HydraulicErosionTest, EdgeCase_MaxInertia) {
+    Heightmap hm(20, 20);
+
+    // Create a slope
+    for (size_t y = 0; y < 20; ++y) {
+        for (size_t x = 0; x < 20; ++x) {
+            hm.set(x, y, 10.0f - static_cast<float>(y) * 0.5f);
+        }
+    }
+
+    // Test maximum inertia (particle should maintain direction)
+    HydraulicErosionParams params;
+    params.inertia = 0.99f;
+
+    HydraulicErosion erosion(params);
+    EXPECT_NO_THROW(erosion.erode(hm, 30));
+}
+
+TEST(HydraulicErosionTest, EdgeCase_GridBoundaries) {
+    Heightmap hm(10, 10);
+
+    // Create terrain with high edges
+    for (size_t y = 0; y < 10; ++y) {
+        for (size_t x = 0; x < 10; ++x) {
+            if (x == 0 || y == 0 || x == 9 || y == 9) {
+                hm.set(x, y, 20.0f);
+            } else {
+                hm.set(x, y, 5.0f);
+            }
+        }
+    }
+
+    HydraulicErosion erosion;
+
+    // Particles near boundaries should not cause out-of-bounds access
+    EXPECT_NO_THROW(erosion.simulateParticle(hm, 0.5f, 0.5f));
+    EXPECT_NO_THROW(erosion.simulateParticle(hm, 8.9f, 8.9f));
+    EXPECT_NO_THROW(erosion.simulateParticle(hm, 0.1f, 8.9f));
+    EXPECT_NO_THROW(erosion.simulateParticle(hm, 8.9f, 0.1f));
+}

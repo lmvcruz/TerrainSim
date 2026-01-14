@@ -40,24 +40,85 @@ function App() {
     particlesSimulated: number
     totalParticles: number
   } | null>(null)
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('connecting')
   const socketRef = useRef<Socket | null>(null)
+  const reconnectAttemptRef = useRef(0)
+  const maxReconnectAttempts = 5
 
   // Setup WebSocket connection
   useEffect(() => {
-    const socket = io(WS_URL)
+    const socket = io(WS_URL, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: maxReconnectAttempts,
+      timeout: 10000,
+    })
     socketRef.current = socket
 
     socket.on('connect', () => {
       logger.info('🔌 WebSocket connected')
+      setConnectionStatus('connected')
+      setError(null)
+      reconnectAttemptRef.current = 0
     })
 
-    socket.on('disconnect', () => {
-      logger.info('🔌 WebSocket disconnected')
+    socket.on('disconnect', (reason) => {
+      logger.info('🔌 WebSocket disconnected', { reason })
+      setConnectionStatus('disconnected')
+
+      // Handle mid-simulation disconnects
+      if (simulating) {
+        setError('Connection lost during simulation. Attempting to reconnect...')
+        setSimulating(false)
+        setSimulationProgress(null)
+      }
+
+      // If disconnect was not intentional, show error
+      if (reason === 'io server disconnect' || reason === 'transport close') {
+        setError('Lost connection to server. Check your internet connection.')
+      }
+    })
+
+    socket.on('connect_error', (error) => {
+      logger.error('WebSocket connection error', error)
+      setConnectionStatus('error')
+      reconnectAttemptRef.current++
+
+      if (reconnectAttemptRef.current >= maxReconnectAttempts) {
+        setError('Cannot connect to server. Please check if the API is running and try refreshing the page.')
+      } else {
+        setError(`Connection attempt ${reconnectAttemptRef.current}/${maxReconnectAttempts} failed. Retrying...`)
+      }
+
+      // Stop simulation if running
+      if (simulating) {
+        setSimulating(false)
+        setSimulationProgress(null)
+      }
+    })
+
+    socket.on('reconnect', (attemptNumber) => {
+      logger.info('🔌 WebSocket reconnected', { attemptNumber })
+      setConnectionStatus('connected')
+      setError(null)
+      reconnectAttemptRef.current = 0
+    })
+
+    socket.on('reconnect_attempt', (attemptNumber) => {
+      logger.info('🔌 Attempting to reconnect...', { attemptNumber })
+      setError(`Reconnecting... (attempt ${attemptNumber}/${maxReconnectAttempts})`)
+    })
+
+    socket.on('reconnect_failed', () => {
+      logger.error('🔌 WebSocket reconnection failed')
+      setConnectionStatus('error')
+      setError('Failed to reconnect after multiple attempts. Please refresh the page.')
     })
 
     socket.on('error', (error) => {
       logger.error('WebSocket error', error)
-      setError(error.message || 'WebSocket error')
+      setError(error.message || 'WebSocket error occurred')
       setSimulating(false)
     })
 
@@ -185,6 +246,12 @@ function App() {
       return
     }
 
+    // Check connection status before starting
+    if (connectionStatus !== 'connected') {
+      setError('Cannot start simulation: Not connected to server. Please wait for connection.')
+      return
+    }
+
     logger.info('🌊 Starting erosion simulation', parameters)
 
     setSimulating(true)
@@ -240,6 +307,43 @@ function App() {
       }}>
         Hello Terrain
       </h1>
+
+      {/* Connection Status Indicator */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        zIndex: 10,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '8px 16px',
+        background: 'rgba(30, 30, 30, 0.9)',
+        borderRadius: '6px',
+        color: 'white',
+        fontSize: '14px',
+        border: '2px solid ' + (
+          connectionStatus === 'connected' ? 'rgba(74, 255, 158, 0.5)' :
+          connectionStatus === 'error' ? 'rgba(255, 74, 74, 0.5)' :
+          'rgba(255, 158, 74, 0.5)'
+        ),
+      }}>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: connectionStatus === 'connected' ? '#4aff9e' :
+                      connectionStatus === 'error' ? '#ff4a4a' :
+                      '#ff9e4a',
+          animation: connectionStatus === 'connecting' ? 'pulse 1.5s infinite' : 'none',
+        }} />
+        <span>
+          {connectionStatus === 'connected' ? 'Connected' :
+           connectionStatus === 'error' ? 'Connection Error' :
+           connectionStatus === 'disconnected' ? 'Disconnected' :
+           'Connecting...'}
+        </span>
+      </div>
 
       <NoiseParametersPanel
         initialParameters={DEFAULT_PARAMETERS}

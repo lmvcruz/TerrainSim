@@ -327,7 +327,7 @@ export function ErosionParametersPanel({
             className={`simulate-button ${loading ? 'stop' : ''}`}
             onClick={handleSimulate}
           >
-            {loading ? '⏸ Stop Simulation' : '▶ Start Simulation'}
+            {loading ? '⏹ Stop Simulation' : '▶ Start Simulation'}
           </button>
 
           {/* Error Message */}
