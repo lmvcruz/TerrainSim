@@ -20,6 +20,8 @@ const erosion = require(bindingPath);
 
 export const simulateErosion = erosion.simulateErosion;
 export const simulateParticle = erosion.simulateParticle;
+export const validateConfig = erosion.validateConfig;
+export const executeFrame = erosion.executeFrame;
 export const getVersion = erosion.getVersion;
 export const DEFAULT_PARAMS = erosion.DEFAULT_PARAMS;
 

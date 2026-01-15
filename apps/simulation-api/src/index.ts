@@ -6,6 +6,8 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { generatePerlinNoise, generateFbm } from './generators/heightmapGenerators.js';
 import { simulateParticle } from './erosion-binding.js';
+import { jobSystemRouter, sessions } from './routes/jobSystem.js';
+import { setupJobSystemWebSocket } from './websocket/jobSystemEvents.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -70,6 +72,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Mount job system routes
+app.use(jobSystemRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -273,6 +278,8 @@ if (IS_DEV) {
 }
 
 // API-005: WebSocket connection handling
+setupJobSystemWebSocket(io, sessions);
+
 io.on('connection', (socket) => {
   console.log(`🔌 Client connected: ${socket.id}`);
 

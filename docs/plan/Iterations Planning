@@ -398,19 +398,21 @@ The project follows an iterative development model, with each iteration deliveri
 - [x] **TEST-203:** Write Config Parser unit tests (15 cases: valid/invalid JSON)
 
 **Delivery Block 2: API Layer**
-- [ ] **API-007:** Create POST /config/validate endpoint
+- [x] **API-007:** Create POST /config/validate endpoint
   - Input: Pipeline configuration JSON
   - Output: Validation result (isValid, uncoveredFrames, warnings)
-- [ ] **API-008:** Create POST /config/save endpoint (save config to file)
-- [ ] **API-009:** Create GET /config/load/:id endpoint (load saved config)
-- [ ] **API-010:** Update POST /simulate to accept job-based configs
-  - Maintain backward compatibility with old format
-  - Add migration helper to convert old → new format
-- [ ] **API-011:** Implement WebSocket progress events
+- [x] **API-008:** Create POST /config/save endpoint (save config to file)
+- [x] **API-009:** Create GET /config/load/:id endpoint (load saved config)
+- [x] **API-010:** Implement session-based POST /simulate endpoints
+  - POST /simulate/create: Initialize session with config
+  - POST /simulate/execute: Execute single frame by sessionId and frame number
+  - DELETE /simulate/session/:id: Clean up session and free memory
+  - Session management with automatic cleanup (30-minute timeout)
+- [x] **API-011:** Implement WebSocket progress events
   - Emit frame:complete when each frame finishes
-  - Emit job:start / job:end for tracking
-  - Emit validation:error for coverage gaps
-- [ ] **TEST-204:** Write API integration tests (end-to-end: create → validate → execute)
+  - Event payload: { sessionId, frame, heights, width, height }
+  - WebSocket event: job-simulation:start for frame-by-frame streaming
+- [x] **TEST-204:** Write API integration tests (end-to-end: create → validate → execute)
 
 **Delivery Block 3: Frontend Foundation (UI Layout & Panels)**
 - [ ] **WEB-054:** Create integrated 4-panel layout

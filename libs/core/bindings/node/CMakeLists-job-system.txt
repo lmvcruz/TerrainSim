@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-cmake_policy(SET CMP0091 NEW)
-cmake_policy(SET CMP0042 NEW)
-
-project(terrain_erosion_native)
+project(terrain_job_system_native)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -55,7 +52,7 @@ set(TERRAIN_CORE_SOURCES
 
 # Build the native addon
 add_library(${PROJECT_NAME} SHARED
-    erosion_addon.cpp
+    job-system-binding.cpp
     ${TERRAIN_CORE_SOURCES}
 )
 
