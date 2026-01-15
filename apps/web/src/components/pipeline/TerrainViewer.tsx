@@ -3,17 +3,30 @@ import { OrbitControls } from '@react-three/drei';
 import { TerrainMesh } from '../TerrainMesh';
 import { usePipeline } from '../../contexts/PipelineContext';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { generateSemiSphere } from '../../utils/terrainGenerators';
 
 export default function TerrainViewer() {
   const { currentFrame, setCurrentFrame, config, heightmapCache } = usePipeline();
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Get heightmap for current frame (placeholder for now)
-  const currentHeightmap = heightmapCache.get(currentFrame);
+  // Generate default terrain for preview (semi-sphere)
+  const defaultHeightmap = useMemo(() => {
+    return generateSemiSphere(256, 256, 128, 128, 80);
+  }, []);
+
+  // Get heightmap for current frame, fallback to default terrain
+  const currentHeightmap = heightmapCache.get(currentFrame) || defaultHeightmap;
+
+  // DEBUG: Log when frame changes
+  console.log(`🎬 TerrainViewer: Rendering frame ${currentFrame}`, {
+    hasCachedHeightmap: heightmapCache.has(currentFrame),
+    usingDefault: !heightmapCache.has(currentFrame),
+    heightmapSample: currentHeightmap ? [currentHeightmap[0], currentHeightmap[1000], currentHeightmap[10000]] : null
+  });
 
   const handlePrevFrame = () => {
-    if (currentFrame > 1) {
+    if (currentFrame > 0) {
       setCurrentFrame(currentFrame - 1);
     }
   };
@@ -28,7 +41,7 @@ export default function TerrainViewer() {
     <div className="relative w-full h-full">
       {/* 3D Canvas */}
       <Canvas
-        camera={{ position: [100, 150, 200], fov: 60 }}
+        camera={{ position: [0, 10, 15], fov: 60 }}
         style={{ background: '#09090b' }} // zinc-950
       >
         <ambientLight intensity={0.5} />
@@ -37,8 +50,9 @@ export default function TerrainViewer() {
         <OrbitControls
           enableDamping
           dampingFactor={0.05}
-          minDistance={50}
-          maxDistance={500}
+          minDistance={5}
+          maxDistance={50}
+          target={[0, 0, 0]}
         />
       </Canvas>
 

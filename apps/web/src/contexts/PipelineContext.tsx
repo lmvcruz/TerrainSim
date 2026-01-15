@@ -64,6 +64,10 @@ interface PipelineContextType {
   setCurrentFrame: (frame: number) => void;
   heightmapCache: Map<number, Float32Array>;
   setHeightmapForFrame: (frame: number, heightmap: Float32Array) => void;
+  sessionId: string | null;
+  setSessionId: (sessionId: string | null) => void;
+  executeSimulation: () => Promise<void>;
+  isSimulating: boolean;
 }
 
 const PipelineContext = createContext<PipelineContextType | undefined>(undefined);
@@ -75,7 +79,7 @@ const DEFAULT_CONFIG: PipelineConfig = {
     frequency: 0.05,
     amplitude: 50,
   },
-  totalFrames: 100,
+  totalFrames: 10,
   jobs: [],
 };
 
@@ -98,6 +102,8 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
   const [validation, setValidation] = useState<ValidationResult | null>(null);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [heightmapCache] = useState<Map<number, Float32Array>>(new Map());
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   // Persist config to localStorage whenever it changes
   useEffect(() => {
@@ -180,6 +186,58 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     heightmapCache.set(frame, heightmap);
   };
 
+  const executeSimulation = async () => {
+    if (!sessionId) {
+      console.error('No session ID - generate terrain first');
+      return;
+    }
+
+    if (config.jobs.length === 0) {
+      console.warn('No jobs configured - simulation will just copy terrain across frames');
+    }
+
+    setIsSimulating(true);
+
+    try {
+      // Execute frame-by-frame for frames 1 through totalFrames (frame 0 is input)
+      for (let frame = 1; frame <= config.totalFrames; frame++) {
+        const response = await fetch('http://localhost:3001/simulate/execute', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId,
+            frame,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: response.statusText }));
+          throw new Error(`Frame ${frame} execution failed: ${errorData.error || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Store heightmap in cache
+        if (data.terrain) {
+          const heightmap = new Float32Array(data.terrain);
+          setHeightmapForFrame(frame, heightmap);
+          console.log(`Frame ${frame} complete:`, data.statistics);
+        }
+
+        // Small delay for visualization
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      console.log('Simulation complete!');
+    } catch (error) {
+      console.error('Simulation error:', error);
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   // Initial validation
   useEffect(() => {
     validateConfig(config);
@@ -201,6 +259,10 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         setCurrentFrame,
         heightmapCache,
         setHeightmapForFrame,
+        sessionId,
+        setSessionId,
+        executeSimulation,
+        isSimulating,
       }}
     >
       {children}

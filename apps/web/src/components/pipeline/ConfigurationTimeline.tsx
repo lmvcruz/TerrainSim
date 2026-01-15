@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Square } from 'lucide-react';
 
 export default function ConfigurationTimeline() {
-  const { config, validation, currentFrame, setCurrentFrame } = usePipeline();
+  const { config, validation, currentFrame, setCurrentFrame, sessionId, executeSimulation, isSimulating } = usePipeline();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [hasExecutedSimulation, setHasExecutedSimulation] = useState(false);
 
   // Update container width on resize
   useEffect(() => {
@@ -119,11 +120,34 @@ export default function ConfigurationTimeline() {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const frameWidth = (canvas.width - 40) / config.totalFrames;
-    const clickedFrame = Math.floor((x - 20) / frameWidth) + 1;
+    const clickedFrame = Math.floor((x - 20) / frameWidth);
 
-    if (clickedFrame >= 1 && clickedFrame <= config.totalFrames) {
+    if (clickedFrame >= 0 && clickedFrame <= config.totalFrames) {
       setCurrentFrame(clickedFrame);
     }
+  };
+
+  // Handle play button - execute simulation if not done yet
+  const handlePlay = async () => {
+    if (!sessionId) {
+      console.error('No session - generate terrain first');
+      alert('Please generate terrain first');
+      return;
+    }
+
+    console.log('Play button clicked, sessionId:', sessionId);
+
+    // If simulation hasn't been executed yet, do it now
+    if (!hasExecutedSimulation && !isSimulating) {
+      console.log('Executing simulation for frames 2-10...');
+      await executeSimulation();
+      setHasExecutedSimulation(true);
+      console.log('Simulation complete, starting playback');
+    }
+
+    // Start playback from frame 0 (input model)
+    setCurrentFrame(0);
+    setIsPlaying(!isPlaying);
   };
 
   // Playback controls
@@ -133,7 +157,7 @@ export default function ConfigurationTimeline() {
     const interval = setInterval(() => {
       if (currentFrame >= config.totalFrames) {
         setIsPlaying(false);
-        setCurrentFrame(1);
+        setCurrentFrame(0); // Loop back to input model
       } else {
         setCurrentFrame(currentFrame + 1);
       }
@@ -148,16 +172,17 @@ export default function ConfigurationTimeline() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="p-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors"
-            title={isPlaying ? 'Pause' : 'Play'}
+            onClick={handlePlay}
+            disabled={isSimulating || !sessionId}
+            className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:cursor-not-allowed rounded transition-colors"
+            title={isSimulating ? 'Simulating...' : isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+            {isSimulating ? '⏳' : isPlaying ? <Pause size={16} /> : <Play size={16} />}
           </button>
           <button
             onClick={() => {
               setIsPlaying(false);
-              setCurrentFrame(1);
+              setCurrentFrame(0);
             }}
             className="p-2 bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
             title="Stop"

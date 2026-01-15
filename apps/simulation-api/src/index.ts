@@ -22,6 +22,7 @@ const allowedOrigins = [
 // Allow Cloudflare Pages preview deployments
 const isAllowedOrigin = (origin: string | undefined) => {
   if (!origin) return true; // Allow requests with no origin (e.g., mobile apps, curl)
+  if (IS_DEV) return true; // Allow all origins in development mode
   if (allowedOrigins.includes(origin)) return true;
   // Allow Cloudflare Pages preview URLs: *.terrainsim.pages.dev
   if (origin.match(/^https:\/\/[a-z0-9-]+\.terrainsim\.pages\.dev$/)) return true;
@@ -71,7 +72,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+// Increase body size limit to handle heightmap arrays (256x256 floats = ~1MB)
+app.use(express.json({ limit: '10mb' }));
 
 // Mount job system routes
 app.use(jobSystemRouter);

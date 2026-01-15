@@ -1,6 +1,6 @@
 import { Panel, Group, Separator } from 'react-resizable-panels';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { PanelImperativeHandle } from 'react-resizable-panels';
 import { PipelineProvider } from '../../contexts/PipelineContext';
 import PipelineBuilder from './PipelineBuilder';
@@ -16,6 +16,25 @@ export default function PipelineLayout() {
   const leftPanelRef = useRef<PanelImperativeHandle>(null);
   const rightPanelRef = useRef<PanelImperativeHandle>(null);
   const bottomPanelRef = useRef<PanelImperativeHandle>(null);
+
+  // DIAGNOSTIC: Log panel states on mount and state changes
+  useState(() => {
+    console.log('🔍 DIAGNOSTIC: PipelineLayout mounted');
+    console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
+    setTimeout(() => {
+      const panels = document.querySelectorAll('[data-panel]');
+      panels.forEach((panel, i) => {
+        const rect = panel.getBoundingClientRect();
+        console.log(`Panel ${i}:`, {
+          width: rect.width,
+          height: rect.height,
+          left: rect.left,
+          top: rect.top,
+          classes: panel.className
+        });
+      });
+    }, 1000);
+  });
 
   const toggleLeftPanel = () => {
     if (leftCollapsed) {
@@ -46,19 +65,18 @@ export default function PipelineLayout() {
 
   return (
     <PipelineProvider>
-      <div className="h-screen w-screen flex flex-col bg-zinc-900 text-white overflow-hidden">
-        {/* Top Section: 3 vertical panels */}
-        <Group orientation="horizontal" className="flex-1">
-          {/* Left Panel: Pipeline Builder */}
-          <Panel
-            panelRef={leftPanelRef}
-            defaultSize={25}
-            minSize={15}
-            maxSize={40}
-            collapsible={true}
-          >
-            {!leftCollapsed && (
-              <div className="h-full flex flex-col border-r border-zinc-700">
+      <div className="h-screen w-screen bg-zinc-900 text-white overflow-hidden">
+        <Group orientation="vertical">
+          {/* Top Section: 3 horizontal panels */}
+          <Panel defaultSize={75}>
+            <Group orientation="horizontal">
+              {/* Left Panel: Pipeline Builder */}
+              <Panel
+                panelRef={leftPanelRef}
+                defaultSize={30}
+                minSize={25}
+              >
+              <div className="h-full flex flex-col border-r border-zinc-700" style={{ minWidth: '300px' }}>
                 <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
                   <h2 className="text-sm font-semibold">Pipeline Builder</h2>
                   <button
@@ -73,24 +91,12 @@ export default function PipelineLayout() {
                   <PipelineBuilder />
                 </div>
               </div>
-            )}
-            {leftCollapsed && (
-              <div className="h-full w-8 border-r border-zinc-700 flex items-center justify-center bg-zinc-800">
-                <button
-                  onClick={toggleLeftPanel}
-                  className="p-1 hover:bg-zinc-700 rounded rotate-90"
-                  aria-label="Expand left panel"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
           </Panel>
 
           <Separator className="w-1 bg-zinc-700 hover:bg-blue-500 transition-colors" />
 
           {/* Center Panel: 3D Viewer */}
-          <Panel defaultSize={50} minSize={30}>
+          <Panel defaultSize={40} minSize={25}>
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
                 <h2 className="text-sm font-semibold">Terrain Viewer</h2>
@@ -106,45 +112,32 @@ export default function PipelineLayout() {
           {/* Right Panel: Job Manager */}
           <Panel
             panelRef={rightPanelRef}
-            defaultSize={25}
-            minSize={15}
-            maxSize={40}
-            collapsible={true}
+            defaultSize={30}
+            minSize={25}
           >
-            {!rightCollapsed && (
-              <div className="h-full flex flex-col border-l border-zinc-700">
-                <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
-                  <h2 className="text-sm font-semibold">Job Manager</h2>
-                  <button
-                    onClick={toggleRightPanel}
-                    className="p-1 hover:bg-zinc-700 rounded"
-                    aria-label="Collapse right panel"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-                <div className="flex-1 overflow-y-auto">
-                  <JobManager />
-                </div>
-              </div>
-            )}
-            {rightCollapsed && (
-              <div className="h-full w-8 border-l border-zinc-700 flex items-center justify-center bg-zinc-800">
+            <div className="h-full flex flex-col border-l border-zinc-700" style={{ minWidth: '300px' }}>
+              <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
+                <h2 className="text-sm font-semibold">Job Manager</h2>
                 <button
                   onClick={toggleRightPanel}
-                  className="p-1 hover:bg-zinc-700 rounded -rotate-90"
-                  aria-label="Expand right panel"
+                  className="p-1 hover:bg-zinc-700 rounded"
+                  aria-label="Collapse right panel"
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronRight size={16} />
                 </button>
               </div>
-            )}
+              <div className="flex-1 overflow-y-auto">
+                <JobManager />
+              </div>
+            </div>
           </Panel>
         </Group>
+      </Panel>
 
-        {/* Bottom Panel: Configuration Timeline */}
-        <Group orientation="vertical">
-          <Panel panelRef={bottomPanelRef} defaultSize={150} minSize={100} maxSize={300} collapsible={true}>
+          <Separator className="h-1 bg-zinc-700 hover:bg-blue-500 transition-colors" />
+
+          {/* Bottom Panel: Configuration Timeline */}
+          <Panel panelRef={bottomPanelRef} defaultSize={25} minSize={15}>
             {!bottomCollapsed && (
               <div className="h-full flex flex-col border-t border-zinc-700">
                 <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">

@@ -1,8 +1,83 @@
 import { usePipeline, type ModelingConfig } from '../../contexts/PipelineContext';
-import { Sliders } from 'lucide-react';
+import { Sliders, Wand2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function PipelineBuilder() {
-  const { config, updateStep0, updateTotalFrames } = usePipeline();
+  const { config, updateStep0, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerateTerrain = async () => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      // Convert method to lowercase for backend API
+      const payload = {
+        ...config.step0,
+        method: config.step0.method.toLowerCase() as 'perlin' | 'fbm',
+        width: 256,
+        height: 256,
+      };
+
+      const response = await fetch('http://localhost:3001/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(errorData.error || `Server error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.data) {
+        // Convert heightmap array to Float32Array and store in cache at frame 0 (input model)
+        const heightmapArray = new Float32Array(data.data);
+        setHeightmapForFrame(0, heightmapArray);
+
+        // Create simulation session with this terrain as initial model
+        const sessionResponse = await fetch('http://localhost:3001/simulate/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            config: {
+              ...config,
+              width: 256,
+              height: 256,
+            },
+            initialTerrain: data.data, // Pass the generated terrain
+          }),
+        });
+
+        if (!sessionResponse.ok) {
+          const sessionError = await sessionResponse.json().catch(() => ({ error: sessionResponse.statusText }));
+          throw new Error(`Session creation failed: ${sessionError.error || sessionResponse.statusText}`);
+        }
+
+        const sessionData = await sessionResponse.json();
+        setSessionId(sessionData.sessionId); // Store session ID in context
+
+        setCurrentFrame(1); // Switch to frame 1 to display generated terrain
+        console.log('Terrain generated successfully:', data.statistics);
+        console.log('Session created:', sessionData.sessionId);
+      } else {
+        throw new Error('No heightmap data received');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate terrain';
+      setError(errorMessage);
+      console.error('Error generating terrain:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleMethodChange = (method: ModelingConfig['method']) => {
     updateStep0({ ...config.step0, method });
@@ -157,6 +232,21 @@ export default function PipelineBuilder() {
           </div>
 
           {renderParameters()}
+
+          {/* Generate Button */}
+          <div className="mt-6">
+            <button
+              onClick={handleGenerateTerrain}
+              disabled={isGenerating}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-colors"
+            >
+              <Wand2 size={18} className={isGenerating ? 'animate-spin' : ''} />
+              {isGenerating ? 'Generating...' : 'Generate Terrain'}
+            </button>
+            {error && (
+              <p className="text-xs text-red-400 mt-2">Error: {error}</p>
+            )}
+          </div>
         </div>
       </div>
 
