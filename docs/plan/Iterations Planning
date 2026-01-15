@@ -442,14 +442,14 @@ The project follows an iterative development model, with each iteration deliveri
   - Hover tooltips showing job details
 
 **Delivery Block 4: Job Creation & Configuration**
-- [ ] **WEB-058:** Create Create/Edit Job modal
+- [x] **WEB-058:** Create Create/Edit Job modal
   - Job name input
   - Step selection dropdown
   - Frame range inputs (start, end)
   - Step-specific configuration form
   - Real-time validation feedback
   - Preview how job affects coverage
-- [ ] **INT-005:** Implement job templates system
+- [x] **INT-005:** Implement job templates system
   - Create 1-2 preset templates per step type:
     - Hydraulic: "Heavy Erosion", "Light Smoothing"
     - Thermal: "Aggressive Collapse", "Gentle Settling"

@@ -1,10 +1,26 @@
 import { usePipeline, type SimulationJob } from '../../contexts/PipelineContext';
 import { Plus, Edit, Trash2, Power } from 'lucide-react';
 import { useState } from 'react';
+import { JobModal } from './JobModal';
 
 export default function JobManager() {
   const { config, deleteJob, toggleJobEnabled } = usePipeline();
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [editingJob, setEditingJob] = useState<SimulationJob | undefined>(undefined);
+
+  const openCreateModal = () => {
+    setModalMode('create');
+    setEditingJob(undefined);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (job: SimulationJob) => {
+    setModalMode('edit');
+    setEditingJob(job);
+    setModalOpen(true);
+  };
 
   const getJobColor = (step: SimulationJob['step']) => {
     return step === 'hydraulicErosion' ? 'bg-blue-600' : 'bg-orange-600';
@@ -17,13 +33,18 @@ export default function JobManager() {
 
   return (
     <div className="p-4 space-y-4">
+      {/* Create Job Modal */}
+      <JobModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        mode={modalMode}
+        editingJob={editingJob}
+      />
+
       {/* Create Job Button */}
       <button
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium transition-colors"
-        onClick={() => {
-          // TODO: Open create job modal
-          alert('Create Job modal - Coming next!');
-        }}
+        onClick={openCreateModal}
       >
         <Plus size={16} />
         Create Job
@@ -92,8 +113,7 @@ export default function JobManager() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Open edit modal
-                      alert('Edit Job modal - Coming in Delivery Block 4!');
+                      openEditModal(job);
                     }}
                     className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
                     title="Edit job"
