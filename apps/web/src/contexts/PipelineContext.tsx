@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import apiConfig from '../config/api';
 
 export interface ModelingConfig {
   method: 'Perlin' | 'FBM' | 'SemiSphere' | 'Cone' | 'Sigmoid';
@@ -211,7 +212,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
           break;
         }
 
-        const response = await fetch('http://localhost:3001/simulate/execute', {
+        const response = await fetch(apiConfig.endpoints.simulate.execute, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -252,7 +253,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       // Clean up server session
       if (sessionId) {
         try {
-          await fetch(`http://localhost:3001/simulate/session/${sessionId}`, {
+          await fetch(apiConfig.endpoints.simulate.session(sessionId), {
             method: 'DELETE',
           });
           console.log('Server session cleaned up');

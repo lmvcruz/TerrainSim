@@ -2,6 +2,8 @@
  * Diagnostic utility to capture and report UI layout information
  */
 
+import apiConfig from '../config/api'
+
 interface PanelDiagnostic {
   index: number;
   width: number;
@@ -118,7 +120,7 @@ export function captureLayoutDiagnostics(): LayoutDiagnostic {
 
 export async function sendDiagnosticToServer(diagnostic: LayoutDiagnostic) {
   try {
-    const response = await fetch('http://localhost:3001/dev/logs', {
+    const response = await fetch(apiConfig.endpoints.dev.logs, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

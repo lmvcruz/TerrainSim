@@ -1,6 +1,7 @@
 import { usePipeline, type ModelingConfig } from '../../contexts/PipelineContext';
 import { Sliders, Wand2 } from 'lucide-react';
 import { useState } from 'react';
+import apiConfig from '../../config/api';
 
 export default function PipelineBuilder() {
   const { config, updateStep0, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
@@ -20,7 +21,7 @@ export default function PipelineBuilder() {
         height: 256,
       };
 
-      const response = await fetch('http://localhost:3001/generate', {
+      const response = await fetch(apiConfig.endpoints.generate, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export default function PipelineBuilder() {
         setHeightmapForFrame(0, heightmapArray);
 
         // Create simulation session with this terrain as initial model
-        const sessionResponse = await fetch('http://localhost:3001/simulate/create', {
+        const sessionResponse = await fetch(apiConfig.endpoints.simulate.create, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

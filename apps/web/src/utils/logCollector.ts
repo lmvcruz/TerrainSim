@@ -11,6 +11,7 @@
  */
 
 import { logger, type LogLevel } from './logger'
+import apiConfig from '../config/api'
 
 interface CapturedLog {
   timestamp: number
@@ -171,7 +172,7 @@ class LogCollector {
   /**
    * Send logs to backend API (for agent access)
    */
-  async sendToBackend(apiUrl = 'http://localhost:3001/dev/logs') {
+  async sendToBackend(apiUrl = apiConfig.endpoints.dev.logs) {
     if (!this.enabled) return
 
     try {
@@ -267,7 +268,7 @@ if (import.meta.env.DEV) {
 
   // Optionally enable auto-send to backend (tries silently)
   // Check if backend is available first
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  const apiUrl = import.meta.env.VITE_API_URL || apiConfig.apiUrl
   fetch(`${apiUrl}/health`, { method: 'GET' })
     .then(response => {
       if (response.ok) {
