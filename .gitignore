@@ -1,4 +1,10 @@
+# ==========================================
+# TerrainSim - Root .gitignore
+# ==========================================
+# Prevents build artifacts, logs, and temporary files from being committed
+
 # === Build & Binary Artifacts ===
+# C++ compiled binaries and build outputs
 build/
 bin/
 obj/
@@ -6,13 +12,20 @@ out/
 *.exe
 *.so
 *.dll
+*.dylib
+*.a
+*.lib
 
 # === C++ / vcpkg ===
+# vcpkg package manager artifacts
 vcpkg_installed/
 vcpkg.user.targets
 cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
 
-# === Node / Frontend ===
+# === Node / pnpm ===
+# Node modules and pnpm store (monorepo package manager)
 node_modules/
 dist/
 .npm/
@@ -20,39 +33,68 @@ dist/
 .pnpm-store/
 
 # === Vite ===
+# Vite development server and build cache
 .vite/
 *.local
 
-# === Build outputs ===
+# === TypeScript ===
+# TypeScript incremental build info files
 *.tsbuildinfo
+.tsbuildinfo
 
-# === Test coverage ===
+# === Test Coverage ===
+# Code coverage reports and temp files
 coverage/
 .nyc_output/
+*.lcov
 
 # === Playwright ===
+# End-to-end test results and reports
 test-results/
 playwright-report/
 playwright/.cache/
 
-# === Cache directories ===
+# === Cache Directories ===
+# Various framework cache directories
 .cache/
 .turbo/
 .next/
 .nuxt/
 .output/
+.parcel-cache/
 
 # === Logs ===
+# Application logs and debug files (including dev logs)
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 .dev-logs/
 
+# === Environment Variables ===
+# Local environment configuration (secrets)
+.env
+.env.local
+.env.*.local
+
 # === IDE & OS ===
+# Editor and operating system files
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
 .vs/
 .idea/
+*.swp
+*.swo
+*~
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+# === Temporary Reports ===
+# Generated reports that should not be committed
+docs/temp/*.md
+!docs/temp/.gitkeep

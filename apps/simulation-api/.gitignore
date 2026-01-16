@@ -1,5 +1,35 @@
+# ==========================================
+# TerrainSim API - .gitignore
+# ==========================================
+# Backend-specific ignores (Node.js + Express)
+
+# === Dependencies ===
 node_modules/
+
+# === Build Outputs ===
 dist/
+
+# === Logs ===
 *.log
+logs/
+.dev-logs/
+
+# === Environment Variables ===
+# Do not commit secrets
 .env
+.env.local
+
+# === TypeScript ===
+*.tsbuildinfo
+
+# === Test Coverage ===
+coverage/
+
+# === Session & Preset Files ===
+# Temporary simulation presets (generated at runtime)
+presets/*.json
+!presets/.gitkeep
+
+# === OS Files ===
 .DS_Store
+Thumbs.db

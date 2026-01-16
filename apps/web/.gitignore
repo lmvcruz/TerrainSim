@@ -1,4 +1,9 @@
-# Logs
+# ==========================================
+# TerrainSim Web App - .gitignore
+# ==========================================
+# Frontend-specific ignores (Vite + React)
+
+# === Logs ===
 logs
 *.log
 npm-debug.log*
@@ -7,12 +12,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# === Dependencies ===
 node_modules
+
+# === Build Outputs ===
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# === TypeScript ===
+*.tsbuildinfo
+
+# === Test Coverage ===
+coverage/
+.nyc_output/
+
+# === Editor & IDE ===
 .vscode/*
 !.vscode/extensions.json
 .idea

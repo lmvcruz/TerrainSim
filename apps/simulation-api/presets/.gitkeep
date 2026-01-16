@@ -1,0 +1,2 @@
+# This file ensures the presets/ directory is tracked by git
+# while keeping runtime-generated preset files ignored by .gitignore
