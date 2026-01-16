@@ -296,78 +296,75 @@ The infrastructure is in place and can be enabled by customizing the pre-commit 
 
 ### TEST-301: C++ Benchmark Integration ✅ COMPLETED (2026-01-16)
 **Priority:** Medium
-**Effort:** 2 hours (Actual: 1.5 hours)
+**Effort:** 2 hours (Actual: 3 hours including API fixes)
 
 **Tasks:**
 - Add benchmark step to CI pipeline (optional, manual trigger) ✅
 - Create baseline benchmark results file (`docs/infra/BENCHMARK_BASELINE.md`) ✅
 - Add benchmark comparison script (detect regressions >10%) ✅
 - Document how to run benchmarks locally ✅
-- Document known issues and limitations ✅
+- Fix API compatibility issues ✅
+- Establish real baseline measurements ✅
 
 **Results:**
 - **CI Integration:**
   - Created `.github/workflows/benchmarks.yml` with manual trigger (workflow_dispatch)
   - Runs on Ubuntu with Release build configuration
-  - Outputs results in JSON format
-  - Includes artifact upload for result storage (30-day retention)
+  - Outputs results in JSON format with 3 repetitions
+  - Includes artifact upload (v4) for result storage (30-day retention)
+  
 - **Baseline Documentation:**
-  - Created `docs/infra/BENCHMARK_BASELINE.md` with comprehensive structure
+  - Created `docs/infra/BENCHMARK_BASELINE.md` (400+ lines)
   - Documented all three benchmark suites (Heightmap, Perlin Noise, Hydraulic Erosion)
-  - Included expected performance targets and complexity analysis
-  - Placeholder baseline values (estimates based on algorithm complexity)
+  - **Real measurements** captured on 20-core @ 2.808 GHz system
+  - Performance targets based on actual results
+  - Detailed insights and scaling analysis
+  
 - **Regression Detection:**
-  - Created `scripts/compare-benchmarks.py` Python script
+  - Created `scripts/compare-benchmarks.py` (220 lines)
   - Compares current results with baseline (10% threshold)
   - Parses markdown baseline and JSON results
   - Exits with error code if regressions detected
-- **Known Issues:**
-  - ⚠️ Benchmarks have compilation errors (API mismatches with current implementation)
-    - Missing functions: `generateFBmNoise()`, `generatePerlinNoise()` not in `terrain` namespace
-    - Missing type: `ErosionParams` struct not exposed
-    - API changes: `HydraulicErosion::erode()` signature mismatch
-    - Missing method: `HydraulicErosion::calculateGradient()` not exposed
-  - Actual baseline measurements pending API alignment work
-  - Infrastructure (CI workflow, comparison script, documentation) is production-ready
+  - Colored output (🔴 regressions, 🟢 improvements, ⚪ unchanged)
 
-**CI Configuration:**
-```yaml
-name: C++ Benchmarks
+- **API Fixes:**
+  - Fixed all benchmark files to match C++ implementation
+  - Corrected function names: `generateFBmNoise` → `generators::generateFbm`
+  - Fixed parameter order: octaves before frequency in fBm calls
+  - Fixed types: `ErosionParams` → `HydraulicErosionParams`
+  - Fixed constructors: `HydraulicErosion(params)` instead of `(width, height, params)`
+  - Fixed method signatures: `erode(heightmap, numParticles)`
+  - Added proper namespace usage
+  - Fixed Google Benchmark Counter API usage
 
-on:
-  workflow_dispatch:
-    inputs:
-      compare_baseline:
-        description: 'Compare results with baseline'
-        required: false
-        default: 'true'
-
-jobs:
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Benchmarks
-        run: |
-          cd libs/core
-          cmake -S . -B build -DBUILD_BENCHMARKS=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --target terrain_core_benchmarks
-      - name: Run Benchmarks
-        run: |
-          cd libs/core/build
-          ./terrain_core_benchmarks --benchmark_out=benchmark_results.json
-      - name: Upload Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: benchmark-results
-          path: libs/core/build/benchmark_results.json
-```
+**Key Performance Metrics (Baseline):**
+- Heightmap Creation (256²): 6.1 μs
+- Perlin Noise fBm (256², 4 octaves): 6.98 ms
+- Hydraulic Erosion (50K droplets): 98.2 ms
+- Linear droplet scaling: ~2,000 ns per droplet
 
 **Success Criteria:**
 - ✅ Benchmark workflow added to CI (manual trigger)
-- ✅ Baseline documentation created with structure and estimates
-- ✅ Regression detection script implemented
+- ✅ Baseline documentation created with actual measurements
+- ✅ Regression detection script implemented and tested
 - ✅ Local execution documented
+- ✅ All benchmarks compile and run successfully
+- ✅ Real baseline established on reference hardware
+
+**Success Criteria:**
+- ✅ Benchmark workflow added to CI (manual trigger)
+- ✅ Baseline documentation created with actual measurements
+- ✅ Regression detection script implemented and tested
+- ✅ Local execution documented
+- ✅ All benchmarks compile and run successfully
+- ✅ Real baseline established on reference hardware
+
+**Next Steps:**
+- Monitor for performance regressions in future changes
+- Consider adding thermal erosion benchmarks when implemented
+- Evaluate GPU acceleration opportunities for hot paths
+
+---
 - ✅ Namespace issues resolved
 - ⏳ **Pending:** API alignment (functions/types need to be exposed in C++ headers)
 - ⏳ **Pending:** Actual baseline measurements after API fixes
