@@ -18,7 +18,6 @@ const bindingPath = join(__dirname, '../../../libs/core/bindings/node/job-system
 // Load the native addon
 const jobSystem = require(bindingPath);
 
+// Export all for future use (commented import exists in jobSystem.ts)
 export const validateConfig = jobSystem.validateConfig;
 export const executeFrame = jobSystem.executeFrame;
-
-export default jobSystem;

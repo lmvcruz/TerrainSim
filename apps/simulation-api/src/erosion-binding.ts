@@ -18,11 +18,6 @@ const bindingPath = join(__dirname, '../../../libs/core/bindings/node/index.js')
 // Load the native addon
 const erosion = require(bindingPath);
 
-export const simulateErosion = erosion.simulateErosion;
+// Only export what's actually used
 export const simulateParticle = erosion.simulateParticle;
-export const validateConfig = erosion.validateConfig;
 export const executeFrame = erosion.executeFrame;
-export const getVersion = erosion.getVersion;
-export const DEFAULT_PARAMS = erosion.DEFAULT_PARAMS;
-
-export default erosion;

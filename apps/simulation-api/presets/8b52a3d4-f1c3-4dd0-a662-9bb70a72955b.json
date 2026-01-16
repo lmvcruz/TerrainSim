@@ -1,0 +1,60 @@
+{
+  "id": "8b52a3d4-f1c3-4dd0-a662-9bb70a72955b",
+  "name": "Test Configuration",
+  "config": {
+    "totalFrames": 10,
+    "width": 256,
+    "height": 256,
+    "step0": {
+      "method": "Perlin",
+      "seed": 12345,
+      "frequency": 0.05,
+      "amplitude": 1
+    },
+    "jobs": [
+      {
+        "id": "job-1",
+        "name": "Initial Erosion",
+        "startFrame": 1,
+        "endFrame": 5,
+        "enabled": true,
+        "step": "HydraulicErosion",
+        "config": {
+          "numParticles": 1000,
+          "maxIterations": 30,
+          "erosionRadius": 3,
+          "inertia": 0.05,
+          "sedimentCapacityFactor": 4,
+          "minSedimentCapacity": 0.01,
+          "erodeSpeed": 0.3,
+          "depositSpeed": 0.3,
+          "evaporateSpeed": 0.01,
+          "gravity": 4,
+          "maxDropletSpeed": 10
+        }
+      },
+      {
+        "id": "job-2",
+        "name": "Final Smoothing",
+        "startFrame": 6,
+        "endFrame": 10,
+        "enabled": true,
+        "step": "HydraulicErosion",
+        "config": {
+          "numParticles": 500,
+          "maxIterations": 20,
+          "erosionRadius": 2,
+          "inertia": 0.1,
+          "sedimentCapacityFactor": 3,
+          "minSedimentCapacity": 0.01,
+          "erodeSpeed": 0.2,
+          "depositSpeed": 0.4,
+          "evaporateSpeed": 0.01,
+          "gravity": 4,
+          "maxDropletSpeed": 10
+        }
+      }
+    ]
+  },
+  "createdAt": "2026-01-16T14:19:09.366Z"
+}
