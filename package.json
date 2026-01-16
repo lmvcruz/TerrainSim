@@ -7,6 +7,12 @@
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
   },
+  "pnpm": {
+    "overrides": {
+      "react": "^19.2.0",
+      "react-dom": "^19.2.0"
+    }
+  },
   "scripts": {
     "dev": "pnpm --filter \"*\" run dev",
     "build": "pnpm --filter \"*\" run build",
