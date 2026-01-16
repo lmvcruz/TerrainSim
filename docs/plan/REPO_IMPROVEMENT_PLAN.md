@@ -322,9 +322,13 @@ The infrastructure is in place and can be enabled by customizing the pre-commit 
   - Parses markdown baseline and JSON results
   - Exits with error code if regressions detected
 - **Known Issues:**
-  - ⚠️ Benchmarks currently have compilation errors (include path issues)
-  - Actual baseline measurements pending resolution of build issues
-  - Infrastructure ready for future integration
+  - ⚠️ Benchmarks have compilation errors (API mismatches with current implementation)
+    - Missing functions: `generateFBmNoise()`, `generatePerlinNoise()` not in `terrain` namespace
+    - Missing type: `ErosionParams` struct not exposed
+    - API changes: `HydraulicErosion::erode()` signature mismatch
+    - Missing method: `HydraulicErosion::calculateGradient()` not exposed
+  - Actual baseline measurements pending API alignment work
+  - Infrastructure (CI workflow, comparison script, documentation) is production-ready
 
 **CI Configuration:**
 ```yaml
@@ -364,10 +368,16 @@ jobs:
 - ✅ Baseline documentation created with structure and estimates
 - ✅ Regression detection script implemented
 - ✅ Local execution documented
-- ⏳ **Pending:** Actual baseline measurements after fixing compilation issues
+- ✅ Namespace issues resolved
+- ⏳ **Pending:** API alignment (functions/types need to be exposed in C++ headers)
+- ⏳ **Pending:** Actual baseline measurements after API fixes
 
 **Next Steps:**
-1. Fix include path issues in benchmark files
+1. Expose missing functions and types in C++ headers:
+   - Add `generateFBmNoise()` and `generatePerlinNoise()` to `terrain` namespace
+   - Expose `ErosionParams` struct publicly
+   - Update `HydraulicErosion::erode()` API or benchmark usage
+   - Expose `HydraulicErosion::calculateGradient()` method
 2. Run benchmarks locally to establish real baseline values
 3. Update BENCHMARK_BASELINE.md with actual measurements
 4. Test CI workflow execution
