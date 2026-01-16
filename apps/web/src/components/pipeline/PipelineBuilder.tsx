@@ -64,7 +64,7 @@ export default function PipelineBuilder() {
         const sessionData = await sessionResponse.json();
         setSessionId(sessionData.sessionId); // Store session ID in context
 
-        setCurrentFrame(1); // Switch to frame 1 to display generated terrain
+        setCurrentFrame(0); // Switch to frame 0 to display generated terrain (input model)
         console.log('Terrain generated successfully:', data.statistics);
         console.log('Session created:', sessionData.sessionId);
       } else {
@@ -238,7 +238,7 @@ export default function PipelineBuilder() {
             <button
               onClick={handleGenerateTerrain}
               disabled={isGenerating}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:text-zinc-400 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded flex items-center justify-center gap-2 transition-colors"
             >
               <Wand2 size={18} className={isGenerating ? 'animate-spin' : ''} />
               {isGenerating ? 'Generating...' : 'Generate Terrain'}

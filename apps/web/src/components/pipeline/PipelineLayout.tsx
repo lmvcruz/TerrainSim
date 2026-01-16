@@ -13,6 +13,11 @@ export default function PipelineLayout() {
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [bottomCollapsed, setBottomCollapsed] = useState(false);
 
+  // Track previous sizes to restore on expand
+  const [leftPreviousSize, setLeftPreviousSize] = useState(30);
+  const [rightPreviousSize, setRightPreviousSize] = useState(30);
+  const [bottomPreviousSize, setBottomPreviousSize] = useState(25);
+
   const leftPanelRef = useRef<PanelImperativeHandle>(null);
   const rightPanelRef = useRef<PanelImperativeHandle>(null);
   const bottomPanelRef = useRef<PanelImperativeHandle>(null);
@@ -38,34 +43,43 @@ export default function PipelineLayout() {
 
   const toggleLeftPanel = () => {
     if (leftCollapsed) {
-      leftPanelRef.current?.expand();
+      leftPanelRef.current?.resize(leftPreviousSize);
+      setLeftCollapsed(false);
     } else {
+      const currentSize = leftPanelRef.current?.getSize();
+      if (currentSize) setLeftPreviousSize(currentSize);
       leftPanelRef.current?.collapse();
+      setLeftCollapsed(true);
     }
-    setLeftCollapsed(!leftCollapsed);
   };
 
   const toggleRightPanel = () => {
     if (rightCollapsed) {
-      rightPanelRef.current?.expand();
+      rightPanelRef.current?.resize(rightPreviousSize);
+      setRightCollapsed(false);
     } else {
+      const currentSize = rightPanelRef.current?.getSize();
+      if (currentSize) setRightPreviousSize(currentSize);
       rightPanelRef.current?.collapse();
+      setRightCollapsed(true);
     }
-    setRightCollapsed(!rightCollapsed);
   };
 
   const toggleBottomPanel = () => {
     if (bottomCollapsed) {
-      bottomPanelRef.current?.expand();
+      bottomPanelRef.current?.resize(bottomPreviousSize);
+      setBottomCollapsed(false);
     } else {
+      const currentSize = bottomPanelRef.current?.getSize();
+      if (currentSize) setBottomPreviousSize(currentSize);
       bottomPanelRef.current?.collapse();
+      setBottomCollapsed(true);
     }
-    setBottomCollapsed(!bottomCollapsed);
   };
 
   return (
     <PipelineProvider>
-      <div className="h-screen w-screen bg-zinc-900 text-white overflow-hidden">
+      <div className="h-full w-full bg-zinc-900 text-white overflow-hidden">
         <Group orientation="vertical">
           {/* Top Section: 3 horizontal panels */}
           <Panel defaultSize={75}>
@@ -74,23 +88,37 @@ export default function PipelineLayout() {
               <Panel
                 panelRef={leftPanelRef}
                 defaultSize={30}
-                minSize={25}
+                minSize={20}
+                collapsible={true}
+                collapsedSize={5}
               >
-              <div className="h-full flex flex-col border-r border-zinc-700" style={{ minWidth: '300px' }}>
-                <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
-                  <h2 className="text-sm font-semibold">Pipeline Builder</h2>
+              {!leftCollapsed ? (
+                <div className="h-full flex flex-col border-r border-zinc-700">
+                  <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
+                    <h2 className="text-sm font-semibold">Pipeline Builder</h2>
+                    <button
+                      onClick={toggleLeftPanel}
+                      className="p-1 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
+                      aria-label="Collapse left panel"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    <PipelineBuilder />
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center border-r border-zinc-700 bg-zinc-800">
                   <button
                     onClick={toggleLeftPanel}
-                    className="p-1 hover:bg-zinc-700 rounded"
-                    aria-label="Collapse left panel"
+                    className="p-2 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
+                    aria-label="Expand left panel"
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronRight size={16} />
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto">
-                  <PipelineBuilder />
-                </div>
-              </div>
+              )}
           </Panel>
 
           <Separator className="w-1 bg-zinc-700 hover:bg-blue-500 transition-colors" />
@@ -113,23 +141,37 @@ export default function PipelineLayout() {
           <Panel
             panelRef={rightPanelRef}
             defaultSize={30}
-            minSize={25}
+            minSize={20}
+            collapsible={true}
+            collapsedSize={5}
           >
-            <div className="h-full flex flex-col border-l border-zinc-700" style={{ minWidth: '300px' }}>
-              <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
-                <h2 className="text-sm font-semibold">Job Manager</h2>
+            {!rightCollapsed ? (
+              <div className="h-full flex flex-col border-l border-zinc-700">
+                <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
+                  <h2 className="text-sm font-semibold">Job Manager</h2>
+                  <button
+                    onClick={toggleRightPanel}
+                    className="p-1 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
+                    aria-label="Collapse right panel"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  <JobManager />
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center border-l border-zinc-700 bg-zinc-800">
                 <button
                   onClick={toggleRightPanel}
-                  className="p-1 hover:bg-zinc-700 rounded"
-                  aria-label="Collapse right panel"
+                  className="p-2 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
+                  aria-label="Expand right panel"
                 >
-                  <ChevronRight size={16} />
+                  <ChevronLeft size={16} />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto">
-                <JobManager />
-              </div>
-            </div>
+            )}
           </Panel>
         </Group>
       </Panel>
@@ -137,14 +179,20 @@ export default function PipelineLayout() {
           <Separator className="h-1 bg-zinc-700 hover:bg-blue-500 transition-colors" />
 
           {/* Bottom Panel: Configuration Timeline */}
-          <Panel panelRef={bottomPanelRef} defaultSize={25} minSize={15}>
-            {!bottomCollapsed && (
+          <Panel
+            panelRef={bottomPanelRef}
+            defaultSize={25}
+            minSize={10}
+            collapsible={true}
+            collapsedSize={5}
+          >
+            {!bottomCollapsed ? (
               <div className="h-full flex flex-col border-t border-zinc-700">
                 <div className="flex items-center justify-between p-3 border-b border-zinc-700 bg-zinc-800">
                   <h2 className="text-sm font-semibold">Configuration Timeline</h2>
                   <button
                     onClick={toggleBottomPanel}
-                    className="p-1 hover:bg-zinc-700 rounded"
+                    className="p-1 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
                     aria-label="Collapse timeline"
                   >
                     <ChevronDown size={16} />
@@ -154,12 +202,11 @@ export default function PipelineLayout() {
                   <ConfigurationTimeline />
                 </div>
               </div>
-            )}
-            {bottomCollapsed && (
-              <div className="h-8 border-t border-zinc-700 flex items-center justify-center bg-zinc-800">
+            ) : (
+              <div className="h-full flex items-center justify-center border-t border-zinc-700 bg-zinc-800">
                 <button
                   onClick={toggleBottomPanel}
-                  className="p-1 hover:bg-zinc-700 rounded"
+                  className="p-2 hover:bg-zinc-700 rounded bg-zinc-800 text-white"
                   aria-label="Expand timeline"
                 >
                   <ChevronUp size={16} />

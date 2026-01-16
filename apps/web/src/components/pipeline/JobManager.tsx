@@ -43,7 +43,7 @@ export default function JobManager() {
 
       {/* Create Job Button */}
       <button
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium transition-colors"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
         onClick={openCreateModal}
       >
         <Plus size={16} />
@@ -102,7 +102,7 @@ export default function JobManager() {
                     }}
                     className={`flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                       job.enabled
-                        ? 'bg-zinc-700 hover:bg-zinc-600'
+                        ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
                         : 'bg-green-600/20 hover:bg-green-600/30 text-green-400'
                     }`}
                     title={job.enabled ? 'Disable job' : 'Enable job'}
@@ -115,7 +115,7 @@ export default function JobManager() {
                       e.stopPropagation();
                       openEditModal(job);
                     }}
-                    className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
+                    className="p-1.5 hover:bg-zinc-700 rounded transition-colors bg-zinc-800 text-white"
                     title="Edit job"
                   >
                     <Edit size={14} />
@@ -127,7 +127,7 @@ export default function JobManager() {
                         deleteJob(job.id);
                       }
                     }}
-                    className="p-1.5 hover:bg-red-600/20 text-red-400 rounded transition-colors"
+                    className="p-1.5 hover:bg-red-600/20 text-red-400 rounded transition-colors bg-zinc-800"
                     title="Delete job"
                   >
                     <Trash2 size={14} />

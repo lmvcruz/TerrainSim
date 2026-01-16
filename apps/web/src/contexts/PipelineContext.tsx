@@ -67,6 +67,8 @@ interface PipelineContextType {
   sessionId: string | null;
   setSessionId: (sessionId: string | null) => void;
   executeSimulation: () => Promise<void>;
+  stopSimulation: () => void;
+  clearCache: () => void;
   isSimulating: boolean;
 }
 
@@ -104,6 +106,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
   const [heightmapCache] = useState<Map<number, Float32Array>>(new Map());
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [shouldStopSimulation, setShouldStopSimulation] = useState(false);
 
   // Persist config to localStorage whenever it changes
   useEffect(() => {
@@ -197,10 +200,17 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     }
 
     setIsSimulating(true);
+    setShouldStopSimulation(false);
 
     try {
       // Execute frame-by-frame for frames 1 through totalFrames (frame 0 is input)
       for (let frame = 1; frame <= config.totalFrames; frame++) {
+        // Check if user requested stop
+        if (shouldStopSimulation) {
+          console.log('Simulation stopped by user at frame', frame);
+          break;
+        }
+
         const response = await fetch('http://localhost:3001/simulate/execute', {
           method: 'POST',
           headers: {
@@ -230,12 +240,38 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         await new Promise(resolve => setTimeout(resolve, 50));
       }
 
-      console.log('Simulation complete!');
+      if (!shouldStopSimulation) {
+        console.log('Simulation complete!');
+      }
     } catch (error) {
       console.error('Simulation error:', error);
     } finally {
       setIsSimulating(false);
+      setShouldStopSimulation(false);
+
+      // Clean up server session
+      if (sessionId) {
+        try {
+          await fetch(`http://localhost:3001/simulate/session/${sessionId}`, {
+            method: 'DELETE',
+          });
+          console.log('Server session cleaned up');
+        } catch (error) {
+          console.error('Failed to clean up server session:', error);
+        }
+      }
     }
+  };
+
+  const stopSimulation = () => {
+    console.log('Stop simulation requested');
+    setShouldStopSimulation(true);
+  };
+
+  const clearCache = () => {
+    console.log('Clearing heightmap cache');
+    heightmapCache.clear();
+    setCurrentFrame(0);
   };
 
   // Initial validation
@@ -262,6 +298,8 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         sessionId,
         setSessionId,
         executeSimulation,
+        stopSimulation,
+        clearCache,
         isSimulating,
       }}
     >

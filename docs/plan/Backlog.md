@@ -111,6 +111,87 @@ This document tracks features that have been deferred from active iterations for
 
 ---
 
+## Extreme Parameter Value Warnings
+
+**Status:** Deferred from Iteration 3.6 Delivery Block 5
+
+**Description:** Add visual warnings when users configure jobs with extreme parameter values that might produce unexpected results or performance issues.
+
+**Implementation Ideas:**
+- Define thresholds for "very short" (<5 frames?) and "very long" (>100 frames?) job ranges
+- Define thresholds for extreme erosion parameters (e.g., erosionRate > 0.9)
+- Display warning icons (⚠️) in job creation modal when thresholds exceeded
+- Show tooltip explaining potential issues (e.g., "Very high erosion rate may produce unrealistic results")
+- Allow user to proceed with warnings (non-blocking)
+- Add "Why is this a warning?" help button with detailed explanations
+
+**Benefits:**
+- Helps users avoid common mistakes
+- Educates users about parameter impacts
+- Reduces support requests for "unexpected" results
+- Improves overall user experience
+
+**Complexity:** Low-Medium
+
+**Dependencies:**
+- Requires job creation UI (Iteration 3.6 Delivery Block 4)
+- Needs parameter threshold research/testing
+
+**Open Questions:**
+- What thresholds should trigger warnings?
+- Should warnings be configurable/dismissible?
+- Show warnings during creation or after?
+
+---
+
+## Advanced Validation Features
+
+**Status:** Deferred from Iteration 3.6 Delivery Block 5
+
+**Description:** Enhanced validation UI features including detailed error messages, tooltips, API integration, and overlapping job warnings.
+
+**Deferred Tasks:**
+
+**INT-006b:** Enhanced client-side validation UI
+- Add error banner component at top of PipelineLayout
+- Add tooltips on hover showing exact uncovered frame ranges
+- Real-time validation feedback during job creation
+
+**INT-007b:** Overlapping jobs warnings and explanations
+- Display warning badge in timeline when overlaps detected
+- Show tooltip listing which jobs overlap on that frame
+- Clarify in UI: "Jobs execute sequentially: Job A → Job B → Job C"
+- Add info icon explaining execution order model
+
+**INT-008:** Validation API integration
+- Call POST /config/validate before running simulation
+- Compare client-side validation with server validation
+- Display server-side warnings in UI
+- Debouncing/throttling for performance with many jobs
+
+**TEST-205b:** E2E validation tests
+- Test: Create pipeline with gaps → Verify visual feedback
+- Test: Create overlapping jobs → Verify warning displayed
+- Test: Fill all gaps → Verify feedback updates
+
+**Benefits:**
+- Improved user guidance for configuration errors
+- Better understanding of job execution model
+- Double-validation (client + server) prevents invalid simulations
+
+**Complexity:** Medium
+
+**Dependencies:**
+- Requires basic validation system (already implemented in PipelineContext)
+- Requires timeline component (Delivery Block 5)
+
+**Reason for Deferral:**
+- User needs clarification on validation timing and behavior
+- Focus first on core Simulate/Play/Reset functionality
+- Can be added incrementally after core features work
+
+---
+
 ## Branching Pipelines
 
 **Status:** Future consideration (Phase 4+)

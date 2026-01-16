@@ -457,19 +457,37 @@ The project follows an iterative development model, with each iteration deliveri
   - Template parameter preview
 
 **Delivery Block 5: Validation & Error Handling**
-- [ ] **INT-006:** Implement client-side validation
-  - Validate before API calls
-  - Display coverage errors in UI
-  - Red timeline segments for gaps
-  - Error banner listing uncovered frame ranges
-  - Disable "Run Simulation" button when invalid
-- [ ] **INT-007:** Add warning messages for edge cases
-  - Overlapping jobs (show which jobs conflict)
-  - Extreme parameter values
-  - Very short/long frame ranges
+
+**IMPORTANT CLARIFICATIONS:**
+- **Job Execution Model:** Jobs execute SEQUENTIALLY in creation order (NOT "last wins")
+  - First job: Uses previous frame as input
+  - Subsequent jobs: Use result of previous job as input
+  - Last job: Result returned to frontend
+  - This applies to overlapping frames - all overlapping jobs execute in sequence
+
+**Tasks:**
+- [ ] **INT-006:** Implement Simulate/Play/Reset button architecture
+  - Timeline (bottom panel) buttons:
+    - "Simulate" button: Creates frames, fills cache, disabled when validation fails
+    - "Reset" button: Cleans up cache (deletes models, preserves configuration)
+  - Viewer (center panel) buttons:
+    - "Play" button: Plays animation from cached frames
+    - "Back"/"Forward" buttons: Frame-by-frame navigation
+  - Button state management:
+    - Simulate disabled when validation.isValid === false
+    - Simulate changes to "Stop" during execution
+    - Stop finishes server session, keeps cache intact
+- [ ] **INT-007:** Enhanced timeline visual feedback
+  - Display frame numbers along timeline
+  - Show active jobs with color-coded bars
+  - Red segments for coverage gaps (visual indicator for invalid state)
+  - Current frame indicator
+  - Click to jump to frame
 - [ ] **TEST-205:** Write frontend E2E tests
-  - Build pipeline → Create jobs → Validate → Run → View results
-  - Test error states (attempt to run with gaps)
+  - Test: Build pipeline → Create jobs → Simulate → Play → View results
+  - Test: Simulate → Stop → Verify cache preserved
+  - Test: Reset → Verify cache cleared
+  - Test: Frame-by-frame navigation with Back/Forward buttons
 
 **Delivery Block 6: Configuration Persistence**
 - [ ] **INT-008:** Implement configuration save/load
