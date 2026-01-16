@@ -3,9 +3,9 @@ module.exports = {
     name: 'terrainsim-api',
     cwd: '/var/www/terrainsim/apps/simulation-api',
     script: 'src/index.ts',
-    interpreter: '/var/www/terrainsim/node_modules/.bin/tsx',
+    interpreter: 'npx',
+    interpreter_args: 'tsx',
     instances: 1,
-    exec_mode: 'cluster',
     env: {
       NODE_ENV: 'production',
       PORT: 3001,
