@@ -85,10 +85,30 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
             echo "⚙️  Configuring nginx body size limit..."
 
+            # Find nginx config file for api.lmvcruz.work
+            NGINX_CONFIG=$(sudo find /etc/nginx -type f -name "*.conf" -exec grep -l "api.lmvcruz.work" {} \; | head -1)
+            
+            if [ -z "$NGINX_CONFIG" ]; then
+              echo "❌ Could not find nginx config for api.lmvcruz.work"
+              echo "Available nginx configs:"
+              sudo ls -la /etc/nginx/sites-available/ /etc/nginx/conf.d/ 2>/dev/null || true
+              echo "Checking nginx.conf for api.lmvcruz.work..."
+              sudo grep -r "api.lmvcruz.work" /etc/nginx/ || true
+              exit 1
+            fi
+
+            echo "Found nginx config: $NGINX_CONFIG"
+
             # Check if client_max_body_size is already set
-            if ! sudo grep -q "client_max_body_size" /etc/nginx/sites-available/api.lmvcruz.work; then
+            if ! sudo grep -q "client_max_body_size" "$NGINX_CONFIG"; then
               echo "Adding client_max_body_size to nginx config..."
-              sudo sed -i "/server_name api.lmvcruz.work;/a \    client_max_body_size 20M;" /etc/nginx/sites-available/api.lmvcruz.work
+              # Add to http or server block
+              if sudo grep -q "server_name.*api.lmvcruz.work" "$NGINX_CONFIG"; then
+                sudo sed -i "/server_name.*api.lmvcruz.work/a \    client_max_body_size 20M;" "$NGINX_CONFIG"
+              else
+                # Add to the first server block
+                sudo sed -i "/server {/a \    client_max_body_size 20M;" "$NGINX_CONFIG"
+              fi
 
               # Test nginx configuration
               if sudo nginx -t; then
@@ -97,6 +117,7 @@ jobs:
                 echo "✅ Nginx configured to accept up to 20MB request bodies"
               else
                 echo "❌ Nginx config test failed!"
+                sudo cat "$NGINX_CONFIG"
                 exit 1
               fi
             else
