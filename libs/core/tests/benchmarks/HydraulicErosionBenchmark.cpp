@@ -3,6 +3,8 @@
 #include "../../include/Heightmap.hpp"
 #include "../../include/TerrainGenerators.hpp"
 
+using namespace terrain;
+
 // Benchmark: Single erosion iteration (1000 droplets)
 static void BM_HydraulicErosionSingleIteration(benchmark::State& state) {
     const int size = state.range(0);

@@ -2,6 +2,8 @@
 #include "../../include/Heightmap.hpp"
 #include <random>
 
+using namespace terrain;
+
 // Benchmark: Heightmap creation
 static void BM_HeightmapCreation(benchmark::State& state) {
     const int size = state.range(0);

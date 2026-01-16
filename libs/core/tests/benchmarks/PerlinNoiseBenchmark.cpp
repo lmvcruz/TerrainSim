@@ -3,6 +3,8 @@
 #include "../../include/Heightmap.hpp"
 #include "../../include/TerrainGenerators.hpp"
 
+using namespace terrain;
+
 // Benchmark: Single Perlin noise octave generation
 static void BM_PerlinNoiseSingleOctave(benchmark::State& state) {
     const int size = state.range(0);
