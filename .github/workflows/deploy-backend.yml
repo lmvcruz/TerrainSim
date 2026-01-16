@@ -88,7 +88,7 @@ jobs:
             pm2 delete terrainsim-api || true
 
             echo "🚀 Starting PM2 with ecosystem config..."
-            pm2 start ecosystem.config.js
+            pm2 start ecosystem.config.cjs
             pm2 save
           '
 
