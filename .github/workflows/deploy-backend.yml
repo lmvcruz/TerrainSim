@@ -83,8 +83,13 @@ jobs:
       - name: Deploy - Restart PM2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
-            echo "🔄 Restarting PM2 process..."
-            pm2 restart terrainsim-api
+            cd /var/www/terrainsim
+            echo "🔄 Stopping PM2 process..."
+            pm2 delete terrainsim-api || true
+
+            echo "🚀 Starting PM2 with ecosystem config..."
+            pm2 start ecosystem.config.js
+            pm2 save
           '
 
       - name: Wait for PM2 Restart
