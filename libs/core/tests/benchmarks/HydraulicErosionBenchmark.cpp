@@ -10,11 +10,9 @@ static void BM_HydraulicErosionSingleIteration(benchmark::State& state) {
     const int size = state.range(0);
 
     // Generate terrain
-    Heightmap terrain = generateFBmNoise(size, size, 12345, 0.05f, 1.0f, 4, 0.5f, 2.0f);
+    Heightmap hm = generators::generateFbm(size, size, 12345, 4, 0.05f, 1.0f, 0.5f, 2.0f);
 
-    // Erosion parameters
-    ErosionParams params;
-    params.droplets = 1000;
+    HydraulicErosionParams params;
     params.erosionRadius = 3;
     params.inertia = 0.3f;
     params.sedimentCapacityFactor = 3.0f;
@@ -23,21 +21,20 @@ static void BM_HydraulicErosionSingleIteration(benchmark::State& state) {
     params.erodeSpeed = 0.3f;
     params.evaporateSpeed = 0.01f;
     params.gravity = 4.0f;
-    params.maxDropletLifetime = 30;
-    params.initialWaterVolume = 1.0f;
-    params.initialSpeed = 1.0f;
+    params.maxIterations = 30;
 
-    HydraulicErosion erosion(terrain.width(), terrain.height(), params);
+    HydraulicErosion erosion(params);
+    const int droplets = 1000;
 
     for (auto _ : state) {
-        Heightmap copy = terrain; // Copy for each iteration
-        erosion.erode(copy);
+        Heightmap copy = hm; // Copy for each iteration
+        erosion.erode(copy, droplets);
         benchmark::DoNotOptimize(copy);
     }
 
-    state.SetItemsProcessed(state.iterations() * params.droplets);
+    state.SetItemsProcessed(state.iterations() * droplets);
     state.counters["droplets_per_sec"] = benchmark::Counter(
-        state.iterations() * params.droplets,
+        state.iterations() * droplets,
         benchmark::Counter::kIsRate
     );
 }
@@ -48,10 +45,9 @@ static void BM_HydraulicErosionDropletCount(benchmark::State& state) {
     const int size = 256;
     const int dropletCount = state.range(0);
 
-    Heightmap terrain = generateFBmNoise(size, size, 12345, 0.05f, 1.0f, 4, 0.5f, 2.0f);
+    Heightmap terrain = generators::generateFbm(size, size, 12345, 4, 0.05f, 1.0f, 0.5f, 2.0f);
 
-    ErosionParams params;
-    params.droplets = dropletCount;
+    HydraulicErosionParams params;
     params.erosionRadius = 3;
     params.inertia = 0.3f;
     params.sedimentCapacityFactor = 3.0f;
@@ -60,15 +56,13 @@ static void BM_HydraulicErosionDropletCount(benchmark::State& state) {
     params.erodeSpeed = 0.3f;
     params.evaporateSpeed = 0.01f;
     params.gravity = 4.0f;
-    params.maxDropletLifetime = 30;
-    params.initialWaterVolume = 1.0f;
-    params.initialSpeed = 1.0f;
+    params.maxIterations = 30;
 
-    HydraulicErosion erosion(size, size, params);
+    HydraulicErosion erosion(params);
 
     for (auto _ : state) {
         Heightmap copy = terrain;
-        erosion.erode(copy);
+        erosion.erode(copy, dropletCount);
         benchmark::DoNotOptimize(copy);
     }
 
@@ -79,39 +73,12 @@ BENCHMARK(BM_HydraulicErosionDropletCount)
     ->Arg(1000)->Arg(5000)->Arg(10000)->Arg(50000)
     ->Complexity();
 
-// Benchmark: Gradient calculation (critical operation)
-static void BM_HydraulicErosionGradientCalculation(benchmark::State& state) {
-    const int size = 256;
-    Heightmap terrain = generateFBmNoise(size, size, 12345, 0.05f, 1.0f, 4, 0.5f, 2.0f);
-
-    ErosionParams params;
-    params.erosionRadius = 3;
-    HydraulicErosion erosion(size, size, params);
-
-    int x = size / 2;
-    int y = size / 2;
-
-    for (auto _ : state) {
-        auto [gradX, gradY] = erosion.calculateGradient(terrain, x, y);
-        benchmark::DoNotOptimize(gradX);
-        benchmark::DoNotOptimize(gradY);
-
-        // Move to next cell
-        x = (x + 1) % (size - 2) + 1;
-        if (x == 1) y = (y + 1) % (size - 2) + 1;
-    }
-
-    state.SetItemsProcessed(state.iterations());
-}
-BENCHMARK(BM_HydraulicErosionGradientCalculation);
-
 // Benchmark: Single water particle simulation
 static void BM_HydraulicErosionSingleParticle(benchmark::State& state) {
     const int size = 256;
-    Heightmap terrain = generateFBmNoise(size, size, 12345, 0.05f, 1.0f, 4, 0.5f, 2.0f);
+    Heightmap terrain = generators::generateFbm(size, size, 12345, 4, 0.05f, 1.0f, 0.5f, 2.0f);
 
-    ErosionParams params;
-    params.droplets = 1;
+    HydraulicErosionParams params;
     params.erosionRadius = 3;
     params.inertia = 0.3f;
     params.sedimentCapacityFactor = 3.0f;
@@ -120,15 +87,14 @@ static void BM_HydraulicErosionSingleParticle(benchmark::State& state) {
     params.erodeSpeed = 0.3f;
     params.evaporateSpeed = 0.01f;
     params.gravity = 4.0f;
-    params.maxDropletLifetime = 30;
-    params.initialWaterVolume = 1.0f;
-    params.initialSpeed = 1.0f;
+    params.maxIterations = 30;
 
-    HydraulicErosion erosion(size, size, params);
+    HydraulicErosion erosion(params);
+    const int droplets = 1;
 
     for (auto _ : state) {
         Heightmap copy = terrain;
-        erosion.erode(copy);
+        erosion.erode(copy, droplets);
         benchmark::DoNotOptimize(copy);
     }
 
@@ -141,11 +107,10 @@ static void BM_HydraulicErosionFullSimulation(benchmark::State& state) {
     const int size = 256;
 
     // Generate initial terrain
-    Heightmap terrain = generateFBmNoise(size, size, 12345, 0.05f, 1.0f, 4, 0.5f, 2.0f);
+    Heightmap terrain = generators::generateFbm(size, size, 12345, 4, 0.05f, 1.0f, 0.5f, 2.0f);
 
     // Realistic production parameters
-    ErosionParams params;
-    params.droplets = 50000;
+    HydraulicErosionParams params;
     params.erosionRadius = 3;
     params.inertia = 0.3f;
     params.sedimentCapacityFactor = 3.0f;
@@ -154,22 +119,21 @@ static void BM_HydraulicErosionFullSimulation(benchmark::State& state) {
     params.erodeSpeed = 0.3f;
     params.evaporateSpeed = 0.01f;
     params.gravity = 4.0f;
-    params.maxDropletLifetime = 30;
-    params.initialWaterVolume = 1.0f;
-    params.initialSpeed = 1.0f;
+    params.maxIterations = 30;
 
-    HydraulicErosion erosion(size, size, params);
+    HydraulicErosion erosion(params);
+    const int droplets = 50000;
 
     for (auto _ : state) {
         Heightmap copy = terrain;
-        erosion.erode(copy);
+        erosion.erode(copy, droplets);
         benchmark::DoNotOptimize(copy);
     }
 
-    const int64_t cells_processed = size * size * params.droplets;
-    state.SetItemsProcessed(state.iterations() * params.droplets);
+    const int64_t cells_processed = size * size * droplets;
+    state.SetItemsProcessed(state.iterations() * droplets);
     state.counters["droplets_per_sec"] = benchmark::Counter(
-        state.iterations() * params.droplets,
+        state.iterations() * droplets,
         benchmark::Counter::kIsRate
     );
     state.counters["total_cells"] = benchmark::Counter(cells_processed);
@@ -180,12 +144,11 @@ BENCHMARK(BM_HydraulicErosionFullSimulation)->Unit(benchmark::kMillisecond);
 static void BM_HydraulicErosionMemoryAllocation(benchmark::State& state) {
     const int size = state.range(0);
 
-    ErosionParams params;
-    params.droplets = 10000;
+    HydraulicErosionParams params;
     params.erosionRadius = 3;
 
     for (auto _ : state) {
-        HydraulicErosion erosion(size, size, params);
+        HydraulicErosion erosion(params);
         benchmark::DoNotOptimize(erosion);
     }
 

@@ -13,7 +13,7 @@ static void BM_PerlinNoiseSingleOctave(benchmark::State& state) {
     const float amplitude = 1.0f;
 
     for (auto _ : state) {
-        Heightmap hm = generatePerlinNoise(size, size, seed, frequency, amplitude);
+        Heightmap hm = generators::generatePerlinNoise(size, size, seed, frequency, amplitude);
         benchmark::DoNotOptimize(hm);
     }
 
@@ -33,7 +33,7 @@ static void BM_PerlinNoiseFBm(benchmark::State& state) {
     const float lacunarity = 2.0f;
 
     for (auto _ : state) {
-        Heightmap hm = generateFBmNoise(size, size, seed, frequency, amplitude, octaves, persistence, lacunarity);
+        Heightmap hm = generators::generateFbm(size, size, seed, octaves, frequency, amplitude, persistence, lacunarity);
         benchmark::DoNotOptimize(hm);
     }
 
@@ -53,7 +53,7 @@ static void BM_PerlinNoiseFBmOctaves(benchmark::State& state) {
     const float lacunarity = 2.0f;
 
     for (auto _ : state) {
-        Heightmap hm = generateFBmNoise(size, size, seed, frequency, amplitude, octaves, persistence, lacunarity);
+        Heightmap hm = generators::generateFbm(size, size, seed, octaves, frequency, amplitude, persistence, lacunarity);
         benchmark::DoNotOptimize(hm);
     }
 
@@ -106,13 +106,13 @@ static void BM_PerlinNoiseGridSizeComparison(benchmark::State& state) {
     const float lacunarity = 2.0f;
 
     for (auto _ : state) {
-        Heightmap hm = generateFBmNoise(size, size, seed, frequency, amplitude, octaves, persistence, lacunarity);
+        Heightmap hm = generators::generateFbm(size, size, seed, octaves, frequency, amplitude, persistence, lacunarity);
         benchmark::DoNotOptimize(hm);
     }
 
     const int64_t cells = size * size;
     state.SetItemsProcessed(state.iterations() * cells);
-    state.counters["cells"] = benchmark::Counter(cells, benchmark::Counter::kDefIs, benchmark::Counter::kIs1024);
+    state.counters["cells"] = benchmark::Counter(static_cast<double>(cells), benchmark::Counter::kDefaults, benchmark::Counter::kIs1024);
     state.counters["cells_per_sec"] = benchmark::Counter(state.iterations() * cells, benchmark::Counter::kIsRate);
 }
 BENCHMARK(BM_PerlinNoiseGridSizeComparison)->Arg(64)->Arg(128)->Arg(256)->Arg(512)->Arg(1024);
