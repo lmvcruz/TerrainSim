@@ -1,6 +1,6 @@
 import { Panel, Group, Separator } from 'react-resizable-panels';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import type { PanelImperativeHandle } from 'react-resizable-panels';
 import { PipelineProvider } from '../../contexts/PipelineContext';
 import PipelineBuilder from './PipelineBuilder';
@@ -47,7 +47,7 @@ export default function PipelineLayout() {
       setLeftCollapsed(false);
     } else {
       const currentSize = leftPanelRef.current?.getSize();
-      if (currentSize) setLeftPreviousSize(currentSize);
+      if (currentSize) setLeftPreviousSize(currentSize.asPercentage);
       leftPanelRef.current?.collapse();
       setLeftCollapsed(true);
     }
@@ -59,7 +59,7 @@ export default function PipelineLayout() {
       setRightCollapsed(false);
     } else {
       const currentSize = rightPanelRef.current?.getSize();
-      if (currentSize) setRightPreviousSize(currentSize);
+      if (currentSize) setRightPreviousSize(currentSize.asPercentage);
       rightPanelRef.current?.collapse();
       setRightCollapsed(true);
     }
@@ -71,7 +71,7 @@ export default function PipelineLayout() {
       setBottomCollapsed(false);
     } else {
       const currentSize = bottomPanelRef.current?.getSize();
-      if (currentSize) setBottomPreviousSize(currentSize);
+      if (currentSize) setBottomPreviousSize(currentSize.asPercentage);
       bottomPanelRef.current?.collapse();
       setBottomCollapsed(true);
     }

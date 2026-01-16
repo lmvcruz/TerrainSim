@@ -1,4 +1,4 @@
-import { usePipeline, type SimulationJob } from '../../contexts/PipelineContext';
+import { usePipeline } from '../../contexts/PipelineContext';
 import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Square, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
 
