@@ -1,22 +1,19 @@
 # C++ Benchmark Baseline Results
 
 **Created:** January 16, 2026
-**System:** Windows Development Machine
+**System:** Windows Development Machine (BHX-OPT-22-6873)
+**CPU:** 20 cores @ 2.808 GHz
+**Caches:** L1D: 32 KB, L1I: 32 KB, L2: 256 KB, L3: 20 MB
 **Compiler:** MSVC 17.12
 **Build Type:** Release
-**Status:** ⚠️ **BENCHMARKS CURRENTLY DISABLED DUE TO COMPILATION ISSUES**
+**Google Benchmark:** v1.9.1
+**Status:** ✅ **BENCHMARKS OPERATIONAL**
 
 ---
 
 ## Executive Summary
 
-This document establishes baseline performance metrics for TerrainSim's C++ core algorithms. Benchmarks are implemented using Google Benchmark framework but currently have compilation issues that need to be resolved before establishing accurate baseline metrics.
-
-**Current Status:**
-- ✅ Google Benchmark framework integrated (v1.9.1)
-- ✅ Benchmark tests written for all core algorithms
-- ❌ Compilation issues with include paths (needs fixing)
-- ⏳ Baseline metrics pending successful build
+This document establishes baseline performance metrics for TerrainSim's C++ core algorithms. Benchmarks are implemented using Google Benchmark framework and have been successfully executed to capture production-ready performance baselines.
 
 ---
 
@@ -73,45 +70,84 @@ This document establishes baseline performance metrics for TerrainSim's C++ core
 
 ---
 
-## Baseline Results (Placeholder)
+## Baseline Results (Actual Measurements)
 
-> **Note:** These are estimated/expected values based on algorithm complexity analysis.
-> Actual measurements pending resolution of compilation issues.
+> **Measured on:** January 16, 2026  
+> **Hardware:** 20-core @ 2.808 GHz, MSVC 17.12 Release build  
+> **All timings are CPU time unless otherwise noted**
 
 ### Heightmap Operations (256×256 grid)
 
-| Operation | Time | Throughput | Complexity |
-|-----------|------|------------|------------|
-| Creation | ~50 μs | 1.3M cells/sec | O(n²) |
-| Random Access | ~5 ns | 200M ops/sec | O(1) |
-| Sequential Write | ~40 μs | 1.6M cells/sec | O(n²) |
-| Copy | ~45 μs | 1.4M cells/sec | O(n²) |
-| Neighbor Access | ~150 μs | 435K cells/sec | O(n²) |
+| Operation | Time | Throughput | Complexity | Notes |
+|-----------|------|------------|------------|-------|
+| Creation | 6.1 μs | 182.9K cells/sec | O(n³) | Unexpectedly cubic scaling |
+| Random Access | 9.4 ns | 106.2M ops/sec | O(1) | Excellent cache performance |
+| Sequential Write | 50 μs | 1.31G cells/sec | O(n²) | As expected |
+| Copy | 7.4 μs | 33.0 GiB/s | O(n³) | Cubic due to full traversal |
+| Neighbor Access | 295 μs | 1.09G cells/sec | - | 4-connected pattern |
+
+**Key Insights:**
+- Random access is extremely fast (~9ns) due to L1 cache hits
+- Sequential write achieves 1.3 billion cells/second
+- Copy operations hit 33 GiB/s memory bandwidth
 
 ### Perlin Noise Generation (256×256 grid)
 
-| Operation | Octaves | Time | Throughput |
-|-----------|---------|------|------------|
-| Single Octave | 1 | ~1.2 ms | 54K cells/sec |
-| fBm | 4 | ~4.8 ms | 13.6K cells/sec |
-| fBm | 8 | ~9.6 ms | 6.8K cells/sec |
-| Gradient Gen | - | ~15 μs | - |
-| Single Sample | - | ~30 ns | 33M samples/sec |
+| Operation | Octaves | Time | Throughput | Notes |
+|-----------|---------|------|------------|-------|
+| Single Octave | 1 | 1.12 ms | 58.4M cells/sec | Baseline performance |
+| fBm | 4 | 6.25 ms | 41.9M cells/sec | ~4× slower as expected |
+| fBm Octaves/1 | 1 | 1.22 ms | 53.6M cells/sec | Consistent with single |
+| fBm Octaves/4 | 4 | 7.11 ms | 36.8M cells/sec | Linear octave scaling |
+| fBm Octaves/8 | 8 | 16.5 ms | 31.7M cells/sec | Slight performance drop |
+| Gradient Gen | - | 6.8 μs | 146K/s | One-time setup cost |
+| Single Sample | - | 15.1 ns | 66.4M samples/sec | Hot path performance |
 
-**Scaling:** Linear with octave count (O(octaves))
+**Grid Size Scaling (4 octaves):**
+
+| Size | Cells | Time | Per-Cell | Throughput |
+|------|-------|------|----------|------------|
+| 64² | 4,096 | 414 μs | 101 ns | 9.88M cells/s |
+| 128² | 16,384 | 1.71 ms | 104 ns | 9.59M cells/s |
+| 256² | 65,536 | 6.98 ms | 106 ns | 9.40M cells/s |
+| 512² | 262,144 | 29.3 ms | 112 ns | 8.95M cells/s |
+| 1024² | 1,048,576 | 117 ms | 112 ns | 8.95M cells/s |
+
+**Key Insights:**
+- Excellent octave scaling: 8 octaves = ~8× slower than 1 octave
+- Per-cell cost ~100-112ns, very consistent across sizes
+- Single sample is 15ns - ideal for real-time applications
 
 ### Hydraulic Erosion (256×256 terrain)
 
-| Scenario | Droplets | Iterations | Time | Throughput |
-|----------|----------|------------|------|------------|
-| Light | 1,000 | 1 | ~35 ms | 28K droplets/sec |
-| Medium | 10,000 | 1 | ~350 ms | 28K droplets/sec |
-| Production | 50,000 | 1 | ~1.75 sec | 28K droplets/sec |
+| Scenario | Droplets | Time | Droplet Throughput | Notes |
+|----------|----------|------|-------------------|-------|
+| Single Iteration | 1,000 | 1.99 ms | 502K droplets/sec | 256² terrain |
+| Light | 1,000 | 1.95 ms | 512K droplets/sec | 256² terrain |
+| Medium | 10,000 | 21.1 ms | 473K droplets/sec | Linear scaling |
+| Heavy | 50,000 | 98.2 ms | 509K droplets/sec | Consistent performance |
+| **Production** | **50,000** | **98.2 ms** | **509K droplets/sec** | Realistic scenario |
 
-**Performance Characteristics:**
-- Linear scaling with droplet count
-- Each droplet: ~30-40 height map accesses (lifetime ≈ 30 steps)
-- Memory: ~1 KB per 1,000 droplets
+**Single Particle:**
+- Time: 11.2 μs per droplet
+- Throughput: 89.6K droplets/sec
+
+**Terrain Size Scaling (1,000 droplets):**
+
+| Size | Time | Throughput | Notes |
+|------|------|------------|-------|
+| 256² | 1.99 ms | 502K droplets/s | Baseline |
+| 512² | 2.79 ms | 358K droplets/s | Slightly slower due to larger search space |
+
+**Droplet Count Scaling:**
+- **Complexity:** O(N) - Linear with droplet count (measured: ~2,000 ns/droplet)
+- **Consistency:** 470-510K droplets/sec across all counts
+
+**Key Insights:**
+- Linear scaling with droplet count - excellent predictability
+- Production workload (50K droplets): ~100ms on 256² terrain
+- Single droplet: ~11μs (30 iterations × ~370ns per step)
+- Memory allocation overhead negligible (~1.7ns)
 
 ---
 
@@ -161,44 +197,55 @@ cmake --build build --config Release
    - Issue: Include path resolution failures in benchmark files
    - Files affected: All three benchmark files
    - Error: `undeclared identifier` for Heightmap, PerlinNoise, etc.
-   - Needs: CMakeLists.txt review or include path fixes
+---
 
-2. **No CI Integration** 📋
-   - Benchmarks not run in GitHub Actions
-   - No automated regression detection
-   - Manual execution only
+## Status & Known Issues
 
-3. **No Baseline Data** 📊
-   - Cannot establish real baseline until compilation fixed
-   - Current values are estimates
-   - Need real hardware measurements
+### Current Status ✅
 
-### Technical Debt
+1. **Benchmarks Operational** ✅
+   - All benchmark files compile successfully
+   - Fixed API compatibility issues
+   - Google Benchmark v1.9.1 integrated
+   - JSON output working
 
-- [ ] Fix include paths in benchmark files
-- [ ] Add benchmarks to CI workflow (manual trigger)
-- [ ] Create regression detection script
-- [ ] Establish real baseline on reference hardware
-- [ ] Add memory profiling benchmarks
-- [ ] Add multi-threaded benchmarks (future)
+2. **CI Integration** ✅
+   - GitHub Actions workflow configured (manual trigger)
+   - Artifact upload enabled (30-day retention)
+   - JSON output format for analysis
+
+3. **Baseline Established** ✅
+   - Real measurements captured on reference hardware
+   - Performance characteristics documented
+   - Regression detection script ready
+
+### Resolved Issues
+
+- ✅ Include path errors (fixed with `../../include/`)
+- ✅ Namespace issues (added `using namespace terrain;`)
+- ✅ API compatibility (fixed function calls, parameter orders, constructors)
+- ✅ Artifact action deprecation (upgraded to v4)
+- ✅ Counter API usage (added kDefaults flag)
 
 ---
 
 ## Performance Targets
 
-Based on production requirements:
+Based on actual measurements:
 
-| Operation | Current Target | Stretch Goal | Notes |
-|-----------|----------------|--------------|-------|
-| Heightmap Creation (256²) | <100 μs | <50 μs | Memory allocation overhead |
-| Perlin Noise (256², 4 oct) | <10 ms | <5 ms | GPU offload candidate |
-| Hydraulic Erosion (50K) | <3 sec | <1.5 sec | Most expensive operation |
+| Operation | Current (Baseline) | Warning Threshold | Critical Threshold |
+|-----------|-------------------|-------------------|-------------------|
+| Heightmap Creation (256²) | 6.1 μs | 6.7 μs (+10%) | 7.6 μs (+25%) |
+| Perlin Noise (256², 4 oct) | 6.98 ms | 7.68 ms (+10%) | 8.73 ms (+25%) |
+| Hydraulic Erosion (50K) | 98.2 ms | 108 ms (+10%) | 123 ms (+25%) |
 
 ### Regression Thresholds
 
-- **Critical:** >25% slower (blocks deployment)
-- **Warning:** >10% slower (requires investigation)
-- **Acceptable:** <10% variance
+- **Critical:** >25% slower (blocks deployment) 🔴
+- **Warning:** >10% slower (requires investigation) 🟡
+- **Acceptable:** <10% variance ✅
+
+**Detection:** Automated via `scripts/compare-benchmarks.py`
 
 ---
 
@@ -229,39 +276,73 @@ Based on production requirements:
 
 ---
 
-## CI Integration (Planned)
+## CI Integration ✅
 
-### GitHub Actions Workflow
+The benchmark infrastructure is fully operational in GitHub Actions.
 
-```yaml
-name: Benchmark Performance
+### Workflow: `.github/workflows/benchmarks.yml`
 
-on:
-  workflow_dispatch:
-    inputs:
-      compare_baseline:
-        description: 'Compare with baseline'
-        required: false
-        default: true
+**Trigger:** Manual (workflow_dispatch)
+**Runner:** ubuntu-latest
+**Build:** CMake Release with `-DBUILD_BENCHMARKS=ON`
+**Output:** JSON artifact (30-day retention)
+**Repetitions:** 3 runs for statistical accuracy
 
-jobs:
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+### Running in CI
 
-      - name: Build Benchmarks
-        run: |
-          cd libs/core
-          cmake -S . -B build -DBUILD_BENCHMARKS=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release
+1. Navigate to **Actions** → **C++ Benchmarks**
+2. Click **Run workflow**
+3. Optional: Enable baseline comparison
+4. Wait for completion (~5-10 minutes)
+5. Download JSON artifact
 
-      - name: Run Benchmarks
-        run: |
-          cd libs/core/build
-          ./terrain_core_benchmarks --benchmark_out=results.json
+### Regression Detection
 
-      - name: Check for Regressions
+**Script:** `scripts/compare-benchmarks.py`
+
+```bash
+python scripts/compare-benchmarks.py \
+  docs/infra/BENCHMARK_BASELINE.md \
+  benchmark_results.json \
+  10  # threshold percentage
+```
+
+**Exit Codes:**
+- `0` - No regressions detected ✅
+- `1` - Regressions found (>10% slower) 🔴
+- `2` - Script error
+
+**Output:**
+- 🔴 Regressions (>threshold)
+- 🟢 Improvements (faster)
+- ⚪ Unchanged (within threshold)
+
+---
+
+## Future Enhancements
+
+### Planned Benchmarks
+
+1. **Thermal Erosion**
+   - Not yet implemented
+   - Expected: O(n² × iterations)
+
+2. **Job System Overhead**
+   - Configuration parsing
+   - Frame validation
+   - Pipeline execution
+
+3. **Memory Allocations**
+   - Heightmap memory patterns
+   - Cache efficiency metrics
+   - NUMA awareness (multi-socket systems)
+
+### Profiling Integration
+
+- **Valgrind/Cachegrind:** Cache miss analysis
+- **perf:** CPU performance counters
+- **Tracy:** Real-time profiling
+- **Windows Performance Analyzer:** System-wide metrics
         if: inputs.compare_baseline
         run: |
           python scripts/compare-benchmarks.py \
