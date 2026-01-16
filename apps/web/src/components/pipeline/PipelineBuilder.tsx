@@ -2,6 +2,9 @@ import { usePipeline, type ModelingConfig } from '../../contexts/PipelineContext
 import { Sliders, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 import apiConfig from '../../config/api';
+import { logger } from '../../utils/logger';
+
+const builderLogger = logger.withContext('PipelineBuilder');
 
 export default function PipelineBuilder() {
   const { config, updateStep0, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
@@ -66,15 +69,14 @@ export default function PipelineBuilder() {
         setSessionId(sessionData.sessionId); // Store session ID in context
 
         setCurrentFrame(0); // Switch to frame 0 to display generated terrain (input model)
-        console.log('Terrain generated successfully:', data.statistics);
-        console.log('Session created:', sessionData.sessionId);
+        builderLogger.info('Terrain generated successfully', { statistics: data.statistics, sessionId: sessionData.sessionId });
       } else {
         throw new Error('No heightmap data received');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate terrain';
       setError(errorMessage);
-      console.error('Error generating terrain:', err);
+      builderLogger.error('Error generating terrain:', err);
     } finally {
       setIsGenerating(false);
     }

@@ -5,6 +5,9 @@
 
 import { Server as SocketServer, Socket } from 'socket.io';
 import { executeFrame } from '../erosion-binding.js';
+import { logger } from '../utils/logger.js';
+
+const wsLogger = logger.withContext('JobSystemWebSocket');
 
 interface Session {
   id: string;
@@ -18,7 +21,7 @@ interface Session {
 
 export function setupJobSystemWebSocket(io: SocketServer, sessions: Map<string, Session>) {
   io.on('connection', (socket: Socket) => {
-    console.log(`🔌 Client connected for job system: ${socket.id}`);
+    wsLogger.info(`🔌 Client connected for job system`, { socketId: socket.id });
 
     /**
      * Event: 'job-simulation:start'
@@ -42,7 +45,7 @@ export function setupJobSystemWebSocket(io: SocketServer, sessions: Map<string, 
         const totalFrames = session.config.totalFrames || endFrame || 100;
         const finalFrame = Math.min(endFrame || totalFrames, totalFrames);
 
-        console.log(`🎬 Starting job simulation for session ${sessionId}: frames ${startFrame}-${finalFrame}`);
+        wsLogger.info(`🎬 Starting job simulation`, { sessionId, startFrame, finalFrame });
 
         // Execute frames sequentially
         for (let frame = startFrame; frame <= finalFrame; frame++) {
@@ -70,7 +73,7 @@ export function setupJobSystemWebSocket(io: SocketServer, sessions: Map<string, 
               totalFrames: finalFrame
             });
 
-            console.log(`📊 Frame ${frame}/${finalFrame} complete for session ${sessionId}`);
+            wsLogger.info(`📊 Frame complete`, { frame, finalFrame, sessionId });
 
             // Delay between frames for visualization
             if (frame < finalFrame) {
@@ -78,7 +81,7 @@ export function setupJobSystemWebSocket(io: SocketServer, sessions: Map<string, 
             }
 
           } catch (frameError) {
-            console.error(`Error executing frame ${frame}:`, frameError);
+            wsLogger.error(`Error executing frame ${frame}:`, frameError);
             socket.emit('error', {
               message: `Frame ${frame} execution failed`,
               error: frameError instanceof Error ? frameError.message : 'Unknown error'

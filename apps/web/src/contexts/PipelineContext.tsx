@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import apiConfig from '../config/api';
+import { logger } from '../utils/logger';
+
+const pipelineLogger = logger.withContext('PipelineContext');
 
 export interface ModelingConfig {
   method: 'Perlin' | 'FBM' | 'SemiSphere' | 'Cone' | 'Sigmoid';
@@ -96,7 +99,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       try {
         return JSON.parse(stored);
       } catch (e) {
-        console.error('Failed to parse stored config:', e);
+        pipelineLogger.error('Failed to parse stored config:', e);
       }
     }
     return DEFAULT_CONFIG;
@@ -192,12 +195,12 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
 
   const executeSimulation = async () => {
     if (!sessionId) {
-      console.error('No session ID - generate terrain first');
+      pipelineLogger.error('No session ID - generate terrain first');
       return;
     }
 
     if (config.jobs.length === 0) {
-      console.warn('No jobs configured - simulation will just copy terrain across frames');
+      pipelineLogger.warn('No jobs configured - simulation will just copy terrain across frames');
     }
 
     setIsSimulating(true);
@@ -208,7 +211,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       for (let frame = 1; frame <= config.totalFrames; frame++) {
         // Check if user requested stop
         if (shouldStopSimulation) {
-          console.log('Simulation stopped by user at frame', frame);
+          pipelineLogger.info('Simulation stopped by user at frame', { frame });
           break;
         }
 
@@ -234,7 +237,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         if (data.terrain) {
           const heightmap = new Float32Array(data.terrain);
           setHeightmapForFrame(frame, heightmap);
-          console.log(`Frame ${frame} complete:`, data.statistics);
+          pipelineLogger.info(`Frame ${frame} complete`, { statistics: data.statistics });
         }
 
         // Small delay for visualization
@@ -242,10 +245,10 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       }
 
       if (!shouldStopSimulation) {
-        console.log('Simulation complete!');
+        pipelineLogger.info('Simulation complete!');
       }
     } catch (error) {
-      console.error('Simulation error:', error);
+      pipelineLogger.error('Simulation error:', error);
     } finally {
       setIsSimulating(false);
       setShouldStopSimulation(false);
@@ -256,21 +259,21 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
           await fetch(apiConfig.endpoints.simulate.session(sessionId), {
             method: 'DELETE',
           });
-          console.log('Server session cleaned up');
+          pipelineLogger.info('Server session cleaned up');
         } catch (error) {
-          console.error('Failed to clean up server session:', error);
+          pipelineLogger.error('Failed to clean up server session:', error);
         }
       }
     }
   };
 
   const stopSimulation = () => {
-    console.log('Stop simulation requested');
+    pipelineLogger.info('Stop simulation requested');
     setShouldStopSimulation(true);
   };
 
   const clearCache = () => {
-    console.log('Clearing heightmap cache');
+    pipelineLogger.info('Clearing heightmap cache');
     heightmapCache.clear();
     setCurrentFrame(0);
   };

@@ -3,6 +3,9 @@
  */
 
 import apiConfig from '../config/api'
+import { logger } from './logger'
+
+const diagnosticLogger = logger.withContext('Diagnostic')
 
 interface PanelDiagnostic {
   index: number;
@@ -132,20 +135,20 @@ export async function sendDiagnosticToServer(diagnostic: LayoutDiagnostic) {
     });
 
     if (response.ok) {
-      console.log('✅ Diagnostic sent to server');
+      diagnosticLogger.info('✅ Diagnostic sent to server');
     }
   } catch (error) {
-    console.error('❌ Failed to send diagnostic:', error);
+    diagnosticLogger.error('❌ Failed to send diagnostic:', error);
   }
 }
 
 export function runDiagnostic() {
-  console.log('🔍 Running layout diagnostic...');
+  diagnosticLogger.debug('🔍 Running layout diagnostic...');
 
   // Wait for layout to settle
   setTimeout(() => {
     const diagnostic = captureLayoutDiagnostics();
-    console.log('📊 Layout Diagnostic:', diagnostic);
+    diagnosticLogger.debug('📊 Layout Diagnostic:', diagnostic);
 
     // Send to server
     sendDiagnosticToServer(diagnostic);

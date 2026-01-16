@@ -1,6 +1,9 @@
 import { usePipeline } from '../../contexts/PipelineContext';
 import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Square, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
+import { logger } from '../../utils/logger';
+
+const timelineLogger = logger.withContext('ConfigurationTimeline');
 
 export default function ConfigurationTimeline() {
   const { config, validation, currentFrame, setCurrentFrame, sessionId, executeSimulation, stopSimulation, clearCache, isSimulating, heightmapCache } = usePipeline();
@@ -132,18 +135,18 @@ export default function ConfigurationTimeline() {
   // Handle simulate button - execute simulation
   const handleSimulate = async () => {
     if (!sessionId) {
-      console.error('No session - generate terrain first');
+      timelineLogger.error('No session - generate terrain first');
       alert('Please generate terrain first');
       return;
     }
 
     if (!validation?.isValid) {
-      console.error('Invalid configuration - has coverage gaps');
+      timelineLogger.error('Invalid configuration - has coverage gaps');
       alert('Configuration has coverage gaps. Please add jobs to cover all frames.');
       return;
     }
 
-    console.log('Simulate button clicked, sessionId:', sessionId);
+    timelineLogger.info('Simulate button clicked', { sessionId });
     await executeSimulation();
   };
 
