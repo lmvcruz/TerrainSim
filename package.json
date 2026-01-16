@@ -25,10 +25,17 @@
     "test:visual:update": "playwright test e2e/terrain.visual.spec.ts --update-snapshots",
     "lint": "pnpm --filter \"*\" run lint",
     "typecheck": "pnpm --filter \"*\" run typecheck",
-    "ci": "python scripts/run-ci-locally.py"
+    "ci": "python scripts/run-ci-locally.py",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "pnpm lint",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.57.0"
   }
 }

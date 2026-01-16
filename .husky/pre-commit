@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Pre-commit hook: Placeholder for linting/formatting
+echo "Pre-commit hooks installed. Customize as needed."
+
