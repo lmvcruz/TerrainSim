@@ -24,7 +24,7 @@ const isAllowedOrigin = (origin: string | undefined) => {
   if (!origin) return true; // Allow requests with no origin (e.g., mobile apps, curl)
   if (IS_DEV) return true; // Allow all origins in development mode
   if (allowedOrigins.includes(origin)) return true;
-  // Allow Cloudflare Pages preview URLs: *.terrainsim.pages.dev
+  // Allow all Cloudflare Pages URLs: *.terrainsim.pages.dev (preview and production)
   if (origin.match(/^https:\/\/[a-z0-9-]+\.terrainsim\.pages\.dev$/)) return true;
   return false;
 };
