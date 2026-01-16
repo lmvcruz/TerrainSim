@@ -137,10 +137,11 @@ export function JobModal({ open, onOpenChange, mode, editingJob }: JobModalProps
           <div className="space-y-4">
             {/* Job Name */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1">
+              <label htmlFor="job-name-input" className="block text-sm font-medium text-zinc-300 mb-1">
                 Job Name <span className="text-red-400">*</span>
               </label>
               <input
+                id="job-name-input"
                 type="text"
                 value={jobName}
                 onChange={(e) => setJobName(e.target.value)}
@@ -152,10 +153,11 @@ export function JobModal({ open, onOpenChange, mode, editingJob }: JobModalProps
 
             {/* Step Selection */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1">
+              <label htmlFor="erosion-type-select" className="block text-sm font-medium text-zinc-300 mb-1">
                 Erosion Type <span className="text-red-400">*</span>
               </label>
               <select
+                id="erosion-type-select"
                 value={step}
                 onChange={(e) => {
                   const newStep = e.target.value as 'hydraulicErosion' | 'thermalErosion';
@@ -174,10 +176,11 @@ export function JobModal({ open, onOpenChange, mode, editingJob }: JobModalProps
             {/* Frame Range */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1">
+                <label htmlFor="start-frame-input" className="block text-sm font-medium text-zinc-300 mb-1">
                   Start Frame <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id="start-frame-input"
                   type="number"
                   min={1}
                   max={config.totalFrames}
@@ -188,10 +191,11 @@ export function JobModal({ open, onOpenChange, mode, editingJob }: JobModalProps
                 {errors.startFrame && <p className="text-sm text-red-400 mt-1">{errors.startFrame}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1">
+                <label htmlFor="end-frame-input" className="block text-sm font-medium text-zinc-300 mb-1">
                   End Frame <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id="end-frame-input"
                   type="number"
                   min={1}
                   max={config.totalFrames}
@@ -209,10 +213,11 @@ export function JobModal({ open, onOpenChange, mode, editingJob }: JobModalProps
 
             {/* Template Selection */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1">
+              <label htmlFor="config-preset-select" className="block text-sm font-medium text-zinc-300 mb-1">
                 Configuration Preset
               </label>
               <select
+                id="config-preset-select"
                 value={selectedTemplateId}
                 onChange={(e) => setSelectedTemplateId(e.target.value)}
                 className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-zinc-100 focus:outline-none focus:border-zinc-500"
@@ -405,12 +410,14 @@ function ParamInput({
   max: number;
   step: number;
 }) {
+  const inputId = `param-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
   return (
     <div>
-      <label className="block text-xs text-zinc-400 mb-1">
+      <label htmlFor={inputId} className="block text-xs text-zinc-400 mb-1">
         {label}: <span className="text-zinc-300 font-mono">{value}</span>
       </label>
       <input
+        id={inputId}
         type="range"
         min={min}
         max={max}

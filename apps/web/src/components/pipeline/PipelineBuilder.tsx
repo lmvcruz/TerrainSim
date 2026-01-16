@@ -99,8 +99,9 @@ export default function PipelineBuilder() {
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Seed</label>
+              <label htmlFor="seed-input" className="block text-xs text-zinc-400 mb-1">Seed</label>
               <input
+                id="seed-input"
                 type="number"
                 value={config.step0.seed || 12345}
                 onChange={(e) => handleParameterChange('seed', parseInt(e.target.value))}
@@ -108,10 +109,11 @@ export default function PipelineBuilder() {
               />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">
+              <label htmlFor="frequency-slider" className="block text-xs text-zinc-400 mb-1">
                 Frequency: {config.step0.frequency || 0.05}
               </label>
               <input
+                id="frequency-slider"
                 type="range"
                 min="0.01"
                 max="0.2"
@@ -122,10 +124,11 @@ export default function PipelineBuilder() {
               />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">
+              <label htmlFor="amplitude-slider" className="block text-xs text-zinc-400 mb-1">
                 Amplitude: {config.step0.amplitude || 50}
               </label>
               <input
+                id="amplitude-slider"
                 type="range"
                 min="10"
                 max="100"
@@ -138,10 +141,11 @@ export default function PipelineBuilder() {
             {method === 'FBM' && (
               <>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">
+                  <label htmlFor="octaves-slider" className="block text-xs text-zinc-400 mb-1">
                     Octaves: {config.step0.octaves || 4}
                   </label>
                   <input
+                    id="octaves-slider"
                     type="range"
                     min="1"
                     max="8"
@@ -152,10 +156,11 @@ export default function PipelineBuilder() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">
+                  <label htmlFor="persistence-slider" className="block text-xs text-zinc-400 mb-1">
                     Persistence: {config.step0.persistence || 0.5}
                   </label>
                   <input
+                    id="persistence-slider"
                     type="range"
                     min="0.1"
                     max="1"
@@ -166,10 +171,11 @@ export default function PipelineBuilder() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">
+                  <label htmlFor="lacunarity-slider" className="block text-xs text-zinc-400 mb-1">
                     Lacunarity: {config.step0.lacunarity || 2.0}
                   </label>
                   <input
+                    id="lacunarity-slider"
                     type="range"
                     min="1"
                     max="4"
@@ -189,10 +195,11 @@ export default function PipelineBuilder() {
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">
+              <label htmlFor="amplitude-slider-geo" className="block text-xs text-zinc-400 mb-1">
                 Amplitude: {config.step0.amplitude || 50}
               </label>
               <input
+                id="amplitude-slider-geo"
                 type="range"
                 min="10"
                 max="100"
@@ -220,8 +227,9 @@ export default function PipelineBuilder() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs text-zinc-400 mb-2">Modeling Method</label>
+            <label htmlFor="modeling-method-select" className="block text-xs text-zinc-400 mb-2">Modeling Method</label>
             <select
+              id="modeling-method-select"
               value={config.step0.method}
               onChange={(e) => handleMethodChange(e.target.value as ModelingConfig['method'])}
               className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm"
@@ -255,8 +263,9 @@ export default function PipelineBuilder() {
 
       {/* Total Frames */}
       <div className="pt-4 border-t border-zinc-700">
-        <label className="block text-xs text-zinc-400 mb-2">Total Frames</label>
+        <label htmlFor="total-frames-input" className="block text-xs text-zinc-400 mb-2">Total Frames</label>
         <input
+          id="total-frames-input"
           type="number"
           min="1"
           max="1000"
