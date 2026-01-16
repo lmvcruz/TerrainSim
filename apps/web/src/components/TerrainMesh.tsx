@@ -197,7 +197,9 @@ export function TerrainMesh({
         data[i * 4 + 2] = 0 // B channel unused
         data[i * 4 + 3] = 1 // A channel = 1
       }
-      heightmapTexture.image.data = data
+      if (heightmapTexture.image) {
+        heightmapTexture.image.data = data
+      }
       heightmapTexture.needsUpdate = true
       return
     }
@@ -226,7 +228,9 @@ export function TerrainMesh({
       })
     }, true)
 
-    heightmapTexture.image.data = data
+    if (heightmapTexture.image) {
+      heightmapTexture.image.data = data
+    }
     heightmapTexture.needsUpdate = true
     console.log('✨ GPU TEXTURE UPDATED - needsUpdate set to true');
     console.log('   Sample values:', heightmap.slice(0, 5));

@@ -13,8 +13,8 @@ test.describe('Visual Regression - Proof of Concept', () => {
     await page.goto('/')
     await page.waitForLoadState('domcontentloaded')
 
-    // Wait for canvas (basic rendering check)
-    const canvas = page.locator('canvas')
+    // Wait for Three.js viewer canvas (not timeline canvas)
+    const canvas = page.locator('canvas[data-engine]').first()
     await canvas.waitFor({ state: 'visible', timeout: 15000 })
 
     // Extra wait for WebGL rendering
