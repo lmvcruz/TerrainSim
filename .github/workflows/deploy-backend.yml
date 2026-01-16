@@ -85,14 +85,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
             echo "⚙️  Configuring nginx body size limit..."
 
-            # Find nginx config file for api.lmvcruz.work
-            NGINX_CONFIG=$(sudo find /etc/nginx -type f -name "*.conf" -exec grep -l "api.lmvcruz.work" {} \; | head -1)
-            
+            # Find nginx config file for api.lmvcruz.work (search all files, not just .conf)
+            NGINX_CONFIG=$(sudo grep -rl "server_name.*api.lmvcruz.work" /etc/nginx/sites-available/ /etc/nginx/conf.d/ 2>/dev/null | head -1)
+
             if [ -z "$NGINX_CONFIG" ]; then
               echo "❌ Could not find nginx config for api.lmvcruz.work"
               echo "Available nginx configs:"
               sudo ls -la /etc/nginx/sites-available/ /etc/nginx/conf.d/ 2>/dev/null || true
-              echo "Checking nginx.conf for api.lmvcruz.work..."
+              echo "Searching all nginx files for api.lmvcruz.work..."
               sudo grep -r "api.lmvcruz.work" /etc/nginx/ || true
               exit 1
             fi
