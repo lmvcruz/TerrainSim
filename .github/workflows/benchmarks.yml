@@ -1,0 +1,75 @@
+name: C++ Benchmarks
+
+on:
+  workflow_dispatch:
+    inputs:
+      compare_baseline:
+        description: 'Compare results with baseline'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential
+
+      - name: Configure CMake with Benchmarks
+        run: |
+          cd libs/core
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_BENCHMARKS=ON
+
+      - name: Build Benchmarks
+        run: |
+          cd libs/core
+          cmake --build build --config Release --target terrain_core_benchmarks
+
+      - name: Run Benchmarks
+        id: run_benchmarks
+        run: |
+          cd libs/core/build
+          ./terrain_core_benchmarks \
+            --benchmark_out=benchmark_results.json \
+            --benchmark_out_format=json \
+            --benchmark_repetitions=3
+        continue-on-error: true
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: benchmark-results
+          path: libs/core/build/benchmark_results.json
+          retention-days: 30
+
+      - name: Compare with Baseline
+        if: inputs.compare_baseline == 'true' && steps.run_benchmarks.outcome == 'success'
+        run: |
+          echo "📊 Benchmark comparison not yet implemented"
+          echo "See docs/infra/BENCHMARK_BASELINE.md for expected values"
+          echo ""
+          echo "⚠️ Note: Benchmarks currently have compilation issues"
+          echo "This workflow serves as infrastructure for future integration"
+
+      - name: Comment on Status
+        if: always()
+        run: |
+          if [ "${{ steps.run_benchmarks.outcome }}" = "success" ]; then
+            echo "✅ Benchmarks completed successfully"
+          else
+            echo "❌ Benchmarks failed (expected - compilation issues)"
+            echo "See docs/infra/BENCHMARK_BASELINE.md for details"
+          fi

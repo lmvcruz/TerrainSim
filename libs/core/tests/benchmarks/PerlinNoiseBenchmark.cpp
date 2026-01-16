@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
-#include "../include/PerlinNoise.hpp"
-#include "../include/Heightmap.hpp"
-#include "../include/TerrainGenerators.hpp"
+#include "../../include/PerlinNoise.hpp"
+#include "../../include/Heightmap.hpp"
+#include "../../include/TerrainGenerators.hpp"
 
 // Benchmark: Single Perlin noise octave generation
 static void BM_PerlinNoiseSingleOctave(benchmark::State& state) {

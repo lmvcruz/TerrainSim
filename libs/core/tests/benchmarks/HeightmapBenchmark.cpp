@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "../include/Heightmap.hpp"
+#include "../../include/Heightmap.hpp"
 #include <random>
 
 // Benchmark: Heightmap creation

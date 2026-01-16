@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
-#include "../include/HydraulicErosion.hpp"
-#include "../include/Heightmap.hpp"
-#include "../include/TerrainGenerators.hpp"
+#include "../../include/HydraulicErosion.hpp"
+#include "../../include/Heightmap.hpp"
+#include "../../include/TerrainGenerators.hpp"
 
 // Benchmark: Single erosion iteration (1000 droplets)
 static void BM_HydraulicErosionSingleIteration(benchmark::State& state) {
