@@ -37,6 +37,13 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
             cd /var/www/terrainsim
             echo "📥 Pulling latest code from main branch..."
+            
+            # Stash any local changes to prevent merge conflicts
+            if ! git diff-index --quiet HEAD --; then
+              echo "⚠️  Local changes detected, stashing..."
+              git stash
+            fi
+            
             git pull origin main
 
             echo "📦 Installing/updating dependencies..."
