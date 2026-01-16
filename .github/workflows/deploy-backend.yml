@@ -48,6 +48,16 @@ jobs:
 
             echo "📦 Installing/updating dependencies..."
             pnpm install
+
+            echo "🔍 Verifying tsx installation..."
+            if [ ! -f "node_modules/.bin/tsx" ]; then
+              echo "❌ tsx binary not found, installing directly..."
+              cd apps/simulation-api
+              pnpm add tsx
+              cd ../..
+            fi
+
+            echo "✅ tsx location: $(which tsx || echo node_modules/.bin/tsx)"
           '
 
       - name: Deploy - Rebuild C++ Addon (Incremental)
