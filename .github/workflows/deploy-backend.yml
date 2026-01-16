@@ -80,6 +80,30 @@ jobs:
             cmake --build build --config Release
           '
 
+      - name: Deploy - Configure Nginx Body Size
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            echo "⚙️  Configuring nginx body size limit..."
+
+            # Check if client_max_body_size is already set
+            if ! sudo grep -q "client_max_body_size" /etc/nginx/sites-available/api.lmvcruz.work; then
+              echo "Adding client_max_body_size to nginx config..."
+              sudo sed -i "/server_name api.lmvcruz.work;/a \    client_max_body_size 20M;" /etc/nginx/sites-available/api.lmvcruz.work
+
+              # Test nginx configuration
+              if sudo nginx -t; then
+                echo "✅ Nginx config valid, reloading..."
+                sudo systemctl reload nginx
+                echo "✅ Nginx configured to accept up to 20MB request bodies"
+              else
+                echo "❌ Nginx config test failed!"
+                exit 1
+              fi
+            else
+              echo "✅ Body size limit already configured"
+            fi
+          '
+
       - name: Deploy - Restart PM2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
