@@ -90,16 +90,14 @@ void HydraulicErosion::simulateParticle(Heightmap& heightmap, float startX, floa
             amountToDeposit = std::max(0.0f, amountToDeposit);
             particle.addSediment(-amountToDeposit);
 
-            // Deposit at current grid cell
-            heightmap.set(static_cast<size_t>(gridX), static_cast<size_t>(gridY),
-                         heightmap.at(static_cast<size_t>(gridX), static_cast<size_t>(gridY)) + amountToDeposit);
+            // Deposit distributed across radius
+            applyHeightChange(heightmap, posX, posY, amountToDeposit);
         } else {
             // Erosion - droplet can carry more sediment
             float amountToErode = std::min((capacity - particle.sediment()) * m_params.erodeSpeed, heightDiff);
 
-            // Erode from current grid cell
-            heightmap.set(static_cast<size_t>(gridX), static_cast<size_t>(gridY),
-                         heightmap.at(static_cast<size_t>(gridX), static_cast<size_t>(gridY)) - amountToErode);
+            // Erode distributed across radius
+            applyHeightChange(heightmap, posX, posY, -amountToErode);
 
             particle.addSediment(amountToErode);
         }
@@ -125,6 +123,84 @@ void HydraulicErosion::erode(Heightmap& heightmap, int numParticles) {
         float startX = distX(gen);
         float startY = distY(gen);
         simulateParticle(heightmap, startX, startY);
+    }
+}
+
+void HydraulicErosion::applyHeightChange(Heightmap& heightmap, float posX, float posY, float amount) {
+    // Get the center grid position
+    int centerX = static_cast<int>(posX);
+    int centerY = static_cast<int>(posY);
+
+    if (m_params.erosionRadius <= 1) {
+        // No radius - apply only to current cell (legacy behavior)
+        if (centerX >= 0 && centerX < static_cast<int>(heightmap.width()) &&
+            centerY >= 0 && centerY < static_cast<int>(heightmap.height())) {
+            heightmap.set(static_cast<size_t>(centerX), static_cast<size_t>(centerY),
+                         heightmap.at(static_cast<size_t>(centerX), static_cast<size_t>(centerY)) + amount);
+        }
+        return;
+    }
+
+    // Apply erosion/deposition across a radius with weighted distribution
+    // Use a simple distance-weighted kernel for natural-looking results
+    float totalWeight = 0.0f;
+
+    // First pass: calculate total weight
+    for (int dy = -m_params.erosionRadius; dy <= m_params.erosionRadius; ++dy) {
+        for (int dx = -m_params.erosionRadius; dx <= m_params.erosionRadius; ++dx) {
+            int x = centerX + dx;
+            int y = centerY + dy;
+
+            // Bounds check
+            if (x < 0 || x >= static_cast<int>(heightmap.width()) ||
+                y < 0 || y >= static_cast<int>(heightmap.height())) {
+                continue;
+            }
+
+            // Calculate distance from center
+            float distance = std::sqrt(static_cast<float>(dx * dx + dy * dy));
+
+            // Skip cells outside the circular radius
+            if (distance > static_cast<float>(m_params.erosionRadius)) {
+                continue;
+            }
+
+            // Weight decreases with distance (linear falloff)
+            float weight = std::max(0.0f, 1.0f - distance / static_cast<float>(m_params.erosionRadius));
+            totalWeight += weight;
+        }
+    }
+
+    // Second pass: distribute the height change
+    if (totalWeight > 0.0001f) {  // Avoid division by zero
+        for (int dy = -m_params.erosionRadius; dy <= m_params.erosionRadius; ++dy) {
+            for (int dx = -m_params.erosionRadius; dx <= m_params.erosionRadius; ++dx) {
+                int x = centerX + dx;
+                int y = centerY + dy;
+
+                // Bounds check
+                if (x < 0 || x >= static_cast<int>(heightmap.width()) ||
+                    y < 0 || y >= static_cast<int>(heightmap.height())) {
+                    continue;
+                }
+
+                // Calculate distance from center
+                float distance = std::sqrt(static_cast<float>(dx * dx + dy * dy));
+
+                // Skip cells outside the circular radius
+                if (distance > static_cast<float>(m_params.erosionRadius)) {
+                    continue;
+                }
+
+                // Weight decreases with distance (linear falloff)
+                float weight = std::max(0.0f, 1.0f - distance / static_cast<float>(m_params.erosionRadius));
+
+                // Apply proportional height change
+                float weightedAmount = (weight / totalWeight) * amount;
+                heightmap.set(static_cast<size_t>(x), static_cast<size_t>(y),
+                             heightmap.at(static_cast<size_t>(x), static_cast<size_t>(y)) + weightedAmount);
+            }
+        }
     }
 }
 

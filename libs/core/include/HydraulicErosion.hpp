@@ -83,6 +83,18 @@ private:
      */
     float calculateSedimentCapacity(float speed, float slope, float water) const;
 
+    /**
+     * @brief Apply erosion or deposition across a radius around a point.
+     * @param heightmap The terrain heightmap to modify
+     * @param posX X position (can be fractional)
+     * @param posY Y position (can be fractional)
+     * @param amount Height change to apply (negative = erosion, positive = deposition)
+     *
+     * Distributes the height change across cells within erosionRadius using
+     * a distance-weighted kernel for smooth, natural-looking results.
+     */
+    void applyHeightChange(Heightmap& heightmap, float posX, float posY, float amount);
+
     HydraulicErosionParams m_params;
 };
 

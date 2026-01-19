@@ -130,7 +130,7 @@ All parameters are optional and will use defaults if not provided.
 | `evaporateSpeed` | float | 0.01 | 0.001-0.1 | Water evaporation rate per step |
 | `gravity` | float | 4.0 | 1.0-20.0 | Gravitational acceleration |
 | `maxDropletSpeed` | float | 10.0 | 5.0-50.0 | Maximum droplet velocity (stability) |
-| `erosionRadius` | int | 3 | 1-5 | Radius of erosion effect (not yet implemented) |
+| `erosionRadius` | int | 3 | 1-5 | Radius of erosion/deposition effect (uses distance-weighted distribution) |
 
 See [HYDRAULIC_EROSION_MODEL.md](../../../docs/HYDRAULIC_EROSION_MODEL.md) for detailed parameter explanations.
 
