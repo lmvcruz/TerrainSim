@@ -51,37 +51,11 @@ jobs:
         run: |
           docker compose pull
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.6'
-          cache: 'pnpm'
-          cache-dependency-path: 'apps/simulation-api/pnpm-lock.yaml'
-
-      - name: Install API dependencies
-        working-directory: apps/simulation-api
-        run: pnpm install --frozen-lockfile
-
-      - name: Build C++ native module
-        working-directory: libs/core
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++
-          mkdir -p build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          make -j$(nproc)
-
       - name: Start Docker Compose services
         run: |
           docker compose up -d
-          echo "Waiting for services to start..."
-          sleep 10
+          echo "Waiting for services to start and install dependencies..."
+          sleep 60  # Give containers time to install dependencies
 
       - name: Check container status
         run: |

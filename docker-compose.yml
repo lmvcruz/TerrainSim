@@ -1,8 +1,6 @@
 # Docker Compose Configuration for Local AWS EC2-like Environment
 # Mimics production deployment environment for testing
 
-version: '3.8'
-
 services:
   # Simulation API Service (mimics AWS EC2 deployment)
   api:
