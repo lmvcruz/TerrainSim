@@ -106,7 +106,7 @@ jobs:
           echo "Testing HTTPS endpoint..."
           # First, verify nginx is listening on 443
           docker compose exec nginx netstat -tlnp | grep 443 || echo "Port 443 not listening"
-          
+
           # Try curl with verbose output for debugging
           echo "Attempting HTTPS connection..."
           if curl -k -v --max-time 10 https://localhost/api/health 2>&1 | tee curl-output.txt; then

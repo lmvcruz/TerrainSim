@@ -1,0 +1,181 @@
+name: Load Testing
+
+on:
+  # Manual trigger only to avoid excessive load on infrastructure
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Load test scenario to run'
+        required: true
+        default: 'ci-scenario'
+        type: choice
+        options:
+          - ci-scenario
+          - stress-test
+          - spike-test
+      api_url:
+        description: 'API URL to test (default: production)'
+        required: false
+        default: 'https://api.lmvcruz.work'
+      duration_multiplier:
+        description: 'Duration multiplier (1.0 = normal, 2.0 = double)'
+        required: false
+        default: '1.0'
+
+jobs:
+  load-test:
+    name: Run Load Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run load test
+        id: load-test
+        env:
+          API_URL: ${{ inputs.api_url }}
+          DURATION_MULTIPLIER: ${{ inputs.duration_multiplier }}
+        run: |
+          echo "Running load test scenario: ${{ inputs.scenario }}"
+          echo "Target API: ${{ inputs.api_url }}"
+
+          # Run k6 test
+          k6 run tests/load/${{ inputs.scenario }}.js \
+            --out json=load-test-results.json \
+            --summary-export=summary.json \
+            || echo "LOAD_TEST_FAILED=true" >> $GITHUB_ENV
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: load-test-results
+          path: |
+            load-test-results.json
+            summary.json
+          retention-days: 30
+
+      - name: Parse and display results
+        if: always()
+        run: |
+          if [ -f summary.json ]; then
+            echo "## Load Test Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Scenario:** ${{ inputs.scenario }}" >> $GITHUB_STEP_SUMMARY
+            echo "**API URL:** ${{ inputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Extract key metrics
+            p95=$(jq -r '.metrics.http_req_duration.values["p(95)"]' summary.json)
+            avg=$(jq -r '.metrics.http_req_duration.values.avg' summary.json)
+            error_rate=$(jq -r '.metrics.http_req_failed.values.rate * 100' summary.json)
+            rps=$(jq -r '.metrics.http_reqs.values.rate' summary.json)
+            total_reqs=$(jq -r '.metrics.http_reqs.values.count' summary.json)
+
+            echo "### Performance Metrics" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| P95 Latency | ${p95} ms |" >> $GITHUB_STEP_SUMMARY
+            echo "| Avg Latency | ${avg} ms |" >> $GITHUB_STEP_SUMMARY
+            echo "| Error Rate | ${error_rate}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| RPS | ${rps} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Requests | ${total_reqs} |" >> $GITHUB_STEP_SUMMARY
+
+            # Check thresholds
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Threshold Status" >> $GITHUB_STEP_SUMMARY
+
+            # P95 latency threshold: 1000ms
+            if (( $(echo "$p95 < 1000" | bc -l) )); then
+              echo "✅ P95 latency ($p95 ms) is under threshold (1000 ms)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ P95 latency ($p95 ms) exceeds threshold (1000 ms)" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            # Error rate threshold: 5%
+            if (( $(echo "$error_rate < 5" | bc -l) )); then
+              echo "✅ Error rate ($error_rate%) is under threshold (5%)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Error rate ($error_rate%) exceeds threshold (5%)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Check for performance regression
+        if: always()
+        run: |
+          # Get baseline metrics from previous runs (if they exist)
+          BASELINE_FILE=".github/performance-baseline.json"
+
+          if [ -f "$BASELINE_FILE" ] && [ -f "summary.json" ]; then
+            echo "## Performance Regression Check" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            baseline_p95=$(jq -r '.p95_latency' "$BASELINE_FILE")
+            current_p95=$(jq -r '.metrics.http_req_duration.values["p(95)"]' summary.json)
+
+            baseline_rps=$(jq -r '.rps' "$BASELINE_FILE")
+            current_rps=$(jq -r '.metrics.http_reqs.values.rate' summary.json)
+
+            # Calculate regression percentage (10% threshold)
+            p95_change=$(echo "scale=2; ($current_p95 - $baseline_p95) / $baseline_p95 * 100" | bc)
+            rps_change=$(echo "scale=2; ($current_rps - $baseline_rps) / $baseline_rps * 100" | bc)
+
+            echo "| Metric | Baseline | Current | Change |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|---------|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| P95 Latency | ${baseline_p95} ms | ${current_p95} ms | ${p95_change}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| RPS | ${baseline_rps} | ${current_rps} | ${rps_change}% |" >> $GITHUB_STEP_SUMMARY
+
+            # Check for regression (>10% slower or >10% lower RPS)
+            if (( $(echo "$p95_change > 10" | bc -l) )); then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Performance Regression Detected**: P95 latency increased by ${p95_change}%" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+
+            if (( $(echo "$rps_change < -10" | bc -l) )); then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Performance Regression Detected**: RPS decreased by ${rps_change}%" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ No significant performance regression detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No baseline file found. Run this workflow again to establish a baseline." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Update performance baseline
+        if: success() && github.event.inputs.scenario == 'ci-scenario'
+        run: |
+          # Update baseline only on successful CI scenario runs
+          if [ -f summary.json ]; then
+            p95=$(jq -r '.metrics.http_req_duration.values["p(95)"]' summary.json)
+            rps=$(jq -r '.metrics.http_reqs.values.rate' summary.json)
+
+            cat > .github/performance-baseline.json << EOF
+          {
+            "p95_latency": $p95,
+            "rps": $rps,
+            "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "scenario": "${{ inputs.scenario }}",
+            "commit_sha": "${{ github.sha }}"
+          }
+          EOF
+
+            echo "Updated performance baseline: P95=${p95}ms, RPS=${rps}"
+          fi
+
+      - name: Fail if load test failed
+        if: env.LOAD_TEST_FAILED == 'true'
+        run: |
+          echo "❌ Load test failed - check the results above for details"
+          exit 1
