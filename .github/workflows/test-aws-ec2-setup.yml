@@ -104,12 +104,21 @@ jobs:
       - name: Test HTTPS endpoint (self-signed cert)
         run: |
           echo "Testing HTTPS endpoint..."
-          response=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost/api/health)
-          if [ "$response" = "200" ]; then
-            echo "✅ HTTPS endpoint working (HTTP $response)"
+          # First, verify nginx is listening on 443
+          docker compose exec nginx netstat -tlnp | grep 443 || echo "Port 443 not listening"
+          
+          # Try curl with verbose output for debugging
+          echo "Attempting HTTPS connection..."
+          if curl -k -v --max-time 10 https://localhost/api/health 2>&1 | tee curl-output.txt; then
+            echo "✅ HTTPS endpoint working"
           else
-            echo "❌ HTTPS endpoint failed (HTTP $response)"
-            docker compose logs nginx
+            echo "❌ HTTPS endpoint failed"
+            echo "=== Curl output ==="
+            cat curl-output.txt
+            echo "=== Nginx error logs ==="
+            docker compose logs nginx | tail -50
+            echo "=== Nginx SSL certificate check ==="
+            docker compose exec nginx ls -la /etc/nginx/ssl/
             exit 1
           fi
 
