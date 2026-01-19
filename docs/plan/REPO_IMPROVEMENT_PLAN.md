@@ -602,7 +602,7 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 - **Documentation:** 400+ line guide covering all tools, troubleshooting, examples
 - **CI/CD Integration:** GitHub Actions workflow for automated testing
 
-**CI/CD Workflow (Added 2026-01-19):**
+**CI/CD Workflow (Added 2026-01-19, Updated 2026-01-19):**
 - Created `.github/workflows/test-aws-ec2-setup.yml`
 - Automated testing of Docker Compose setup
 - Validates configuration files (docker-compose.yml, nginx.conf)
@@ -610,6 +610,11 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 - Verifies rate limiting, CORS, GZIP compression
 - Generates test reports with artifact storage
 - Triggers on config changes and manual dispatch
+- **Fixed Issues (2026-01-19):**
+  - Removed obsolete `version: '3.8'` from docker-compose.yml (deprecated in Docker Compose v2)
+  - Fixed cache path from non-existent `apps/simulation-api/pnpm-lock.yaml` to root `pnpm-lock.yaml`
+  - Simplified workflow: removed redundant host-side dependency installation (containers handle their own deps)
+  - Increased container startup wait time from 10s to 60s (allows time for internal dependency installation)
 
 **Success Criteria:**
 - ✅ Can run production-like environment locally with `docker compose up`
