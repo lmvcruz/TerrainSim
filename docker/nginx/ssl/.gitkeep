@@ -1,0 +1,8 @@
+# Self-signed SSL certificates for local development
+# In production, use proper SSL certificates from Let's Encrypt or AWS Certificate Manager
+
+# These files are gitignored and should be generated locally
+# Run: ./scripts/generate-ssl-certs.sh
+
+cert.pem
+key.pem

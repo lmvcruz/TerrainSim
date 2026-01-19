@@ -1,0 +1,93 @@
+# Docker Compose Configuration for Local AWS EC2-like Environment
+# Mimics production deployment environment for testing
+
+version: '3.8'
+
+services:
+  # Simulation API Service (mimics AWS EC2 deployment)
+  api:
+    image: node:20.19.6-bullseye
+    container_name: terrainsim-api-local
+    working_dir: /app
+    volumes:
+      - ./apps/simulation-api:/app
+      - ./libs/core:/libs/core
+      - api-node-modules:/app/node_modules
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - LOG_LEVEL=info
+      - ENABLE_CORS=true
+      # Add other environment variables as needed
+    command: >
+      sh -c "
+        if [ ! -d node_modules ]; then
+          echo '📦 Installing dependencies...'
+          npm install -g pnpm@9.15.4 pm2
+          pnpm install --frozen-lockfile
+        fi
+        echo '🚀 Starting API with PM2...'
+        pm2-runtime start ecosystem.config.cjs --env production
+      "
+    restart: unless-stopped
+    networks:
+      - terrainsim-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx Reverse Proxy (mimics AWS load balancer)
+  nginx:
+    image: nginx:alpine
+    container_name: terrainsim-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - terrainsim-network
+    restart: unless-stopped
+
+  # PostgreSQL Database (if needed in future)
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: terrainsim-db
+  #   environment:
+  #     - POSTGRES_USER=terrainsim
+  #     - POSTGRES_PASSWORD=terrainsim_dev
+  #     - POSTGRES_DB=terrainsim
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - terrainsim-network
+
+  # Redis Cache (if needed in future)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: terrainsim-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - terrainsim-network
+  #   command: redis-server --appendonly yes
+
+networks:
+  terrainsim-network:
+    driver: bridge
+
+volumes:
+  api-node-modules:
+    driver: local
+  # postgres-data:
+  #   driver: local
