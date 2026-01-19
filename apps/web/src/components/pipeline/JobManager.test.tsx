@@ -124,7 +124,7 @@ describe('JobManager', () => {
 
     // Find the actual job card container (not a nested div)
     const jobTitle = screen.getByText(/Toggle Test/i);
-    const jobCard = jobTitle.closest('[class*="border"]')!;
+    const jobCard = jobTitle.closest('[class*="border"]') as HTMLElement;
 
     // Click to expand job card
     fireEvent.click(jobCard);
@@ -157,7 +157,7 @@ describe('JobManager', () => {
 
     // Find the actual job card container
     const jobTitle = screen.getByText(/Edit Test/i);
-    const jobCard = jobTitle.closest('[class*="border"]')!;
+    const jobCard = jobTitle.closest('[class*="border"]') as HTMLElement;
     fireEvent.click(jobCard);
 
     // Click edit button (second button in job card: [0] = toggle, [1] = edit, [2] = delete)
@@ -186,7 +186,7 @@ describe('JobManager', () => {
 
     // Find the actual job card container
     const jobTitle = screen.getByText(/Original Name/i);
-    const jobCard = jobTitle.closest('[class*="border"]')!;
+    const jobCard = jobTitle.closest('[class*="border"]') as HTMLElement;
     fireEvent.click(jobCard);
 
     // Click edit button (second button: [0] = toggle, [1] = edit, [2] = delete)
@@ -221,7 +221,7 @@ describe('JobManager', () => {
 
     // Find the actual job card container
     const jobTitle = screen.getByText(/Delete Test/i);
-    const jobCard = jobTitle.closest('[class*="border"]')!;
+    const jobCard = jobTitle.closest('[class*="border"]') as HTMLElement;
     fireEvent.click(jobCard);
 
     // Click delete button (third button: [0] = toggle, [1] = edit, [2] = delete)
@@ -268,9 +268,9 @@ describe('JobManager', () => {
     // Find job card - it's the parent div with border classes
     const jobTitle = screen.getByText(/Selection Test/i);
     // Go up to find the div with border classes (the job card container)
-    let jobCard = jobTitle.closest('div')!;
+    let jobCard = jobTitle.closest('div') as HTMLDivElement;
     while (jobCard && !jobCard.className.includes('border')) {
-      jobCard = jobCard.parentElement! as HTMLDivElement;
+      jobCard = jobCard.parentElement as HTMLDivElement;
     }
 
     // Initially not selected
