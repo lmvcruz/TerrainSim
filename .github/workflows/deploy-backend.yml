@@ -22,6 +22,32 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pre-deployment security scan
+        run: |
+          chmod +x scripts/pre-deploy-scan.sh
+          ./scripts/pre-deploy-scan.sh --report-file pre-deploy-scan-report.txt
+
+      - name: Upload scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-deploy-scan-report
+          path: pre-deploy-scan-report.txt
+          retention-days: 30
+
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:

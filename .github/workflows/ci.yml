@@ -41,3 +41,28 @@ jobs:
       - name: Run CTest
         working-directory: libs/core/build
         run: ctest --output-on-failure
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install
+      - name: Run pre-deployment security scan
+        run: |
+          chmod +x scripts/pre-deploy-scan.sh
+          ./scripts/pre-deploy-scan.sh --report-file pre-deploy-scan-report.txt
+        continue-on-error: true
+      - name: Upload scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-deploy-scan-report
+          path: pre-deploy-scan-report.txt
+          retention-days: 30

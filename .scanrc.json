@@ -1,0 +1,56 @@
+{
+  "rules": {
+    "no-console": {
+      "enabled": true,
+      "severity": "warning",
+      "exclude": ["scripts/**", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"]
+    },
+    "no-secrets": {
+      "enabled": true,
+      "severity": "error",
+      "patterns": [
+        "API[_-]?KEY",
+        "SECRET[_-]?KEY",
+        "PASSWORD",
+        "TOKEN",
+        "PRIVATE[_-]?KEY",
+        "AWS[_-]?ACCESS",
+        "GITHUB[_-]?TOKEN"
+      ]
+    },
+    "bundle-size-limit": {
+      "enabled": true,
+      "severity": "warning",
+      "maxSize": "5MB",
+      "paths": [
+        "apps/web/dist/**/*.js",
+        "apps/simulation-api/dist/**/*.js"
+      ]
+    },
+    "no-broken-imports": {
+      "enabled": true,
+      "severity": "error",
+      "extensions": [".ts", ".tsx", ".js", ".jsx"]
+    },
+    "error-boundaries": {
+      "enabled": true,
+      "severity": "warning",
+      "componentPaths": ["apps/web/src/components/**/*.tsx"]
+    },
+    "env-variables": {
+      "enabled": true,
+      "severity": "warning",
+      "documentedVarsPath": "docs/infra/LOCAL_ENVIRONMENT_GUIDE.md"
+    }
+  },
+  "ignore": [
+    "node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.min.js",
+    "**/coverage/**",
+    "**/.git/**",
+    "**/pnpm-lock.yaml",
+    "**/package-lock.json"
+  ]
+}

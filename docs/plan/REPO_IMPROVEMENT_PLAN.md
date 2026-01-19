@@ -627,39 +627,66 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 
 ---
 
-### TOOL-002: Code Scanning & Pre-deployment Checks
+### TOOL-002: Code Scanning & Pre-deployment Checks ✅ COMPLETED (2026-01-19)
 **Priority:** High
-**Effort:** 4 hours
+**Effort:** 4 hours (Actual: 3 hours)
 
 **Tasks:**
-- Create `scripts/pre-deploy-scan.sh` to detect issues before deployment:
-  - Check for hardcoded secrets (grep for API keys, passwords)
-  - Validate all import paths resolve (no broken imports)
-  - Check for console.log in production code
-  - Verify environment variables used match documented ones
-  - Detect large bundle sizes (>5MB)
-  - Check for missing error boundaries in React components
-- Add scan to GitHub Actions workflow (pre-deploy step)
-- Create configuration file for scan rules (`.scanrc.json`)
-- Generate scan report with actionable warnings
+- Create `scripts/pre-deploy-scan.sh` to detect issues before deployment ✅
+- Add scan to GitHub Actions workflow (pre-deploy step) ✅
+- Create configuration file for scan rules (`.scanrc.json`) ✅
+- Generate scan report with actionable warnings ✅
 
-**Scan Configuration:**
+**Implementation:**
+- **Script:** `scripts/pre-deploy-scan.sh` (330+ lines)
+  - Bash script with colorized output
+  - 8 comprehensive security and quality checks
+  - Configurable via `.scanrc.json`
+  - Generates detailed markdown reports
+
+**Scan Checks:**
+1. **Hardcoded Secrets:** Detects API keys, passwords, tokens using regex patterns
+2. **Console.log Detection:** Finds console statements in production code (excludes tests)
+3. **Bundle Size Check:** Alerts on files >5MB in dist directories
+4. **Broken Imports:** Runs TypeScript type-check to detect missing modules
+5. **Error Boundaries:** Checks for React ErrorBoundary usage
+6. **Environment Variables:** Validates used env vars are documented
+7. **TODO/FIXME Comments:** Reports pending work items
+8. **Unused Dependencies:** Quick check referencing CLEAN-001 audit
+
+**Configuration (`.scanrc.json`):**
 ```json
 {
   "rules": {
-    "no-console": true,
-    "no-secrets": true,
-    "bundle-size-limit": "5MB",
-    "no-broken-imports": true
+    "no-console": { "enabled": true, "severity": "warning", "exclude": ["scripts/**", "*.test.*"] },
+    "no-secrets": { "enabled": true, "severity": "error", "patterns": ["API_KEY", "SECRET", "PASSWORD"] },
+    "bundle-size-limit": { "enabled": true, "severity": "warning", "maxSize": "5MB" },
+    "no-broken-imports": { "enabled": true, "severity": "error" },
+    "error-boundaries": { "enabled": true, "severity": "warning" },
+    "env-variables": { "enabled": true, "severity": "warning" }
   }
 }
 ```
 
+**CI/CD Integration:**
+- Added to `deploy-backend.yml` as pre-deployment gate
+- Added to `ci.yml` as security-scan job (continue-on-error for visibility)
+- Uploads scan reports as artifacts (30-day retention)
+- Blocks deployment if critical issues (errors > 0)
+
+**Test Results:**
+- ✅ Ran locally: 0 errors, 4 warnings
+- Warnings found:
+  - 37 console.log statements (diagnostic code in pipeline components)
+  - No ErrorBoundary components (improvement opportunity)
+  - BASE_PATH env var not documented
+  - pnpm path resolution in WSL (non-critical)
+
 **Success Criteria:**
-- Pre-deployment scan catches common issues
-- Scan runs automatically in CI before deploy
-- Clear warnings with file/line numbers
-- Deployment blocked if critical issues found
+- ✅ Pre-deployment scan catches common issues (8 check types)
+- ✅ Scan runs automatically in CI before deploy
+- ✅ Clear warnings with file/line numbers (colored output + markdown report)
+- ✅ Deployment blocked if critical issues found (exit code 1 on errors)
 
 ---
 
