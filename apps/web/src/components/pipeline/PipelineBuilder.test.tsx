@@ -6,7 +6,7 @@ import { type ReactNode } from 'react';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+globalThis.fetch = mockFetch;
 
 // Helper to render with context
 const renderWithContext = (component: ReactNode) => {

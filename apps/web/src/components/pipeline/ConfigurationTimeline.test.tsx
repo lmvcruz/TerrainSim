@@ -236,7 +236,7 @@ describe('ConfigurationTimeline', () => {
     expect(canvas).toBeInTheDocument();
 
     // Simulate resize
-    global.dispatchEvent(new Event('resize'));
+    globalThis.dispatchEvent(new Event('resize'));
 
     // Canvas should still be there
     expect(canvas).toBeInTheDocument();

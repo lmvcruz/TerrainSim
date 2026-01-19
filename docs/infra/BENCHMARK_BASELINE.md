@@ -72,8 +72,8 @@ This document establishes baseline performance metrics for TerrainSim's C++ core
 
 ## Baseline Results (Actual Measurements)
 
-> **Measured on:** January 16, 2026  
-> **Hardware:** 20-core @ 2.808 GHz, MSVC 17.12 Release build  
+> **Measured on:** January 16, 2026
+> **Hardware:** 20-core @ 2.808 GHz, MSVC 17.12 Release build
 > **All timings are CPU time unless otherwise noted**
 
 ### Heightmap Operations (256×256 grid)
