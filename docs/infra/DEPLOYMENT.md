@@ -113,7 +113,7 @@ curl http://localhost:3001/health
 
 ## 🧪 CI/CD Pipeline
 
-### GitHub Actions Workflow: `ci.yml`
+### Continuous Integration: `ci.yml`
 
 **Triggers**: Every push to `main` and all pull requests
 
@@ -127,9 +127,46 @@ curl http://localhost:3001/health
 - ✅ C++ compilation (Release mode)
 - ✅ CTest unit tests (Google Test)
 
-**No deployment** - GitHub Actions only runs tests. Deployment happens via:
-- Frontend: Cloudflare Pages (Git integration)
-- Backend: Manual SSH (see above)
+### Continuous Deployment
+
+**Frontend**: Automatic via Cloudflare Pages Git integration (every push to `main`)
+
+**Backend**: Manual trigger via GitHub Actions workflow
+
+#### Backend Automated Deployment (`deploy-backend.yml`)
+
+**How to Deploy:**
+
+1. Navigate to **Actions** tab: `https://github.com/lmvcruz/TerrainSim/actions/workflows/deploy-backend.yml`
+2. Click **"Run workflow"** button (top right)
+3. Select options:
+   - **Branch**: `main` (default)
+   - **Rebuild C++ addon**:
+     - `none` (default) - Code update only (~30 seconds)
+     - `incremental` - Rebuild changed C++ files (~1-2 minutes)
+     - `full` - Clean rebuild from scratch (~3-4 minutes)
+4. Click **"Run workflow"** (green button)
+5. Watch progress in real-time
+
+**Deployment Steps:**
+1. ✅ Checkout repository
+2. ✅ Setup SSH agent with GitHub Secret `SSH_PRIVATE_KEY`
+3. ✅ Add server to known hosts
+4. ✅ Pull latest code: `git pull origin main && pnpm install`
+5. ✅ Rebuild C++ addon (if selected)
+6. ✅ Restart PM2: `pm2 restart terrainsim-api`
+7. ✅ Health check with 30 retries (60 seconds)
+
+**Health Check:**
+- Endpoint: `https://api.lmvcruz.work/health`
+- Expected: `{"status": "ok", "timestamp": "..."}`
+- Retries: 30 attempts over 60 seconds
+- Failure: Workflow fails, email alert sent
+
+**When to Use Each Rebuild Option:**
+- **`none`**: Only TypeScript/JavaScript changes
+- **`incremental`**: Modified C++ files in `libs/core/`
+- **`full`**: CMakeLists.txt changes, new C++ files, or broken incremental build
 
 ---
 

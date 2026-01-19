@@ -786,149 +786,303 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 
 ## Documentation Improvements
 
-### DOC-201: Feature Behavior Documentation (docs/spec/)
-**Priority:** High
-**Effort:** 5 hours
-
-**Tasks:**
-- Create/update docs in docs/spec/ for all major features:
-  - Hydraulic erosion algorithm behavior
-  - Thermal erosion algorithm behavior
-  - Job execution model
-  - Perlin noise generation
-  - UI components and interactions (Timeline, JobManager, PipelineBuilder)
-- For each feature, document:
-  - High-level concept and purpose
-  - Key decisions (why this approach)
-  - Parameter effects (what happens when values change)
-  - Expected behaviors and results
-- Focus on "why" and "what", avoid code details
-- Include UI specifications (not just algorithms)
-
-**Example Structure (Algorithm):**
-```markdown
-# Hydraulic Erosion: Behavior & Concept
-
-## Core Idea
-Simulates water flow by tracking individual water particles as they move downhill, picking up and depositing sediment.
-
-## Why Particle-Based?
-Particle approach captures fine details like streams merging and diverging. Grid-based methods blur these features.
-
-## Key Parameters
-- **erosionRate**: How aggressively water picks up sediment
-  - Low (0.1-0.3): Gentle valley formation
-  - High (0.5-0.8): Deep canyon cutting
-```
-
-**Example Structure (UI Component):**
-```markdown
-# Timeline Component: Behavior & Purpose
-
-## Core Idea
-Visual timeline showing which jobs cover which frame ranges, with color-coded validation feedback.
-
-## Why Canvas Rendering?
-Canvas handles 10,000+ frame bars smoothly. DOM elements would be too slow.
-
-## Key Behaviors
-- **Green fill**: Frame covered by enabled job
-- **Red fill**: Gap in coverage (invalid configuration)
-- **Yellow outline**: Multiple jobs overlap (sequential execution)
-```
-
-**Success Criteria:**
-- All features (algorithms + UI) documented with concepts, not code
-- Parameter/behavior effects explained qualitatively
-- Design decisions justified
-- Readable by non-programmers
-
----
-
-### DOC-202: Documentation Cleanup & Reorganization
-**Priority:** High
-**Effort:** 4 hours
-
-**Tasks:**
-- Reorganize documentation structure:
-  - **docs/plan/**: Project planning, iterations, roadmaps (keep as-is)
-  - **docs/infra/**: Infrastructure, deployment, CI/CD (keep as-is)
-  - **docs/spec/**: Feature specifications, algorithms, UI components (rename from algorithms/)
-  - **docs/temp/**: Uncertain documents that may be useful later (create if needed)
-  - **Remove docs/doc/**: Distribute contents to appropriate folders or delete
-- Scan all folders for outdated/unnecessary documents:
-  - Task-specific docs after task completion
-  - Redundant information across multiple docs
-  - Temporary planning documents now in main plan
-- Move uncertain docs to docs/temp/ (don't delete yet)
-- Create concise specifications in docs/spec/
-
-**Cleanup Checklist:**
-```markdown
-- [ ] Remove or redistribute docs/doc/ contents
-- [ ] Rename docs/algorithms/ to docs/spec/
-- [ ] Create docs/temp/ for uncertain documents
-- [ ] Move task-specific guides to temp/ or delete
-- [ ] Merge redundant documentation
-- [ ] Create one-page feature specs (max 200 lines)
-```
-
-**Success Criteria:**
-- Clear 4-folder structure: plan/, infra/, spec/, temp/
-- No docs/doc/ folder
-- 30% reduction in total documentation volume
-- No duplicate information across docs
-- Uncertain docs preserved in temp/
-
----
-
-### DOC-203: Feature Specification Summaries (docs/spec/)
+### DOC-201: Documentation Reorganization & Cleanup ✅ COMPLETED (2026-01-19)
 **Priority:** High
 **Effort:** 6 hours
 
-**Tasks:**
-- Create concise one-page specs in docs/spec/ for all major features:
-  - **Algorithms**: Hydraulic erosion, Thermal erosion, Perlin noise
-  - **Backend**: Job system, WebSocket streaming, Session management
-  - **UI Components**: Timeline, JobManager, PipelineBuilder, TerrainViewer
-  - **API**: All endpoints with parameters and constraints
-- Use standardized format:
-  - **Purpose**: One sentence
-  - **Key Parameters**: Table with ranges and effects
-  - **Technical Decisions**: Bullet points only
-  - **API/Interface**: Endpoint/props list, no examples
-  - **Constraints**: Limits and validation rules
-  - **UI Behavior**: For UI components, describe interactions
-- Maximum 200 lines per feature specification
-- Remove prose, focus on facts and numbers
+**Objective:**
+Reorganize documentation into a clear 4-folder structure with strict content guidelines. Delete files without long-term value and consolidate remaining documentation.
 
-**Specification Template:**
+**Target Folder Structure:**
+
+1. **docs/plan/** (Keep Only Essential Planning)
+   - `Iterations.md` - Planning and progress tracking
+   - `Backlog.md` - Deferred features and ideas
+   - `REPO_IMPROVEMENT_PLAN.md` - This document
+   - **Delete:** All other files (temporary planning, completed task summaries)
+
+2. **docs/infra/** (Infrastructure Documentation - Reduce Significantly)
+   - **Keep:**
+     - Core deployment guides (AWS EC2, Cloudflare Pages, GitHub Actions)
+     - Environment setup (LOCAL_ENVIRONMENT_GUIDE.md, ENVIRONMENT_VALIDATION.md)
+     - Testing guide (TESTING_GUIDE.md)
+     - Benchmark baseline (BENCHMARK_BASELINE.md)
+   - **Delete/Consolidate:**
+     - Redundant deployment documentation
+     - Temporary tool-specific guides (move to temp/ if uncertain)
+     - Task-specific summaries after task completion
+   - **Target:** Reduce from current file count to ~6-8 essential infrastructure docs
+
+3. **docs/spec/** (System Specifications & Feature Documentation)
+   - `System-Spec.md` - High-level system architecture
+   - Algorithm documentation from `docs/algorithms/`:
+     - Hydraulic erosion behavior and parameters
+     - Thermal erosion behavior and parameters
+     - Perlin noise generation
+   - Feature specifications:
+     - Job system architecture
+     - WebSocket streaming
+     - Pipeline configuration
+     - UI component behaviors (Timeline, JobManager, PipelineBuilder)
+   - **Format:** Concise (max 200 lines per doc), concept-focused, no code
+
+4. **docs/temp/** (Uncertain Future Value)
+   - Documents we're not sure about deleting yet
+   - Tool-specific guides that may be needed later
+   - Experimental documentation
+   - **Review quarterly** for deletion or promotion to permanent location
+
+**Cleanup Actions:**
+
 ```markdown
-# Feature: Timeline Component (UI)
+Phase 1: Identify and Delete (2 hours)
+- [ ] Scan all docs/ folders for files with no long-term value
+- [ ] Delete completed task summaries (e.g., TOOL-002-SUMMARY.md, TEST-304-SUMMARY.md)
+- [ ] Delete temporary planning documents already captured in main plan
+- [ ] Delete redundant deployment guides
+- [ ] Delete duplicate information across multiple files
 
-**Purpose**: Visual representation of job coverage across frames
+Phase 2: Reorganize (2 hours)
+- [ ] Move algorithms/ to spec/ and integrate with feature docs
+- [ ] Consolidate infra/ documentation (merge related guides)
+- [ ] Keep only Iterations.md, Backlog.md, REPO_IMPROVEMENT_PLAN.md in plan/
+- [ ] Create temp/ and move uncertain documents
+- [ ] Remove any other top-level folders (e.g., doc/)
 
-**Props**: (table: name, type, description)
+Phase 3: Create Specifications (2 hours)
+- [ ] Write System-Spec.md (high-level architecture overview)
+- [ ] Create one-page specs for each algorithm in spec/
+- [ ] Document key features (job system, WebSocket, pipeline)
+- [ ] Add UI component behavior documentation
+```
 
-**Technical Decisions**:
-- Canvas-based rendering for 10,000+ frames
-- Color-coded coverage: green (covered), red (gap), yellow (overlap)
-- Click-to-seek frame navigation
+**Specification Template (docs/spec/):**
+```markdown
+# [Feature Name]: Behavior & Architecture
 
-**Interactions**:
-- Click frame: Jump to frame
-- Hover: Show job details tooltip
-- Drag: Pan timeline (if > viewport width)
+## Purpose
+One-sentence description of what this feature does.
 
-**Constraints**: maxFrames=10000, minFrameWidth=2px
+## Core Concept
+2-3 sentences explaining the fundamental approach and why it was chosen.
+
+## Key Parameters/Configuration
+| Parameter | Type | Range | Effect |
+|-----------|------|-------|--------|
+| erosionRate | number | 0.1-0.8 | Controls sediment pickup rate |
+
+## Technical Decisions
+- Why this approach over alternatives
+- Performance considerations
+- Scalability constraints
+
+## Behavior & Interactions
+- How it responds to different inputs
+- Edge cases and constraints
+- Integration with other components
+
+## Constraints
+- Performance limits (e.g., max 10,000 frames)
+- Validation rules
+- Browser/system requirements
 ```
 
 **Success Criteria:**
-- All major features have one-page specs in docs/spec/
-- Specs use standardized format
-- UI components documented alongside algorithms
-- No code examples, only parameter/prop tables
-- Technical decisions clearly stated
+- ✅ Only 4 top-level documentation folders: plan/, infra/, spec/, temp/
+- ✅ plan/ contains only 3 files: Iterations.md, Backlog.md, REPO_IMPROVEMENT_PLAN.md
+- ✅ infra/ reduced to 6-8 essential infrastructure documents
+- ✅ spec/ contains System-Spec.md + algorithm docs + feature docs
+- ✅ temp/ holds uncertain documents for quarterly review
+- ✅ 40-50% reduction in total documentation volume
+- ✅ Zero duplicate information across documents
+- ✅ All specifications follow standard format (max 200 lines)
+- ✅ All docs focus on concepts/behavior, not implementation code
+
+---
+
+### DOC-202: System Specification Document
+**Priority:** High
+**Effort:** 4 hours
+
+**Objective:**
+Create a comprehensive `System-Spec.md` in docs/spec/ that serves as the single source of truth for system architecture and design decisions.
+
+**Tasks:**
+
+1. **Architecture Overview (1 hour)**
+   - System component diagram (ASCII art or reference to image)
+   - Data flow between frontend, backend, and C++ engine
+   - Technology stack and rationale
+   - Deployment architecture (Cloudflare Pages + AWS EC2)
+
+2. **Core Subsystems (2 hours)**
+   - **Terrain Generation Pipeline:**
+     - Job-based execution model
+     - Frame-by-frame processing
+     - Session management
+   - **Real-time Communication:**
+     - WebSocket streaming
+     - Progress updates and frame delivery
+   - **Native Engine Integration:**
+     - C++ addon architecture
+     - N-API bindings
+     - Performance characteristics
+   - **Configuration Management:**
+     - Job configuration schema
+     - Validation and timeline coverage
+     - Save/load mechanism
+
+3. **Design Principles (1 hour)**
+   - Why job-based over single-operation?
+   - Why WebSocket over polling?
+   - Why C++ native addon?
+   - Canvas vs DOM for timeline rendering
+   - Client-side vs server-side rendering
+
+**Document Structure:**
+```markdown
+# TerrainSim System Specification
+
+## System Overview
+[High-level architecture diagram and component relationships]
+
+## Technology Stack
+[Table: Component, Technology, Version, Rationale]
+
+## Core Subsystems
+
+### Terrain Generation Pipeline
+[Job model, execution flow, session lifecycle]
+
+### Real-time Communication
+[WebSocket protocol, message types, reconnection]
+
+### Native Engine
+[C++ integration, N-API bindings, performance]
+
+### Configuration Management
+[Schema, validation, persistence]
+
+## Design Decisions
+[Major architectural choices and their justification]
+
+## Performance Characteristics
+[Benchmarks, scalability limits, optimization strategies]
+
+## Security & Data Flow
+[Authentication, data validation, error handling]
+
+## Deployment Architecture
+[AWS EC2, Cloudflare Pages, CI/CD]
+```
+
+**Success Criteria:**
+- ✅ System-Spec.md exists in docs/spec/
+- ✅ All major subsystems documented
+- ✅ Design decisions clearly explained with rationale
+- ✅ Architecture diagrams included (ASCII or referenced images)
+- ✅ Performance characteristics documented
+- ✅ Maximum 300 lines (concise but complete)
+- ✅ Serves as onboarding document for new contributors
+
+---
+
+### DOC-203: Algorithm & Feature Documentation
+**Priority:** High
+**Effort:** 5 hours
+
+**Objective:**
+Document all algorithms and key features in docs/spec/ following standardized format. Focus on behavior and concepts, not implementation.
+
+**Tasks:**
+
+1. **Algorithm Documentation (2 hours)**
+   - Hydraulic Erosion: particle-based simulation behavior
+   - Thermal Erosion: weathering and slope stability
+   - Perlin Noise: fBm generation and parameters
+   - **Format:** Purpose, concept, parameters table, behavior description
+
+2. **Feature Documentation (2 hours)**
+   - Job System: execution model and validation
+   - Configuration Timeline: visual coverage and interactions
+   - Pipeline Builder: UI workflow and terrain generation
+   - Job Manager: CRUD operations and state management
+   - **Format:** Purpose, UI interactions, state management, edge cases
+
+3. **API Documentation (1 hour)**
+   - All REST endpoints with parameters
+   - WebSocket message protocol
+   - Error response format
+   - **Format:** Endpoint, method, parameters table, responses table
+
+**Documentation Template:**
+```markdown
+# [Algorithm/Feature Name]
+
+## Purpose
+One-sentence description of what this does and why it exists.
+
+## Core Concept (2-3 paragraphs)
+Explain the fundamental approach. Why this method? What problem does it solve?
+Avoid implementation details - focus on the conceptual model.
+
+## Parameters
+
+| Parameter | Type | Range | Default | Effect |
+|-----------|------|-------|---------|--------|
+| erosionRate | number | 0-1 | 0.3 | Sediment pickup strength |
+| evaporation | number | 0-1 | 0.01 | Water loss per step |
+
+## Behavior
+
+### Normal Operation
+How it behaves under typical conditions.
+
+### Edge Cases
+- What happens with extreme parameter values?
+- How does it handle boundary conditions?
+- Performance at scale?
+
+### Visual Results
+Describe the visual/perceptual effects of parameter changes.
+- Low erosionRate: Gentle valley formation
+- High erosionRate: Deep canyon cutting
+
+## Integration
+How this interacts with other system components.
+
+## Constraints
+- Performance limits
+- Parameter validation rules
+- Browser/system requirements
+```
+
+**Files to Create:**
+
+**Algorithms (docs/spec/algorithms/):**
+- `Hydraulic-Erosion.md` (~150 lines)
+- `Thermal-Erosion.md` (~100 lines)
+- `Perlin-Noise.md` (~100 lines)
+
+**Features (docs/spec/features/):**
+- `Job-System.md` (~200 lines)
+- `Configuration-Timeline.md` (~150 lines)
+- `Pipeline-Builder.md` (~150 lines)
+- `Job-Manager.md` (~150 lines)
+
+**API (docs/spec/):**
+- `API-Reference.md` (~250 lines)
+
+**Success Criteria:**
+- ✅ All major algorithms documented in docs/spec/algorithms/
+- ✅ All key features documented in docs/spec/features/
+- ✅ API reference complete in docs/spec/API-Reference.md
+- ✅ All docs follow standardized template
+- ✅ Maximum 200 lines per document (except API reference)
+- ✅ Focus on behavior and concepts, not code
+- ✅ Parameter tables include ranges and effects
+- ✅ Edge cases and constraints documented
+- ✅ Readable by non-programmers
 
 ---
 
@@ -936,15 +1090,18 @@ Canvas handles 10,000+ frame bars smoothly. DOM elements would be too slow.
 
 ### High Priority (Do First)
 1. ✅ **TOOL-001:** Environment Reproduction Tools (reproduce AWS/GH/Cloudflare locally) - COMPLETED 2026-01-19
-2. **TOOL-002:** Code Scanning & Pre-deployment Checks (catch issues before deploy)
-3. **TOOL-004:** Deployment Log Aggregator (centralized log capture) - PARTIALLY COMPLETED (see TOOL-001)
-4. **DOC-201:** Algorithm Behavior Documentation (explain concepts, not code)
-5. **DOC-202:** Documentation Cleanup & Consolidation (remove unnecessary docs)
-6. **DOC-203:** Feature Specification Summaries (concise technical specs)
-7. ✅ **CLEAN-002:** Console.log Elimination (use centralized logging) - COMPLETED 2026-01-16
-8. **CLEAN-005:** Pre-commit Hooks (catches issues early)
-9. **TEST-302:** Job System UI Tests (current feature needs coverage)
-10. **TEST-303:** API Error Path Testing (production reliability)
+2. ✅ **TOOL-002:** Code Scanning & Pre-deployment Checks (catch issues before deploy) - COMPLETED 2026-01-19
+3. ✅ **TOOL-004:** Deployment Log Aggregator (centralized log capture) - COMPLETED 2026-01-19 (integrated with TOOL-001)
+4. ✅ **TOOL-005:** Environment Validation Script - COMPLETED 2026-01-19
+5. **DOC-201:** Documentation Reorganization & Cleanup (delete temporary files, organize into 4 folders)
+6. **DOC-202:** System Specification Document (create comprehensive System-Spec.md)
+7. **DOC-203:** Algorithm & Feature Documentation (document all algorithms and features)
+8. ✅ **CLEAN-002:** Console.log Elimination (use centralized logging) - COMPLETED 2026-01-16
+9. ✅ **CLEAN-005:** Pre-commit Hooks (catches issues early) - COMPLETED 2026-01-16
+10. ✅ **TEST-302:** Job System UI Tests (current feature needs coverage) - COMPLETED 2026-01-16
+11. ✅ **TEST-303:** API Error Path Testing (production reliability) - COMPLETED 2026-01-19
+12. ✅ **TEST-304:** Load Testing Automation - COMPLETED 2026-01-19
+13. ✅ **TEST-305:** Test Documentation - COMPLETED 2026-01-19
 
 ### Medium Priority (Do Next)
 1. **CLEAN-001:** Dependency Audit
@@ -982,12 +1139,17 @@ Canvas handles 10,000+ frame bars smoothly. DOM elements would be too slow.
 - ✅ Pre-deployment scan catches issues (secrets, console.log, broken imports)
 - ✅ Log aggregator combines logs from all sources
 
-**Documentation (Conciseness & Complete Specifications):**
-- ✅ Clear 4-folder structure: plan/, infra/, spec/, temp/
-- ✅ docs/doc/ removed and contents redistributed
-- ✅ 30% reduction in total documentation volume
-- ✅ All major features (algorithms + UI) have one-page specs in docs/spec/
-- ✅ All algorithms and UI components documented with behaviors, not code
+**Documentation (Clear Structure & Complete Specifications):**
+- ✅ Only 4 documentation folders: plan/, infra/, spec/, temp/
+- ✅ plan/ contains only: Iterations.md, Backlog.md, REPO_IMPROVEMENT_PLAN.md
+- ✅ infra/ reduced to 6-8 essential infrastructure documents
+- ✅ spec/ contains System-Spec.md + algorithms/ + features/ + API-Reference.md
+- ✅ temp/ holds uncertain documents for quarterly review
+- ✅ 40-50% reduction in total documentation volume
+- ✅ Zero duplicate information across documents
+- ✅ All algorithms and features documented with behavior-focused specs
+- ✅ All specifications max 200 lines (except System-Spec.md and API-Reference.md)
+- ✅ Documentation readable by non-programmers (concept-focused, not code-focused)
 - ✅ No duplicate information across docs
 
 ### Metrics

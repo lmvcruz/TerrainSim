@@ -101,6 +101,19 @@ Add real-time terrain editing with sculpting brushes: raise/lower, smooth, flatt
 
 ---
 
+## Build Optimization (CI/CD)
+
+Optimize build times for local development and CI/CD pipelines. Measure baseline build times for all workspaces (frontend, backend, C++ libs). Enable TypeScript incremental builds with `.tsbuildinfo` files. Configure GitHub Actions caching for pnpm store and CMake build artifacts. Add build time reporting to CI workflow summaries. Verify Vite HMR is properly configured for instant hot-reloading during development. Document build performance baselines and improvements in repository documentation.
+
+**Target Metrics:**
+- CI builds 30% faster with cache enabled
+- Local frontend rebuilds complete in under 5 seconds
+- C++ library rebuilds cached across CI runs
+
+**Deferred Reason:** Current build times are acceptable for the team's workflow. Can be revisited if build performance becomes a bottleneck as the codebase grows.
+
+---
+
 ## Real-World Data Import
 
 Support importing real-world elevation data from GeoTIFF and DEM files. Implement coordinate system conversion, resampling for different resolutions, and preview functionality before import.
