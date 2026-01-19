@@ -15,6 +15,69 @@ TerrainSim is a high-performance terrain simulation and visualization system tha
 - **Backend**: Node.js + Express + Socket.IO (AWS EC2)
 - **Engine**: C++ native addon via Node-API (N-API)
 
+### System Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         User's Browser                               │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  React Frontend (Cloudflare Pages CDN)                         │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐  │  │
+│  │  │ PipelineUI   │  │ JobManager   │  │ 3D Terrain Viewer  │  │  │
+│  │  │ (Timeline)   │  │ (Config)     │  │ (React Three       │  │  │
+│  │  │              │  │              │  │  Fiber/WebGL)      │  │  │
+│  │  └──────┬───────┘  └──────┬───────┘  └──────┬─────────────┘  │  │
+│  │         │                  │                  │                 │  │
+│  │         └──────────────────┴──────────────────┘                 │  │
+│  │                            │                                     │  │
+│  │                    Zustand State Manager                         │  │
+│  └────────────────────────────┼─────────────────────────────────────┘  │
+└─────────────────────────────────┼─────────────────────────────────────┘
+                                  │
+                    HTTP/WebSocket (Socket.IO)
+                                  │
+┌─────────────────────────────────┼─────────────────────────────────────┐
+│              AWS EC2 (Ubuntu + nginx + PM2)                           │
+│  ┌────────────────────────────┼─────────────────────────────────────┐ │
+│  │      Node.js Backend       │                                     │ │
+│  │  ┌───────────────────────┐ │ ┌─────────────────────────────────┐ │ │
+│  │  │  Express REST API     │ │ │   Socket.IO WebSocket Server    │ │ │
+│  │  │  - /health            ├─┼─┤   - progress events             │ │ │
+│  │  │  - /config/*          │ │ │   - frame streaming              │ │ │
+│  │  │  - /simulate/*        │ │ │   - error handling               │ │ │
+│  │  └───────────┬───────────┘ │ └────────────┬────────────────────┘ │ │
+│  │              │               │              │                      │ │
+│  │              └───────────────┴──────────────┘                      │ │
+│  │                            │                                       │ │
+│  │                     Session Manager                                │ │
+│  │                     (In-memory state)                              │ │
+│  │                            │                                       │ │
+│  │                  ┌─────────┴─────────┐                            │ │
+│  │                  │  Node-API Bridge  │                            │ │
+│  │                  │  (N-API bindings) │                            │ │
+│  │                  └─────────┬─────────┘                            │ │
+│  └────────────────────────────┼─────────────────────────────────────┘ │
+│  ┌────────────────────────────┼─────────────────────────────────────┐ │
+│  │    C++ Native Addon        │  (terrain_erosion_native.node)      │ │
+│  │  ┌─────────────────────────▼───────────────────────────────────┐ │ │
+│  │  │  Terrain Engine (C++20, CMake)                              │ │ │
+│  │  │  - Heightmap data structures                                │ │ │
+│  │  │  - Hydraulic erosion algorithm                              │ │ │
+│  │  │  - Thermal erosion algorithm                                │ │ │
+│  │  │  - Perlin noise generation (fBm)                            │ │ │
+│  │  └─────────────────────────────────────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────────────┘
+
+Data Flow:
+1. User configures jobs in UI → Zustand state
+2. Start simulation → HTTP POST /simulate/create
+3. Backend validates → Creates session → Calls C++ engine
+4. C++ computes frame-by-frame → Returns heightmap arrays
+5. Backend streams results → WebSocket (binary + JSON)
+6. Frontend receives frames → Updates 3D view (React Three Fiber)
+```
+
 ---
 
 ## Technology Stack
@@ -264,14 +327,49 @@ Frontend 3D View (React Three Fiber)
 ### Backend: AWS EC2 t3.micro
 - **OS**: Ubuntu 22.04 LTS
 - **Process Manager**: PM2 (auto-restart, systemd integration)
-- **Reverse Proxy**: nginx (SSL termination, rate limiting)
-- **Runtime**: tsx (direct TypeScript execution)
-- **Deployment**: Manual trigger via GitHub Actions
+- **Reverse Proxy**: nginx (SSL termination, rate limiting, WebSocket proxy)
+- **Runtime**: tsx (direct TypeScript execution, no transpilation needed)
+- **Deployment**: Manual trigger via GitHub Actions (`.github/workflows/deploy-backend.yml`)
+- **Custom Domain**: `api.lmvcruz.work`
 
-### CI/CD
-- **Testing**: GitHub Actions (frontend + backend + C++ tests)
-- **Frontend Deploy**: Automatic (Cloudflare Pages Git integration)
-- **Backend Deploy**: Manual trigger (GitHub Actions workflow)
+### CI/CD Pipeline
+
+**Continuous Integration** (`.github/workflows/ci.yml`):
+- Triggers: Push to `main`, pull requests
+- Steps:
+  1. Install dependencies (`pnpm install`)
+  2. Type checking (`tsc --noEmit`)
+  3. Linting (`eslint`)
+  4. Unit tests (Vitest + Jest)Hydraulic Erosion Model](./algorithms/HYDRAULIC_EROSION_MODEL.md)
+- **Features**: [Job System](./Job-System.md), [API Reference](./API.md)
+- **Infrastructure**: [Deployment Guide](../infra/DEPLOYMENT.md), [Testing Guide](../infra/TESTING_GUIDE.md), [Monitoring](../infra/MONITORING.md)
+- **Development**: [Local Environment](../infra/LOCAL_ENVIRONMENT_GUIDE.md), [Environment Validation](../infra/ENVIRONMENT_VALIDATION.md)
+- **Planning**: [Repository Improvement Plan](../plan/REPO_IMPROVEMENT_PLAN.md), [Backlog](../plan/Backlog
+**Frontend Deployment**:
+- Platform: Cloudflare Pages
+- Trigger: Automatic on `git push` to `main`
+- Build: `pnpm build` (Vite production build)
+- Deploy: Instant global CDN propagation
+- Rollback: Automatic via Cloudflare dashboard
+
+**Backend Deployment** (`.github/workflows/deploy-backend.yml`):
+- Platform: AWS EC2 via SSH
+- Trigger: Manual (workflow_dispatch)
+- Steps:
+  1. Pre-deployment scan (security checks)
+  2. SSH to EC2 instance
+  3. Pull latest code (`git pull`)
+  4. Install dependencies (`pnpm install`)
+  5. Build C++ addon (`cmake --build`)
+  6. Restart PM2 (`pm2 restart`)
+  7. Health check verification
+- Rollback: Manual via PM2 (`pm2 restart --update-env`)
+
+**Load Testing** (`.github/workflows/load-test.yml`):
+- Trigger: Manual (workflow_dispatch)
+- Tool: k6 (stress testing, spike testing)
+- Scenarios: CI scenario (3 min), stress test (10 min), spike test (5 min)
+- Artifacts: Performance reports, baseline comparison
 
 ---
 
