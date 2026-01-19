@@ -6,28 +6,34 @@ services:
   api:
     image: node:20.19.6-bullseye
     container_name: terrainsim-api-local
-    working_dir: /app
+    working_dir: /workspace/apps/simulation-api
     volumes:
-      - ./apps/simulation-api:/app
-      - ./libs/core:/libs/core
-      - api-node-modules:/app/node_modules
+      - .:/workspace
+      - node-modules:/workspace/node_modules
+      - api-node-modules:/workspace/apps/simulation-api/node_modules
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3001
       - LOG_LEVEL=info
       - ENABLE_CORS=true
       # Add other environment variables as needed
     command: >
       sh -c "
-        if [ ! -d node_modules ]; then
-          echo '📦 Installing dependencies...'
-          npm install -g pnpm@9.15.4 pm2
-          pnpm install --frozen-lockfile
+        echo '📦 Installing global tools...'
+        npm install -g pnpm@9.15.4 pm2
+        cd /workspace
+        if [ ! -f node_modules/.installed ]; then
+          echo '📦 Installing minimal dependencies for test server...'
+          cd /workspace/apps/simulation-api
+          npm install express
+          cd /workspace
+          touch node_modules/.installed
         fi
-        echo '🚀 Starting API with PM2...'
-        pm2-runtime start ecosystem.config.cjs --env production
+        cd /workspace/apps/simulation-api
+        echo '🚀 Starting test API with PM2...'
+        pm2-runtime start test-server.js --name terrainsim-api --env production
       "
     restart: unless-stopped
     networks:
@@ -85,6 +91,8 @@ networks:
     driver: bridge
 
 volumes:
+  node-modules:
+    driver: local
   api-node-modules:
     driver: local
   # postgres-data:
