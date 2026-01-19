@@ -27,26 +27,24 @@ describe('PipelineBuilder', () => {
 
     // Check for main elements
     expect(screen.getByText(/Step 0:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Input Model Generation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Initial Terrain/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Generate Terrain/i })).toBeInTheDocument();
   });
 
   it('allows Step 0 configuration - method selection', () => {
     renderWithContext(<PipelineBuilder />);
 
-    // Find method buttons
-    const perlinButton = screen.getByRole('button', { name: /Perlin Noise/i });
-    const fbmButton = screen.getByRole('button', { name: /FBM Noise/i });
+    // Find method select dropdown
+    const methodSelect = screen.getByLabelText(/Modeling Method/i) as HTMLSelectElement;
 
     // Initially Perlin should be selected (default)
-    expect(perlinButton).toHaveClass('bg-blue-600');
-    expect(fbmButton).not.toHaveClass('bg-blue-600');
+    expect(methodSelect.value).toBe('Perlin');
 
-    // Click FBM button
-    fireEvent.click(fbmButton);
+    // Change to FBM
+    fireEvent.change(methodSelect, { target: { value: 'FBM' } });
 
     // FBM should now be selected
-    expect(fbmButton).toHaveClass('bg-blue-600');
+    expect(methodSelect.value).toBe('FBM');
   });
 
   it('validates total frames input', () => {
@@ -135,18 +133,16 @@ describe('PipelineBuilder', () => {
   it('changes parameters based on selected method', () => {
     renderWithContext(<PipelineBuilder />);
 
-    // Select Perlin method
-    const perlinButton = screen.getByRole('button', { name: /Perlin Noise/i });
-    fireEvent.click(perlinButton);
+    // Method select should exist
+    const methodSelect = screen.getByLabelText(/Modeling Method/i);
 
-    // Should show Perlin parameters (frequency, amplitude, seed)
+    // Should show Perlin parameters by default (frequency, amplitude, seed)
     expect(screen.getByLabelText(/Frequency/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Amplitude/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Seed/i)).toBeInTheDocument();
 
     // Select FBM method
-    const fbmButton = screen.getByRole('button', { name: /FBM Noise/i });
-    fireEvent.click(fbmButton);
+    fireEvent.change(methodSelect, { target: { value: 'FBM' } });
 
     // Should show additional FBM parameters (octaves, persistence, lacunarity)
     expect(screen.getByLabelText(/Octaves/i)).toBeInTheDocument();
