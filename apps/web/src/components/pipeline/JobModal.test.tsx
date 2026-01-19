@@ -225,7 +225,7 @@ describe('JobModal', () => {
     ).toBeInTheDocument();
   });
 
-  it('updates existing job when in edit mode', () => {
+  it('updates existing job when in edit mode', async () => {
     const existingJob: SimulationJob = {
       id: 'test-123',
       name: 'Original Name',
@@ -266,9 +266,9 @@ describe('JobModal', () => {
     fireEvent.click(updateButton);
 
     // Modal should close
-    setTimeout(() => {
+    await waitFor(() => {
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
-    }, 100);
+    });
   });
 
   it('displays frame range in friendly format', () => {
