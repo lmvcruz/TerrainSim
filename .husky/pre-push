@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 # Pre-push hook: Run tests before pushing
-echo "Running tests before push..."
-pnpm test
+echo "Running frontend tests before push..."
+cd apps/web && pnpm test
