@@ -836,24 +836,24 @@ Reorganize documentation into a clear 4-folder structure with strict content gui
 
 ```markdown
 Phase 1: Identify and Delete (2 hours)
-- [ ] Scan all docs/ folders for files with no long-term value
-- [ ] Delete completed task summaries (e.g., TOOL-002-SUMMARY.md, TEST-304-SUMMARY.md)
-- [ ] Delete temporary planning documents already captured in main plan
-- [ ] Delete redundant deployment guides
-- [ ] Delete duplicate information across multiple files
+- [x] Scan all docs/ folders for files with no long-term value
+- [x] Delete completed task summaries (e.g., TOOL-002-SUMMARY.md, TEST-304-SUMMARY.md)
+- [x] Delete temporary planning documents already captured in main plan
+- [x] Delete redundant deployment guides
+- [x] Delete duplicate information across multiple files
 
 Phase 2: Reorganize (2 hours)
-- [ ] Move algorithms/ to spec/ and integrate with feature docs
-- [ ] Consolidate infra/ documentation (merge related guides)
-- [ ] Keep only Iterations.md, Backlog.md, REPO_IMPROVEMENT_PLAN.md in plan/
-- [ ] Create temp/ and move uncertain documents
-- [ ] Remove any other top-level folders (e.g., doc/)
+- [x] Move algorithms/ to spec/ and integrate with feature docs
+- [x] Consolidate infra/ documentation (merge related guides)
+- [x] Keep only Iterations.md, Backlog.md, REPO_IMPROVEMENT_PLAN.md in plan/
+- [x] Create temp/ and move uncertain documents
+- [x] Remove any other top-level folders (e.g., doc/)
 
 Phase 3: Create Specifications (2 hours)
-- [ ] Write System-Spec.md (high-level architecture overview)
-- [ ] Create one-page specs for each algorithm in spec/
-- [ ] Document key features (job system, WebSocket, pipeline)
-- [ ] Add UI component behavior documentation
+- [x] Write System-Spec.md (high-level architecture overview)
+- [x] Create one-page specs for each algorithm in spec/
+- [x] Document key features (job system, WebSocket, pipeline)
+- [x] Add UI component behavior documentation
 ```
 
 **Specification Template (docs/spec/):**
