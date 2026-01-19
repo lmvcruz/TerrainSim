@@ -690,45 +690,6 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 
 ---
 
-### TOOL-003: Build Optimization
-**Priority:** Medium
-**Effort:** 4 hours
-
-**Tasks:**
-- Analyze build times (measure baseline)
-- Enable Vite HMR (already enabled, verify)
-- Configure TypeScript incremental builds
-- Add cache to CI pipeline (pnpm store, CMake cache)
-- Document build performance
-
-**Configuration:**
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
-  }
-}
-```
-
-**GitHub Actions Cache:**
-```yaml
-- uses: actions/cache@v3
-  with:
-    path: |
-      ~/.pnpm-store
-      libs/core/build
-    key: ${{ runner.os }}-build-${{ hashFiles('**/pnpm-lock.yaml') }}
-```
-
-**Success Criteria:**
-- CI builds 30% faster with cache
-- Local rebuilds <5 seconds (frontend)
-- Build times documented
-
----
-
 ### TOOL-004: Deployment Log Aggregator ✅ COMPLETED (2026-01-19)
 **Priority:** High
 **Effort:** 5 hours (Actual: integrated into TOOL-001)
@@ -776,44 +737,50 @@ After TEST-303 completion, systematic fixes were applied to failing frontend tes
 
 ---
 
-### TOOL-005: Environment Validation Script
+### TOOL-005: Environment Validation Script ✅ COMPLETED (2026-01-19)
 **Priority:** High
-**Effort:** 1 hour
+**Effort:** 1 hour (Actual: 1.5 hours)
 
 **Tasks:**
-- Create `scripts/validate-env.sh`
-- Check all required environment variables
-- Verify API endpoints reachable
-- Test database connections (if applicable)
-- Validate file permissions
+- Create `scripts/validate-env.sh` (Linux/macOS/CI) ✅
+- Create `scripts/validate-env.ps1` (Windows) ✅
+- Check all required environment variables ✅
+- Verify API endpoints reachable ✅
+- Test database connections (if applicable) ✅
+- Validate file permissions ✅
 
-**Script:**
-```bash
-#!/bin/bash
-echo "🔍 Validating environment..."
+**Implementation:**
+- **Bash Script** (`scripts/validate-env.sh`):
+  - Comprehensive environment validation for Linux/macOS/CI
+  - Colorized output with error/warning/success indicators
+  - 8 validation categories with detailed checks
+  - Supports `--ci` flag for CI/CD environments
+  - Exit codes: 0 (success), 1 (errors found)
 
-# Check env vars
-required_vars=("NODE_ENV" "PORT")
-for var in "${required_vars[@]}"; do
-  if [ -z "${!var}" ]; then
-    echo "❌ Missing: $var"
-    exit 1
-  fi
-done
+- **PowerShell Script** (`scripts/validate-env.ps1`):
+  - Full Windows compatibility with same validation logic
+  - Tests Visual Studio Build Tools availability (for C++ compilation)
+  - Uses `Get-NetTCPConnection` for accurate port checking
+  - Supports `-CI` switch for automated testing
+  - Color-coded output matching bash version
 
-# Test API
-if ! curl -f http://localhost:3001/health > /dev/null 2>&1; then
-  echo "❌ API not responding"
-  exit 1
-fi
-
-echo "✅ Environment valid"
-```
+**Validation Categories:**
+1. **Required Commands**: node, pnpm, git (+ optional: cmake, python, docker)
+2. **Node.js Version**: Validates >= 20.x requirement
+3. **Environment Variables**: NODE_ENV, PORT, VITE_API_URL from .env files
+4. **File Permissions**: Write access to presets/, temp/, build/ directories
+5. **Dependencies**: Checks pnpm-lock.yaml, node_modules in all workspaces
+6. **C++ Library**: Validates terrain engine native addon is built
+7. **API Endpoints**: Tests /health endpoint at http://localhost:3001
+8. **Frontend Dev Server**: Checks Vite dev server at http://localhost:5173
+9. **Git Repository**: Validates git init, current branch, working tree status
 
 **Success Criteria:**
-- Script catches configuration errors
-- Runs before tests/deployment
-- Clear error messages
+- ✅ Script catches configuration errors before development/deployment
+- ✅ Runs on both Windows (PowerShell) and Linux/macOS (Bash)
+- ✅ Clear error messages with actionable fixes
+- ✅ Exit codes indicate success (0) or failure (1)
+- ✅ CI-compatible with `--ci`/`-CI` flags
 
 ---
 
