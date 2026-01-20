@@ -7,10 +7,14 @@ import { useMemo } from 'react';
 export default function TerrainViewer() {
   const { config, currentFrame, heightmapCache } = usePipeline();
 
+  // Extract dimensions to stable values
+  const width = config.width || 256;
+  const height = config.height || 256;
+
   // Generate default flat terrain for preview
   const defaultHeightmap = useMemo(() => {
-    return new Float32Array(config.width * config.height).fill(0);
-  }, [config.width, config.height]);
+    return new Float32Array(width * height).fill(0);
+  }, [width, height]);
 
   // Get heightmap for current frame, fallback to default terrain
   const currentHeightmap = heightmapCache.get(currentFrame) || defaultHeightmap;
@@ -33,8 +37,8 @@ export default function TerrainViewer() {
         <directionalLight position={[100, 100, 50]} intensity={0.8} />
         <TerrainMesh
           heightmap={currentHeightmap}
-          width={config.width}
-          height={config.height}
+          width={width}
+          height={height}
         />
         <OrbitControls
           enableDamping

@@ -103,9 +103,17 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        // Migrate old configs that don't have width/height
-        if (!parsed.width || !parsed.height) {
-          pipelineLogger.info('Migrating old config to include dimensions');
+        // Migrate old configs that don't have valid width/height
+        const needsMigration = 
+          typeof parsed.width !== 'number' || 
+          typeof parsed.height !== 'number' ||
+          parsed.width <= 0 || 
+          parsed.height <= 0 ||
+          !Number.isFinite(parsed.width) || 
+          !Number.isFinite(parsed.height);
+        
+        if (needsMigration) {
+          pipelineLogger.info('Migrating old config to include valid dimensions');
           return {
             ...parsed,
             width: DEFAULT_CONFIG.width,
