@@ -44,6 +44,8 @@ export interface SimulationJob {
 
 export interface PipelineConfig {
   step0: ModelingConfig;
+  width: number;
+  height: number;
   totalFrames: number;
   jobs: SimulationJob[];
 }
@@ -58,6 +60,7 @@ interface PipelineContextType {
   config: PipelineConfig;
   setConfig: (config: PipelineConfig) => void;
   updateStep0: (step0: ModelingConfig) => void;
+  updateDimensions: (width: number, height: number) => void;
   updateTotalFrames: (totalFrames: number) => void;
   addJob: (job: SimulationJob) => void;
   updateJob: (id: string, job: Partial<SimulationJob>) => void;
@@ -85,6 +88,8 @@ const DEFAULT_CONFIG: PipelineConfig = {
     frequency: 0.05,
     amplitude: 50,
   },
+  width: 256,
+  height: 256,
   totalFrames: 10,
   jobs: [],
 };
@@ -125,6 +130,10 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
 
   const updateStep0 = (step0: ModelingConfig) => {
     setConfig({ ...config, step0 });
+  };
+
+  const updateDimensions = (width: number, height: number) => {
+    setConfig({ ...config, width, height });
   };
 
   const updateTotalFrames = (totalFrames: number) => {
@@ -273,9 +282,14 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCache = () => {
-    pipelineLogger.info('Clearing heightmap cache');
+    pipelineLogger.info('Clearing heightmap cache (preserving frame 0)');
+    // Preserve frame 0 (original terrain) when clearing cache
+    const frame0 = heightmapCache.get(0);
     heightmapCache.clear();
-    setCurrentFrame(0);
+    if (frame0) {
+      heightmapCache.set(0, frame0);
+    }
+    setCurrentFrame(0); // Return to original terrain
   };
 
   // Initial validation
@@ -289,6 +303,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         config,
         setConfig,
         updateStep0,
+        updateDimensions,
         updateTotalFrames,
         addJob,
         updateJob,

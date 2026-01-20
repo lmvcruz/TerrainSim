@@ -7,7 +7,7 @@ import { logger } from '../../utils/logger';
 const builderLogger = logger.withContext('PipelineBuilder');
 
 export default function PipelineBuilder() {
-  const { config, updateStep0, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
+  const { config, updateStep0, updateDimensions, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,8 +20,8 @@ export default function PipelineBuilder() {
       const payload = {
         ...config.step0,
         method: config.step0.method.toLowerCase() as 'perlin' | 'fbm',
-        width: 256,
-        height: 256,
+        width: config.width,
+        height: config.height,
       };
 
       const response = await fetch(apiConfig.endpoints.generate, {
@@ -53,8 +53,8 @@ export default function PipelineBuilder() {
           body: JSON.stringify({
             config: {
               ...config,
-              width: 256,
-              height: 256,
+              width: config.width,
+              height: config.height,
             },
             initialTerrain: data.data, // Pass the generated terrain
           }),
@@ -226,6 +226,37 @@ export default function PipelineBuilder() {
         </div>
 
         <div className="space-y-4">
+          {/* Terrain Dimensions */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="terrain-width" className="block text-xs text-zinc-400 mb-1">Width</label>
+              <input
+                id="terrain-width"
+                type="number"
+                min="64"
+                max="1024"
+                step="64"
+                value={config.width}
+                onChange={(e) => updateDimensions(parseInt(e.target.value) || 256, config.height)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label htmlFor="terrain-height" className="block text-xs text-zinc-400 mb-1">Height</label>
+              <input
+                id="terrain-height"
+                type="number"
+                min="64"
+                max="1024"
+                step="64"
+                value={config.height}
+                onChange={(e) => updateDimensions(config.width, parseInt(e.target.value) || 256)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-zinc-500">Terrain grid resolution (64-1024)</p>
+
           <div>
             <label htmlFor="modeling-method-select" className="block text-xs text-zinc-400 mb-2">Modeling Method</label>
             <select

@@ -5,12 +5,12 @@ import { usePipeline } from '../../contexts/PipelineContext';
 import { useMemo } from 'react';
 
 export default function TerrainViewer() {
-  const { currentFrame, heightmapCache } = usePipeline();
+  const { config, currentFrame, heightmapCache } = usePipeline();
 
   // Generate default flat terrain for preview
   const defaultHeightmap = useMemo(() => {
-    return new Float32Array(256 * 256).fill(0);
-  }, []);
+    return new Float32Array(config.width * config.height).fill(0);
+  }, [config.width, config.height]);
 
   // Get heightmap for current frame, fallback to default terrain
   const currentHeightmap = heightmapCache.get(currentFrame) || defaultHeightmap;
@@ -31,7 +31,11 @@ export default function TerrainViewer() {
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[100, 100, 50]} intensity={0.8} />
-        <TerrainMesh heightmap={currentHeightmap} />
+        <TerrainMesh
+          heightmap={currentHeightmap}
+          width={config.width}
+          height={config.height}
+        />
         <OrbitControls
           enableDamping
           dampingFactor={0.05}
