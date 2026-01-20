@@ -2,19 +2,28 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { TerrainMesh } from '../TerrainMesh';
 import { usePipeline } from '../../contexts/PipelineContext';
-import { useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 
 export default function TerrainViewer() {
   const { config, currentFrame, heightmapCache } = usePipeline();
 
-  // Extract dimensions to stable values
-  const width = config.width || 256;
-  const height = config.height || 256;
+  // Cache the last dimensions to detect actual changes
+  const lastDimensionsRef = useRef({ width: 0, height: 0 });
+  const defaultHeightmapRef = useRef<Float32Array | null>(null);
 
-  // Generate default flat terrain for preview
+  // Generate default flat terrain for preview only when dimensions actually change
   const defaultHeightmap = useMemo(() => {
-    return new Float32Array(width * height).fill(0);
-  }, [width, height]);
+    const width = config.width || 256;
+    const height = config.height || 256;
+    
+    // Only create a new array if dimensions actually changed
+    if (lastDimensionsRef.current.width !== width || lastDimensionsRef.current.height !== height) {
+      lastDimensionsRef.current = { width, height };
+      defaultHeightmapRef.current = new Float32Array(width * height).fill(0);
+    }
+    
+    return defaultHeightmapRef.current!;
+  }, [config.width, config.height]);
 
   // Get heightmap for current frame, fallback to default terrain
   const currentHeightmap = heightmapCache.get(currentFrame) || defaultHeightmap;
@@ -37,8 +46,8 @@ export default function TerrainViewer() {
         <directionalLight position={[100, 100, 50]} intensity={0.8} />
         <TerrainMesh
           heightmap={currentHeightmap}
-          width={width}
-          height={height}
+          width={config.width || 256}
+          height={config.height || 256}
         />
         <OrbitControls
           enableDamping
