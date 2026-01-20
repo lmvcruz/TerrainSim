@@ -102,7 +102,17 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Migrate old configs that don't have width/height
+        if (!parsed.width || !parsed.height) {
+          pipelineLogger.info('Migrating old config to include dimensions');
+          return {
+            ...parsed,
+            width: DEFAULT_CONFIG.width,
+            height: DEFAULT_CONFIG.height,
+          };
+        }
+        return parsed;
       } catch (e) {
         pipelineLogger.error('Failed to parse stored config:', e);
       }
