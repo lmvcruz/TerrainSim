@@ -104,14 +104,14 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(stored);
         // Migrate old configs that don't have valid width/height
-        const needsMigration = 
-          typeof parsed.width !== 'number' || 
+        const needsMigration =
+          typeof parsed.width !== 'number' ||
           typeof parsed.height !== 'number' ||
-          parsed.width <= 0 || 
+          parsed.width <= 0 ||
           parsed.height <= 0 ||
-          !Number.isFinite(parsed.width) || 
+          !Number.isFinite(parsed.width) ||
           !Number.isFinite(parsed.height);
-        
+
         if (needsMigration) {
           pipelineLogger.info('Migrating old config to include valid dimensions');
           return {
