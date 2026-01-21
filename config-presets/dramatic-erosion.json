@@ -1,0 +1,30 @@
+{
+  "id": "dramatic-erosion",
+  "name": "Dramatic Erosion",
+  "description": "Strong erosion effect for creating deep valleys and canyons quickly",
+  "createdAt": "2026-01-21T00:00:00.000Z",
+  "width": 192,
+  "height": 192,
+  "totalFrames": 10,
+  "jobs": [
+    {
+      "id": "hyd-dramatic",
+      "name": "Dramatic Hydraulic Erosion",
+      "type": "hydraulic",
+      "enabled": true,
+      "startFrame": 1,
+      "endFrame": 10,
+      "config": {
+        "numParticles": 5000,
+        "erosionRate": 0.35,
+        "depositionRate": 0.20,
+        "evaporationRate": 0.008,
+        "inertia": 0.05,
+        "sedimentCapacity": 5.0,
+        "minSlope": 0.01,
+        "gravity": 5.0,
+        "erosionRadius": 2
+      }
+    }
+  ]
+}

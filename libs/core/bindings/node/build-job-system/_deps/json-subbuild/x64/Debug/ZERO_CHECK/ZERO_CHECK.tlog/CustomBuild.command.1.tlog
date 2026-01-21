@@ -1,0 +1,10 @@
+^D:\PLAYGROUND\TERRAINSIM\LIBS\CORE\BINDINGS\NODE\BUILD-JOB-SYSTEM\_DEPS\JSON-SUBBUILD\CMAKEFILES\FF9A5B52EE9FFD534B60E0259CF370D2\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/playground/TerrainSim/libs/core/bindings/node/build-job-system/_deps/json-subbuild -BD:/playground/TerrainSim/libs/core/bindings/node/build-job-system/_deps/json-subbuild --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/playground/TerrainSim/libs/core/bindings/node/build-job-system/_deps/json-subbuild/json-populate.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -10,6 +10,8 @@ export function generatePerlinNoise(
   frequency: number = 0.05,
   amplitude: number = 1.0
 ): Float32Array {
+  console.log('[DEBUG] generatePerlinNoise called with:', { width, height, seed, frequency, amplitude });
+
   // Parameter validation
   if (width <= 0 || height <= 0) {
     throw new Error('Width and height must be greater than 0');
@@ -24,8 +26,11 @@ export function generatePerlinNoise(
     throw new Error('Amplitude must be a finite number');
   }
 
+  console.log('[DEBUG] Creating heightmap array...');
   const heightmap = new Float32Array(width * height);
+  console.log('[DEBUG] Creating PerlinNoise instance...');
   const perlin = new PerlinNoise(seed);
+  console.log('[DEBUG] PerlinNoise instance created, starting generation loop...');
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -39,6 +44,7 @@ export function generatePerlinNoise(
     }
   }
 
+  console.log('[DEBUG] Heightmap generation complete');
   return heightmap;
 }
 

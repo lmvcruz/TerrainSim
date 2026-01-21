@@ -93,6 +93,12 @@ Value SimulateErosion(const CallbackInfo& info) {
         params.erosionRadius = paramsObj.Get("erosionRadius").As<Number>().Int32Value();
     }
 
+    // Get absolute max elevation for progressive frame fix (optional)
+    float absoluteMaxElevation = std::numeric_limits<float>::max();
+    if (paramsObj.Has("absoluteMaxElevation")) {
+        absoluteMaxElevation = paramsObj.Get("absoluteMaxElevation").As<Number>().FloatValue();
+    }
+
     // Get number of particles (not in struct, used for batch simulation)
     int numParticles = 1;
     if (paramsObj.Has("numParticles")) {
@@ -108,8 +114,8 @@ Value SimulateErosion(const CallbackInfo& info) {
     // Create erosion simulator with parameters
     terrain::HydraulicErosion erosion(params);
 
-    // Run erosion simulation
-    erosion.erode(heightmap, numParticles);
+    // Run erosion simulation with optional absolute max height
+    erosion.erode(heightmap, numParticles, absoluteMaxElevation);
 
     // Copy modified data back to JavaScript Float32Array
     for (size_t i = 0; i < dataLength; ++i) {

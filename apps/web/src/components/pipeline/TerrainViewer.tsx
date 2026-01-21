@@ -1,11 +1,16 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { TerrainMesh } from '../TerrainMesh';
+import { TerrainMesh, type TextureMode } from '../TerrainMesh';
 import { usePipeline } from '../../contexts/PipelineContext';
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 
 export default function TerrainViewer() {
   const { config, currentFrame, heightmapCache } = usePipeline();
+  const [textureMode, setTextureMode] = useState<TextureMode>('landscape');
+
+  // Extract stable width and height values
+  const width = config.width || 256;
+  const height = config.height || 256;
 
   // Cache the last dimensions to detect actual changes
   const lastDimensionsRef = useRef({ width: 0, height: 0 });
@@ -13,17 +18,14 @@ export default function TerrainViewer() {
 
   // Generate default flat terrain for preview only when dimensions actually change
   const defaultHeightmap = useMemo(() => {
-    const width = config.width || 256;
-    const height = config.height || 256;
-    
     // Only create a new array if dimensions actually changed
     if (lastDimensionsRef.current.width !== width || lastDimensionsRef.current.height !== height) {
       lastDimensionsRef.current = { width, height };
       defaultHeightmapRef.current = new Float32Array(width * height).fill(0);
     }
-    
+
     return defaultHeightmapRef.current!;
-  }, [config.width, config.height]);
+  }, [width, height]);
 
   // Get heightmap for current frame, fallback to default terrain
   const currentHeightmap = heightmapCache.get(currentFrame) || defaultHeightmap;
@@ -37,6 +39,22 @@ export default function TerrainViewer() {
 
   return (
     <div className="relative w-full h-full">
+      {/* Texture Mode Controls */}
+      <div className="absolute top-4 right-4 z-10 bg-zinc-900/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-zinc-800">
+        <label htmlFor="texture-mode" className="block text-xs font-medium text-zinc-400 mb-2">
+          Texture Mode
+        </label>
+        <select
+          id="texture-mode"
+          value={textureMode}
+          onChange={(e) => setTextureMode(e.target.value as TextureMode)}
+          className="w-32 px-3 py-1.5 text-xs bg-zinc-800 text-zinc-200 border border-zinc-700 rounded hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="landscape">Landscape</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
       {/* 3D Canvas */}
       <Canvas
         camera={{ position: [0, 10, 15], fov: 60 }}
@@ -46,8 +64,9 @@ export default function TerrainViewer() {
         <directionalLight position={[100, 100, 50]} intensity={0.8} />
         <TerrainMesh
           heightmap={currentHeightmap}
-          width={config.width || 256}
-          height={config.height || 256}
+          width={width}
+          height={height}
+          textureMode={textureMode}
         />
         <OrbitControls
           enableDamping

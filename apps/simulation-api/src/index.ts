@@ -86,6 +86,9 @@ app.get('/health', (req, res) => {
 // API-002: /generate endpoint accepting noise parameters
 app.post('/generate', (req, res) => {
   try {
+    console.log('[DEBUG] /generate endpoint hit');
+    console.log('[DEBUG] Request body:', JSON.stringify(req.body));
+
     const {
       method = 'perlin',
       width = 256,
@@ -98,23 +101,31 @@ app.post('/generate', (req, res) => {
       lacunarity = 2.0
     } = req.body;
 
+    console.log('[DEBUG] Parsed parameters:', { method, width, height, seed, frequency, amplitude });
+
     // Validate basic parameters
     if (typeof width !== 'number' || typeof height !== 'number') {
+      console.log('[DEBUG] Invalid width/height types');
       return res.status(400).json({ error: 'Width and height must be numbers' });
     }
 
     if (width < 1 || width > 2048 || height < 1 || height > 2048) {
+      console.log('[DEBUG] Width/height out of range');
       return res.status(400).json({
         error: 'Width and height must be between 1 and 2048'
       });
     }
 
+    console.log('[DEBUG] About to generate heightmap with method:', method);
     let heightmap: Float32Array;
 
     // API-003: Generate heightmap and serialize to Float32Array
     if (method === 'perlin') {
+      console.log('[DEBUG] Calling generatePerlinNoise...');
       heightmap = generatePerlinNoise(width, height, seed, frequency, amplitude);
+      console.log('[DEBUG] generatePerlinNoise returned, length:', heightmap.length);
     } else if (method === 'fbm') {
+      console.log('[DEBUG] Calling generateFbm...');
       heightmap = generateFbm(
         width,
         height,
@@ -125,25 +136,32 @@ app.post('/generate', (req, res) => {
         persistence,
         lacunarity
       );
+      console.log('[DEBUG] generateFbm returned, length:', heightmap.length);
     } else {
+      console.log('[DEBUG] Invalid method:', method);
       return res.status(400).json({
         error: 'Invalid method. Use "perlin" or "fbm"'
       });
     }
 
     // Calculate statistics
+    console.log('[DEBUG] Calculating statistics...');
     let min = Infinity;
     let max = -Infinity;
     for (let i = 0; i < heightmap.length; i++) {
       if (heightmap[i] < min) min = heightmap[i];
       if (heightmap[i] > max) max = heightmap[i];
     }
+    console.log('[DEBUG] Statistics calculated:', { min, max });
 
     // API-003: Serialize Heightmap to Float32Array in response
+    console.log('[DEBUG] Converting to array...');
+    const dataArray = Array.from(heightmap);
+    console.log('[DEBUG] Sending response...');
     res.json({
       width,
       height,
-      data: Array.from(heightmap), // Convert Float32Array to regular array for JSON
+      data: dataArray, // Convert Float32Array to regular array for JSON
       statistics: {
         min,
         max,
@@ -157,11 +175,14 @@ app.post('/generate', (req, res) => {
         ...(method === 'fbm' && { octaves, persistence, lacunarity })
       }
     });
+    console.log('[DEBUG] Response sent successfully');
 
   } catch (error) {
-    console.error('Error generating terrain:', error);
+    console.error('[ERROR] Error generating terrain:', error);
+    console.error('[ERROR] Stack trace:', error instanceof Error ? error.stack : 'No stack');
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Internal server error'
+      error: error instanceof Error ? error.message : 'Internal server error',
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 });

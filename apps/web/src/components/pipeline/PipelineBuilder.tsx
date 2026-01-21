@@ -1,4 +1,4 @@
-import { usePipeline, type ModelingConfig } from '../../contexts/PipelineContext';
+import { usePipeline, type ModelingConfig, type SimulationJob } from '../../contexts/PipelineContext';
 import { Sliders, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 import apiConfig from '../../config/api';
@@ -7,7 +7,7 @@ import { logger } from '../../utils/logger';
 const builderLogger = logger.withContext('PipelineBuilder');
 
 export default function PipelineBuilder() {
-  const { config, updateStep0, updateDimensions, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId } = usePipeline();
+  const { config, updateStep0, updateDimensions, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId, addJob } = usePipeline();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +67,33 @@ export default function PipelineBuilder() {
 
         const sessionData = await sessionResponse.json();
         setSessionId(sessionData.sessionId); // Store session ID in context
+
+        // Auto-add a default hydraulic erosion job if no jobs exist
+        if (config.jobs.length === 0) {
+          const defaultJob: SimulationJob = {
+            id: `job-${Date.now()}`,
+            name: 'Hydraulic Erosion',
+            startFrame: 1,
+            endFrame: Math.min(10, config.totalFrames),
+            step: 'hydraulicErosion',
+            config: {
+              hydraulicErosion: {
+                numParticles: 50000,
+                erosionRate: 0.3,
+                depositionRate: 0.3,
+                sedimentCapacity: 4.0,
+                minSlope: 0.01,
+                inertia: 0.05,
+                evaporationRate: 0.01,
+                gravity: 4.0,
+                erosionRadius: 1
+              }
+            },
+            enabled: true
+          };
+          addJob(defaultJob);
+          builderLogger.info('Auto-added default hydraulic erosion job');
+        }
 
         setCurrentFrame(0); // Switch to frame 0 to display generated terrain (input model)
         builderLogger.info('Terrain generated successfully', { statistics: data.statistics, sessionId: sessionData.sessionId });

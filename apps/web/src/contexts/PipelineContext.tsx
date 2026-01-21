@@ -264,6 +264,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         if (data.terrain) {
           const heightmap = new Float32Array(data.terrain);
           setHeightmapForFrame(frame, heightmap);
+          setCurrentFrame(frame); // Update viewer to show this frame
           pipelineLogger.info(`Frame ${frame} complete`, { statistics: data.statistics });
         }
 

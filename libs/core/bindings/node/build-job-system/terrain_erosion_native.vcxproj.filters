@@ -19,9 +19,21 @@
     <ClCompile Include="D:\playground\TerrainSim\libs\core\src\TerrainGenerators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\playground\TerrainSim\libs\core\src\JobValidator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\playground\TerrainSim\libs\core\src\JobExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\playground\TerrainSim\libs\core\src\ConfigParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\playground\TerrainSim\libs\core\bindings\node\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="D:\playground\TerrainSim\libs\core\bindings\node\build-job-system\_deps\json-src\nlohmann_json.natvis" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

@@ -4,6 +4,8 @@ import { logger } from '../utils/logger'
 
 const componentLogger = logger.withContext('TerrainMesh')
 
+export type TextureMode = 'landscape' | 'none'
+
 interface TerrainMeshProps {
   /**
    * Width of the terrain grid (number of segments along X axis)
@@ -29,6 +31,10 @@ interface TerrainMeshProps {
    * Enable wireframe rendering mode
    */
   wireframe?: boolean
+  /**
+   * Texture mode for terrain coloring
+   */
+  textureMode?: TextureMode
 }
 
 // Vertex shader - displaces vertices based on heightmap texture
@@ -77,9 +83,8 @@ const vertexShader = `
   }
 `
 
-// Fragment shader - applies lighting and elevation-based color gradient
-const fragmentShader = `
-  uniform vec3 terrainColor;
+// Fragment shader for LANDSCAPE mode - applies lighting and elevation-based color gradient
+const fragmentShaderLandscape = `
   uniform vec3 lightDirection;
   uniform vec3 ambientColor;
   uniform vec3 lightColor;
@@ -121,18 +126,36 @@ const fragmentShader = `
   }
 
   void main() {
-    // Normalize the interpolated normal
     vec3 normal = normalize(vNormal);
-
-    // Get base color from elevation
     vec3 baseColor = getElevationColor(vPosition.z);
 
     // Calculate diffuse lighting
     float diffuse = max(dot(normal, lightDirection), 0.0);
 
-    // Combine ambient and diffuse lighting with elevation-based color
+    // Combine ambient and diffuse lighting with base color
     vec3 finalColor = baseColor * (ambientColor + lightColor * diffuse);
+    gl_FragColor = vec4(finalColor, 1.0);
+  }
+`
 
+// Fragment shader for NONE mode - uniform gray with lighting based on normals
+const fragmentShaderNone = `
+  uniform vec3 lightDirection;
+  uniform vec3 ambientColor;
+  uniform vec3 lightColor;
+
+  varying vec3 vNormal;
+
+  void main() {
+    // Uniform gray base color (no elevation-based gradient)
+    vec3 baseColor = vec3(0.5, 0.5, 0.5);
+
+    // Calculate lighting based on surface normals
+    vec3 normal = normalize(vNormal);
+    float diffuse = max(dot(normal, lightDirection), 0.0);
+
+    // Apply lighting to show terrain shape through shadows
+    vec3 finalColor = baseColor * (ambientColor + lightColor * diffuse);
     gl_FragColor = vec4(finalColor, 1.0);
   }
 `
@@ -150,8 +173,12 @@ export function TerrainMesh({
   meshDepth = 10,
   heightmap,
   wireframe = false,
+  textureMode = 'landscape',
 }: TerrainMeshProps) {
   const meshRef = useRef<Mesh>(null)
+
+  // DEBUG: Component render with texture mode
+  console.log(`🔄🔄🔄 TerrainMesh RENDER with textureMode: ${textureMode}`);
 
   // DEBUG: Log when component receives new props
   useEffect(() => {
@@ -163,8 +190,14 @@ export function TerrainMesh({
     const centerIdx = Math.floor(heightmap.length / 2)
     const sum = Array.from(heightmap).reduce((a, b) => a + b, 0)
     const mean = sum / heightmap.length
-    const min = Math.min(...heightmap)
-    const max = Math.max(...heightmap)
+
+    // Find min/max without spreading array (avoids stack overflow on large arrays)
+    let min = heightmap[0]
+    let max = heightmap[0]
+    for (let i = 1; i < heightmap.length; i++) {
+      if (heightmap[i] < min) min = heightmap[i]
+      if (heightmap[i] > max) max = heightmap[i]
+    }
 
     componentLogger.debug('🎨 TerrainMesh received NEW heightmap prop', {
       reference: `Float32Array@${heightmap.byteOffset}`,
@@ -234,7 +267,14 @@ export function TerrainMesh({
     heightmapTexture.needsUpdate = true
     console.log('✨ GPU TEXTURE UPDATED - needsUpdate set to true');
     console.log('   Sample values:', heightmap.slice(0, 5));
-    console.log('   Statistics:', { min: Math.min(...heightmap), max: Math.max(...heightmap) });
+
+    // Find min/max without spreading (avoids stack overflow)
+    let consoleMin = heightmap[0], consoleMax = heightmap[0];
+    for (let i = 1; i < heightmap.length; i++) {
+      if (heightmap[i] < consoleMin) consoleMin = heightmap[i];
+      if (heightmap[i] > consoleMax) consoleMax = heightmap[i];
+    }
+    console.log('   Statistics:', { min: consoleMin, max: consoleMax });
   }, [heightmap, width, height, heightmapTexture])
 
   // Shader uniforms - include heightmap in dependencies so uniforms update when data changes
@@ -244,8 +284,13 @@ export function TerrainMesh({
     let maxElevation = 0
 
     if (heightmap && heightmap.length > 0) {
-      minElevation = Math.min(...heightmap)
-      maxElevation = Math.max(...heightmap)
+      // Find min/max without spreading array (avoids stack overflow on large arrays)
+      minElevation = heightmap[0]
+      maxElevation = heightmap[0]
+      for (let i = 1; i < heightmap.length; i++) {
+        if (heightmap[i] < minElevation) minElevation = heightmap[i]
+        if (heightmap[i] > maxElevation) maxElevation = heightmap[i]
+      }
 
       // Ensure there's a valid range
       if (maxElevation === minElevation) {
@@ -253,26 +298,71 @@ export function TerrainMesh({
       }
     }
 
+    const textureModeValue = textureMode === 'landscape' ? 0.0 : 1.0;
+
     componentLogger.debug('🎮 Uniforms updated', {
       textureVersion: heightmapTexture?.version ?? null,
       minElevation: minElevation.toFixed(2),
       maxElevation: maxElevation.toFixed(2),
+      textureMode: textureModeValue,
+      textureModeString: textureMode,
+      shouldBeFlat: textureModeValue === 1,
     })
 
-    return {
-      heightmapTexture: { value: heightmapTexture },
-      meshWidth: { value: meshWidth },
-      meshDepth: { value: meshDepth },
-      gridWidth: { value: width },
-      gridHeight: { value: height },
-      terrainColor: { value: [0.23, 0.49, 0.27] }, // #3a7d44 in RGB (legacy, not used in new shader)
-      lightDirection: { value: [0.5, 0.5, 0.7] }, // Normalized light direction
-      ambientColor: { value: [0.3, 0.3, 0.3] }, // Ambient light
-      lightColor: { value: [0.7, 0.7, 0.7] }, // Directional light color
-      minElevation: { value: minElevation },
-      maxElevation: { value: maxElevation },
+    // Only include uniforms needed by the current shader
+    if (textureMode === 'landscape') {
+      return {
+        heightmapTexture: { value: heightmapTexture },
+        meshWidth: { value: meshWidth },
+        meshDepth: { value: meshDepth },
+        gridWidth: { value: width },
+        gridHeight: { value: height },
+        lightDirection: { value: [0.5, 0.5, 0.7] },
+        ambientColor: { value: [0.3, 0.3, 0.3] },
+        lightColor: { value: [0.7, 0.7, 0.7] },
+        minElevation: { value: minElevation },
+        maxElevation: { value: maxElevation },
+      }
+    } else {
+      // None mode - gray color with lighting (no elevation gradient)
+      return {
+        heightmapTexture: { value: heightmapTexture },
+        meshWidth: { value: meshWidth },
+        meshDepth: { value: meshDepth },
+        gridWidth: { value: width },
+        gridHeight: { value: height },
+        lightDirection: { value: [0.5, 0.5, 0.7] },
+        ambientColor: { value: [0.3, 0.3, 0.3] },
+        lightColor: { value: [0.7, 0.7, 0.7] },
+      }
     }
-  }, [heightmapTexture, meshWidth, meshDepth, width, height, heightmap])
+  }, [heightmapTexture, meshWidth, meshDepth, width, height, heightmap, textureMode])
+
+  // Select the appropriate fragment shader based on texture mode
+  const fragmentShader = textureMode === 'landscape' ? fragmentShaderLandscape : fragmentShaderNone;
+
+  componentLogger.debug('🎨 Fragment shader selected', {
+    textureMode,
+    shaderType: textureMode === 'landscape' ? 'LANDSCAPE (with gradient)' : 'NONE (flat gray)',
+    shaderLength: fragmentShader.length,
+    shaderPreview: fragmentShader.substring(0, 100),
+  });
+
+  // Manually update shader when texture mode changes
+  useEffect(() => {
+    if (meshRef.current && meshRef.current.material) {
+      const material = meshRef.current.material as THREE.ShaderMaterial;
+      console.log(`🔄 Updating shader for texture mode: ${textureMode}`);
+
+      // Update the fragment shader code
+      material.fragmentShader = fragmentShader;
+
+      // Mark the material as needing a shader recompile
+      material.needsUpdate = true;
+
+      console.log(`✅ Shader updated and marked for recompile`);
+    }
+  }, [textureMode, fragmentShader]);
 
   return (
     <mesh
@@ -281,13 +371,21 @@ export function TerrainMesh({
       position={[0, 0, 0]}
     >
       <planeGeometry args={[meshWidth, meshDepth, width - 1, height - 1]} />
-      <shaderMaterial
-        key={heightmapTexture?.uuid ?? 'no-texture'} // Force remount when texture changes
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={uniforms}
-        wireframe={wireframe}
-      />
+      {textureMode === 'landscape' ? (
+        <shaderMaterial
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShaderLandscape}
+          uniforms={uniforms}
+          wireframe={wireframe}
+        />
+      ) : (
+        <shaderMaterial
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShaderNone}
+          uniforms={uniforms}
+          wireframe={wireframe}
+        />
+      )}
     </mesh>
   )
 }

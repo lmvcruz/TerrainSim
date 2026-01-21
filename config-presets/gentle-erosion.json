@@ -1,0 +1,30 @@
+{
+  "id": "gentle-erosion",
+  "name": "Gentle Erosion",
+  "description": "Very subtle erosion for detailed terrain - many frames needed to see effect",
+  "createdAt": "2026-01-21T00:00:00.000Z",
+  "width": 192,
+  "height": 192,
+  "totalFrames": 30,
+  "jobs": [
+    {
+      "id": "hyd-gentle",
+      "name": "Gentle Hydraulic Erosion",
+      "type": "hydraulic",
+      "enabled": true,
+      "startFrame": 1,
+      "endFrame": 30,
+      "config": {
+        "numParticles": 1000,
+        "erosionRate": 0.15,
+        "depositionRate": 0.12,
+        "evaporationRate": 0.015,
+        "inertia": 0.05,
+        "sedimentCapacity": 3.5,
+        "minSlope": 0.01,
+        "gravity": 4.0,
+        "erosionRadius": 1
+      }
+    }
+  ]
+}

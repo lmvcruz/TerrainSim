@@ -1,0 +1,30 @@
+{
+  "id": "visual-erosion",
+  "name": "Visual Erosion (Recommended)",
+  "description": "Balanced parameters for visible progressive erosion with realistic results",
+  "createdAt": "2026-01-21T00:00:00.000Z",
+  "width": 192,
+  "height": 192,
+  "totalFrames": 15,
+  "jobs": [
+    {
+      "id": "hyd-visual",
+      "name": "Visual Hydraulic Erosion",
+      "type": "hydraulic",
+      "enabled": true,
+      "startFrame": 1,
+      "endFrame": 15,
+      "config": {
+        "numParticles": 2000,
+        "erosionRate": 0.25,
+        "depositionRate": 0.18,
+        "evaporationRate": 0.01,
+        "inertia": 0.05,
+        "sedimentCapacity": 4.0,
+        "minSlope": 0.01,
+        "gravity": 4.0,
+        "erosionRadius": 1
+      }
+    }
+  ]
+}
