@@ -9,78 +9,120 @@ import type { Router as ExpressRouter } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-// Temporary stub for validateConfig until C++ binding is compiled
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
+
+// Load the erosion native addon directly (navigate from apps/simulation-api/src/routes to libs/core)
+const erosionAddonPath = join(__dirname, '../../../../libs/core/bindings/node/build/Release/terrain_erosion_native.node');
+const erosionAddon = require(erosionAddonPath);
+
+// Temporary stub for validateConfig
 const validateConfig = (config: any) => {
-  return {
-    isValid: true,
-    errors: [],
-    warnings: []
-  };
-};
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const uncoveredFrames: number[] = [];
 
-// Temporary stub for executeFrame - applies AGGRESSIVE smoothing to make frames visually different
-const executeFrame = (config: any, frame: number, terrain: Float32Array, width: number, height: number): Float32Array => {
-  let result = new Float32Array(terrain.length);
-  const smoothFactor = 0.8; // VERY aggressive smoothing (80% per frame)
-  const passes = 3; // Apply smoothing 3 times per frame for dramatic effect
-
-  // Copy initial terrain
-  for (let i = 0; i < terrain.length; i++) {
-    result[i] = terrain[i];
+  // Basic validation
+  if (!config || typeof config !== 'object') {
+    errors.push('Config must be an object');
+    return { isValid: false, errors, warnings, uncoveredFrames };
   }
 
-  // Apply multiple smoothing passes for EXTREME visual changes
-  for (let pass = 0; pass < passes; pass++) {
-    const temp = new Float32Array(result.length);
+  if (typeof config.totalFrames !== 'number' || config.totalFrames < 0) {
+    errors.push('totalFrames must be a non-negative number');
+  }
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const idx = y * width + x;
+  if (!Array.isArray(config.jobs)) {
+    errors.push('jobs must be an array');
+  }
 
-        // Get ALL 8 neighbors (including diagonals) for maximum smoothing
-        let sum = result[idx];
-        let count = 1;
+  // Check frame coverage if valid
+  if (typeof config.totalFrames === 'number' && Array.isArray(config.jobs)) {
+    const coveredFrames = new Set<number>();
 
-        // Cardinal directions
-        if (x > 0) { sum += result[idx - 1]; count++; }
-        if (x < width - 1) { sum += result[idx + 1]; count++; }
-        if (y > 0) { sum += result[idx - width]; count++; }
-        if (y < height - 1) { sum += result[idx + width]; count++; }
-
-        // Diagonals for even more aggressive smoothing
-        if (x > 0 && y > 0) { sum += result[idx - width - 1]; count++; }
-        if (x < width - 1 && y > 0) { sum += result[idx - width + 1]; count++; }
-        if (x > 0 && y < height - 1) { sum += result[idx + width - 1]; count++; }
-        if (x < width - 1 && y < height - 1) { sum += result[idx + width + 1]; count++; }
-
-        const avg = sum / count;
-        temp[idx] = result[idx] * (1 - smoothFactor) + avg * smoothFactor;
+    for (const job of config.jobs) {
+      if (job.enabled !== false && typeof job.startFrame === 'number' && typeof job.endFrame === 'number') {
+        for (let frame = job.startFrame; frame <= job.endFrame; frame++) {
+          coveredFrames.add(frame);
+        }
       }
     }
 
-    result = temp;
+    // Find uncovered frames (excluding frame 0, which is covered by step0/terrain generation)
+    for (let frame = 1; frame <= config.totalFrames; frame++) {
+    errors,
+    warnings,
+    uncoveredFrames
+  };
+};
+
+// Use the real C++ erosion from the addon
+const executeFrame = (config: any, frame: number, terrain: Float32Array, width: number, height: number, absoluteMaxHeight?: number): Float32Array => {
+  console.log(`🎯 Executing frame ${frame} with real C++ erosion (erosionRadius=1, ${config.jobs?.length || 0} jobs, max=${absoluteMaxHeight?.toFixed(2)})`);
+
+  // Instead of using the full pipeline executor (which requires step0),
+  // directly apply the hydraulic erosion for jobs that cover this frame
+  const jobs = config.jobs || [];
+  let currentTerrain = terrain;
+
+  for (const job of jobs) {
+    // Check if this job applies to the current frame
+    if (job.startFrame <= frame && job.endFrame >= frame && job.enabled !== false) {
+      // Support both 'type' (from tests/old API) and 'step' (from frontend)
+      const jobType = job.type || job.step;
+
+      if ((jobType === 'hydraulic' || jobType === 'hydraulicErosion') && job.config) {
+        // Extract hydraulic erosion config - it may be nested under hydraulicErosion key
+        const erosionConfig = job.config.hydraulicErosion || job.config;
+
+        console.log(`  → Applying hydraulic erosion job "${job.name}" (${erosionConfig.numParticles} particles, radius=${erosionConfig.erosionRadius}, maxHeight=${absoluteMaxHeight?.toFixed(2)})`);
+
+        // Call the C++ simulateErosion function directly
+        // This bypasses the pipeline and directly applies erosion
+        const params = {
+          numParticles: erosionConfig.numParticles || 10000,
+          maxIterations: erosionConfig.maxLifetime || 30,
+          inertia: erosionConfig.inertia || 0.05,
+          sedimentCapacityFactor: erosionConfig.sedimentCapacity || 4.0,
+          minSedimentCapacity: erosionConfig.minSlope || 0.01,
+          erodeSpeed: erosionConfig.erosionRate || 0.3,
+          depositSpeed: erosionConfig.depositionRate || 0.3,
+          evaporateSpeed: erosionConfig.evaporationRate || 0.01,
+          gravity: erosionConfig.gravity || 4.0,
+          maxDropletSpeed: 10.0,
+          erosionRadius: erosionConfig.erosionRadius || 1,  // Use radius from config or default to 1
+          absoluteMaxElevation: absoluteMaxHeight  // Pass Frame 0 max to prevent progressive frame compounding
+        };
+
+        currentTerrain = erosionAddon.simulateErosion(currentTerrain, width, height, params);
+      }
+    }
   }
 
-  console.log(`   🔧 Applied AGGRESSIVE smoothing (${passes} passes, ${smoothFactor * 100}% factor) to frame ${frame}`);
-  return result;
+  return currentTerrain;
 };
 
 const router: ExpressRouter = Router();
 
-// Directory for storing configuration presets
-const PRESETS_DIR = path.join(process.cwd(), 'presets');
+const PRESETS_DIR = path.join(process.cwd(), 'config-presets');
 
-// Ensure presets directory exists
-await fs.mkdir(PRESETS_DIR, { recursive: true });
+// Ensure presets directory exists (async initialization)
+fs.mkdir(PRESETS_DIR, { recursive: true }).catch(console.error);
 
 // In-memory session storage (sessions will be cleaned up after execution)
 interface Session {
   id: string;
   config: any;  // PipelineConfig JSON
-  terrain: Float32Array;
+  initialTerrain: Float32Array;  // Original frame 0 (never modified)
+  terrain: Float32Array;         // Current working terrain
   width: number;
   height: number;
+  absoluteMaxHeight: number;     // Original max height from Frame 0 (for progressive erosion)
   createdAt: number;
   lastAccessedAt: number;
 }
@@ -291,21 +333,32 @@ router.post('/simulate/create', (req: Request, res: Response) => {
       console.log(`📄 Session initialized with flat terrain (${width}x${height})`);
     }
 
+    // Calculate absolute max height from initial terrain (Frame 0)
+    // This will be used to prevent deposition from creating spikes in progressive erosion
+    let absoluteMaxHeight = -Infinity;
+    for (let i = 0; i < terrain.length; i++) {
+      if (terrain[i] > absoluteMaxHeight) {
+        absoluteMaxHeight = terrain[i];
+      }
+    }
+
     // Create session
     const sessionId = randomUUID();
     const session: Session = {
       id: sessionId,
       config,
-      terrain,
+      initialTerrain: terrain,  // Store original - never modify this!
+      terrain: terrain.slice(), // Working copy for current frame
       width,
       height,
+      absoluteMaxHeight,        // Store original max for all frames
       createdAt: Date.now(),
       lastAccessedAt: Date.now()
     };
 
     sessions.set(sessionId, session);
 
-    console.log(`🆕 Created session: ${sessionId}`);
+    console.log(`🆕 Created session: ${sessionId} (max height: ${absoluteMaxHeight.toFixed(3)})`);
 
     res.json({
       sessionId,
@@ -348,16 +401,22 @@ router.post('/simulate/execute', (req: Request, res: Response) => {
     // Update last accessed time
     session.lastAccessedAt = Date.now();
 
+    // FIXED: Each frame should build on the PREVIOUS frame's result for progressive erosion.
+    // Frame 1 starts from initialTerrain, Frame 2 from Frame 1's result, etc.
+    // This allows erosion to progressively deepen valleys and wear down peaks.
+    const workingTerrain = session.terrain.slice();
+
     // Execute frame using C++ binding
     const resultTerrain = executeFrame(
       session.config,
       frame,
-      session.terrain,
+      workingTerrain,
       session.width,
-      session.height
+      session.height,
+      session.absoluteMaxHeight  // Pass Frame 0 max to prevent progressive frame compounding
     );
 
-    // Update session terrain (for next frame execution)
+    // CRITICAL: Update session terrain so next frame builds on this result
     session.terrain = resultTerrain;
 
     // Calculate statistics

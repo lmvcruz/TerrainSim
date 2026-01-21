@@ -8,12 +8,12 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
 
-  // Timeout for each test - increased for WebGL rendering
-  timeout: 60 * 1000,
+  // Timeout for each test - increased for WebGL rendering and slow erosion simulations
+  timeout: 90 * 1000,
   expect: {
-    timeout: 10000,
+    timeout: 15000,
     toHaveScreenshot: {
-      timeout: 10000,
+      timeout: 20000, // Increased for canvas rendering
     },
   },
 

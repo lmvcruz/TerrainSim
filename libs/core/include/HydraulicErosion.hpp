@@ -19,7 +19,7 @@ struct HydraulicErosionParams {
     float evaporateSpeed = 0.01f;    // Rate at which water evaporates
     float gravity = 4.0f;            // Gravity acceleration
     float maxDropletSpeed = 10.0f;   // Maximum speed a droplet can reach
-    int erosionRadius = 3;           // Radius around particle affected by erosion/deposition
+    int erosionRadius = 1;           // Radius around particle affected by erosion/deposition (1=natural valleys, 3+=smoothing)
 };
 
 /**
@@ -56,10 +56,17 @@ public:
      * @brief Run erosion simulation with multiple particles.
      * @param heightmap The terrain heightmap to erode (will be modified)
      * @param numParticles Number of water particles to simulate
+     * @param absoluteMaxHeight Optional absolute max height from Frame 0 (prevents progressive frame compounding)
      *
      * Particles are spawned at random positions across the heightmap.
      */
-    void erode(Heightmap& heightmap, int numParticles);
+    void erode(Heightmap& heightmap, int numParticles, float absoluteMaxHeight = std::numeric_limits<float>::max());
+
+    /**
+     * @brief Set the initial maximum height (for progressive frame fix).
+     * @param maxHeight The absolute maximum height from the original terrain
+     */
+    void setInitialMaxHeight(float maxHeight) { m_initialMaxHeight = maxHeight; }
 
     /**
      * @brief Get the current erosion parameters.
@@ -96,6 +103,9 @@ private:
     void applyHeightChange(Heightmap& heightmap, float posX, float posY, float amount);
 
     HydraulicErosionParams m_params;
+    float m_initialMaxHeight;  // Track initial max elevation to prevent deposition creating spikes
+    Heightmap m_initialHeightmap;  // Copy of Frame 0 terrain for checking original heights
+    bool m_hasInitialHeightmap;  // Whether initial heightmap has been saved
 };
 
 } // namespace terrain

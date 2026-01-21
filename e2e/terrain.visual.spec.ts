@@ -67,8 +67,8 @@ test.describe('TerrainSim Visual Regression', () => {
   })
 
   test('canvas renders correctly', async ({ page }) => {
-    // Screenshot just the canvas area
-    const canvas = page.locator('canvas')
+    // Screenshot just the Three.js canvas area (not the timeline canvas)
+    const canvas = page.locator('canvas[data-engine^="three.js"]')
     await expect(canvas).toBeVisible()
 
     await page.waitForTimeout(3000)
