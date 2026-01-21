@@ -3,6 +3,7 @@
 #include "Heightmap.hpp"
 #include "WaterParticle.hpp"
 #include <vector>
+#include <limits>
 
 namespace terrain {
 
