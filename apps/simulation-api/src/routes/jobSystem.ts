@@ -55,6 +55,14 @@ const validateConfig = (config: any) => {
 
     // Find uncovered frames (excluding frame 0, which is covered by step0/terrain generation)
     for (let frame = 1; frame <= config.totalFrames; frame++) {
+      if (!coveredFrames.has(frame)) {
+        uncoveredFrames.push(frame);
+      }
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
     errors,
     warnings,
     uncoveredFrames
