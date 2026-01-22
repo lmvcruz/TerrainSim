@@ -8,6 +8,12 @@ import { generatePerlinNoise, generateFbm } from './generators/heightmapGenerato
 import { simulateParticle } from './erosion-binding.js';
 import { jobSystemRouter, sessions } from './routes/jobSystem.js';
 import { setupJobSystemWebSocket } from './websocket/jobSystemEvents.js';
+import { logService } from './services/LogService.js';
+import { correlationIdMiddleware } from './middleware/correlationId.js';
+import { logger, setCorrelationId } from './utils/logger.js';
+import type { LogLevel } from './types/logging.js';
+
+const endpointLogger = logger.withContext('/generate');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -75,6 +81,9 @@ app.use(cors({
 // Increase body size limit to handle heightmap arrays (256x256 floats = ~1MB)
 app.use(express.json({ limit: '10mb' }));
 
+// Add correlation ID middleware
+app.use(correlationIdMiddleware);
+
 // Mount job system routes
 app.use(jobSystemRouter);
 
@@ -85,9 +94,17 @@ app.get('/health', (req, res) => {
 
 // API-002: /generate endpoint accepting noise parameters
 app.post('/generate', (req, res) => {
+  const requestStartTime = Date.now();
+
   try {
-    console.log('[DEBUG] /generate endpoint hit');
-    console.log('[DEBUG] Request body:', JSON.stringify(req.body));
+    // Set correlation ID for this request
+    setCorrelationId(req.correlationId);
+
+    endpointLogger.trace('Request received', {
+      correlationId: req.correlationId,
+      bodyKeys: Object.keys(req.body),
+      rawMethod: req.body.method
+    });
 
     const {
       method = 'perlin',
@@ -101,31 +118,49 @@ app.post('/generate', (req, res) => {
       lacunarity = 2.0
     } = req.body;
 
-    console.log('[DEBUG] Parsed parameters:', { method, width, height, seed, frequency, amplitude });
+    endpointLogger.trace('Parameters parsed', {
+      method,
+      width,
+      height,
+      seed,
+      frequency,
+      amplitude,
+      ...(method === 'fbm' && { octaves, persistence, lacunarity })
+    });
 
     // Validate basic parameters
     if (typeof width !== 'number' || typeof height !== 'number') {
-      console.log('[DEBUG] Invalid width/height types');
+      endpointLogger.warn('Invalid parameter types', {
+        widthType: typeof width,
+        heightType: typeof height
+      });
       return res.status(400).json({ error: 'Width and height must be numbers' });
     }
 
     if (width < 1 || width > 2048 || height < 1 || height > 2048) {
-      console.log('[DEBUG] Width/height out of range');
+      endpointLogger.warn('Parameters out of range', { width, height });
       return res.status(400).json({
         error: 'Width and height must be between 1 and 2048'
       });
     }
 
-    console.log('[DEBUG] About to generate heightmap with method:', method);
+    endpointLogger.trace('Validation passed', { method, width, height });
+    endpointLogger.trace(`Selected generation method: ${method}`);
+
     let heightmap: Float32Array;
+    const generationStartTime = Date.now();
 
     // API-003: Generate heightmap and serialize to Float32Array
     if (method === 'perlin') {
-      console.log('[DEBUG] Calling generatePerlinNoise...');
+      endpointLogger.trace('Calling generatePerlinNoise', { width, height, seed, frequency, amplitude });
       heightmap = generatePerlinNoise(width, height, seed, frequency, amplitude);
-      console.log('[DEBUG] generatePerlinNoise returned, length:', heightmap.length);
+      endpointLogger.trace('generatePerlinNoise returned', {
+        arrayLength: heightmap.length,
+        expectedLength: width * height,
+        generationDuration: Date.now() - generationStartTime
+      });
     } else if (method === 'fbm') {
-      console.log('[DEBUG] Calling generateFbm...');
+      endpointLogger.trace('Calling generateFbm', { width, height, seed, octaves, frequency, amplitude, persistence, lacunarity });
       heightmap = generateFbm(
         width,
         height,
@@ -136,32 +171,49 @@ app.post('/generate', (req, res) => {
         persistence,
         lacunarity
       );
-      console.log('[DEBUG] generateFbm returned, length:', heightmap.length);
+      endpointLogger.trace('generateFbm returned', {
+        arrayLength: heightmap.length,
+        expectedLength: width * height,
+        generationDuration: Date.now() - generationStartTime
+      });
     } else {
-      console.log('[DEBUG] Invalid method:', method);
+      endpointLogger.warn('Invalid method specified', { method });
       return res.status(400).json({
         error: 'Invalid method. Use "perlin" or "fbm"'
       });
     }
 
     // Calculate statistics
-    console.log('[DEBUG] Calculating statistics...');
+    endpointLogger.trace('Calculating response statistics');
+    const statsStartTime = Date.now();
     let min = Infinity;
     let max = -Infinity;
     for (let i = 0; i < heightmap.length; i++) {
       if (heightmap[i] < min) min = heightmap[i];
       if (heightmap[i] > max) max = heightmap[i];
     }
-    console.log('[DEBUG] Statistics calculated:', { min, max });
+    endpointLogger.trace('Statistics calculated', {
+      min,
+      max,
+      range: max - min,
+      statsDuration: Date.now() - statsStartTime
+    });
 
     // API-003: Serialize Heightmap to Float32Array in response
-    console.log('[DEBUG] Converting to array...');
+    endpointLogger.trace('Converting Float32Array to array for JSON serialization', {
+      sourceLength: heightmap.length
+    });
+    const conversionStartTime = Date.now();
     const dataArray = Array.from(heightmap);
-    console.log('[DEBUG] Sending response...');
-    res.json({
+    endpointLogger.trace('Conversion complete', {
+      dataLength: dataArray.length,
+      conversionDuration: Date.now() - conversionStartTime
+    });
+
+    const responseData = {
       width,
       height,
-      data: dataArray, // Convert Float32Array to regular array for JSON
+      data: dataArray,
       statistics: {
         min,
         max,
@@ -174,12 +226,27 @@ app.post('/generate', (req, res) => {
         amplitude,
         ...(method === 'fbm' && { octaves, persistence, lacunarity })
       }
+    };
+
+    endpointLogger.trace('Sending response', {
+      dataSize: dataArray.length,
+      responseKeys: Object.keys(responseData),
+      totalDuration: Date.now() - requestStartTime
     });
-    console.log('[DEBUG] Response sent successfully');
+
+    res.json(responseData);
+
+    endpointLogger.trace('Response sent successfully', {
+      totalDuration: Date.now() - requestStartTime
+    });
 
   } catch (error) {
-    console.error('[ERROR] Error generating terrain:', error);
-    console.error('[ERROR] Stack trace:', error instanceof Error ? error.stack : 'No stack');
+    endpointLogger.error('Error generating terrain', {
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+      duration: Date.now() - requestStartTime
+    });
+
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Internal server error',
       stack: error instanceof Error ? error.stack : undefined
@@ -187,118 +254,169 @@ app.post('/generate', (req, res) => {
   }
 });
 
-// Development-only log endpoints
-if (IS_DEV) {
-  // POST /dev/logs - Receive logs from browser
-  app.post('/dev/logs', (req, res) => {
-    try {
-      const { logs, timestamp } = req.body;
+// Unified logging endpoints (enabled in both dev and production)
+// POST /logs - Receive logs from frontend
+app.post('/logs', (req, res) => {
+  try {
+    const { logs } = req.body;
 
-      if (!Array.isArray(logs)) {
-        return res.status(400).json({ error: 'Logs must be an array' });
-      }
+    if (!Array.isArray(logs)) {
+      return res.status(400).json({ error: 'Logs must be an array' });
+    }
 
-      // Read existing logs
-      let existingLogs: any[] = [];
-      try {
-        const data = fs.readFileSync(DEV_LOGS_FILE, 'utf-8');
-        existingLogs = JSON.parse(data);
-      } catch (error) {
-        // File doesn't exist or invalid JSON, start fresh
-        existingLogs = [];
-      }
+    // Add logs to the service
+    logService.addLogs(logs);
 
-      // Append new logs
-      existingLogs.push(...logs);
+    const stats = logService.getStats();
 
-      // Keep only the last 5000 logs to prevent unbounded growth
-      if (existingLogs.length > 5000) {
-        existingLogs = existingLogs.slice(-5000);
-      }
+    res.json({
+      received: logs.length,
+      total: stats.totalLogs,
+      timestamp: Date.now()
+    });
 
-      // Write back to file
-      fs.writeFileSync(DEV_LOGS_FILE, JSON.stringify(existingLogs, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('Error storing logs:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
 
-      res.json({
-        received: logs.length,
-        total: existingLogs.length,
-        timestamp: Date.now()
-      });
+// GET /logs - Query logs with filters
+app.get('/logs', (req, res) => {
+  try {
+    const {
+      correlationId,
+      level,
+      source,
+      component,
+      since,
+      until,
+      limit = '100'
+    } = req.query;
 
-    } catch (error) {
-      console.error('Error storing logs:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Internal server error'
+    const logs = logService.query({
+      correlationId: correlationId as string,
+      level: level as LogLevel,
+      source: source as 'frontend' | 'backend',
+      component: component as string,
+      since: since ? parseInt(since as string, 10) : undefined,
+      until: until ? parseInt(until as string, 10) : undefined,
+      limit: parseInt(limit as string, 10),
+    });
+
+    const stats = logService.getStats();
+
+    res.json({
+      logs,
+      count: logs.length,
+      total: stats.totalLogs,
+      timestamp: Date.now()
+    });
+
+  } catch (error) {
+    console.error('Error retrieving logs:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// GET /logs/latest - Get recent operations
+app.get('/logs/latest', (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+    const operations = logService.getLatestOperations(limit);
+
+    res.json({
+      operations,
+      count: operations.length,
+      timestamp: Date.now()
+    });
+
+  } catch (error) {
+    console.error('Error retrieving latest operations:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// GET /logs/stats - Get system statistics
+app.get('/logs/stats', (req, res) => {
+  try {
+    const stats = logService.getStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Error retrieving stats:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// POST /logs/config - Change log level
+app.post('/logs/config', (req, res) => {
+  try {
+    const { level } = req.body;
+
+    if (!level || !['info', 'debug', 'trace', 'warn', 'error'].includes(level)) {
+      return res.status(400).json({
+        error: 'Invalid log level. Must be one of: info, debug, trace, warn, error'
       });
     }
-  });
 
-  // GET /dev/logs - Retrieve logs for agent/debugging
-  app.get('/dev/logs', (req, res) => {
-    try {
-      const { level, component, since, limit = '100' } = req.query;
+    logService.setLogLevel(level);
 
-      // Read logs from file
-      let logs: any[] = [];
-      try {
-        const data = fs.readFileSync(DEV_LOGS_FILE, 'utf-8');
-        logs = JSON.parse(data);
-      } catch (error) {
-        // File doesn't exist or invalid JSON
-        logs = [];
-      }
+    res.json({
+      success: true,
+      level: logService.getLogLevel(),
+      message: `Log level set to ${level}`
+    });
 
-      // Filter logs based on query parameters
-      let filteredLogs = logs;
+  } catch (error) {
+    console.error('Error setting log level:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
 
-      if (level) {
-        filteredLogs = filteredLogs.filter(log => log.level === level);
-      }
+// DELETE /logs - Clear all logs
+app.delete('/logs', (req, res) => {
+  try {
+    logService.clearLogs();
+    res.json({
+      success: true,
+      message: 'All logs cleared',
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error('Error clearing logs:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
 
-      if (component) {
-        filteredLogs = filteredLogs.filter(log => log.component === component);
-      }
-
-      if (since) {
-        const sinceTimestamp = parseInt(since as string, 10);
-        filteredLogs = filteredLogs.filter(log => log.timestamp >= sinceTimestamp);
-      }
-
-      // Apply limit (default 100, max 1000)
-      const limitNum = Math.min(parseInt(limit as string, 10), 1000);
-      filteredLogs = filteredLogs.slice(-limitNum);
-
-      res.json({
-        logs: filteredLogs,
-        count: filteredLogs.length,
-        total: logs.length,
-        timestamp: Date.now()
-      });
-
-    } catch (error) {
-      console.error('Error retrieving logs:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Internal server error'
-      });
-    }
-  });
-
-  // DELETE /dev/logs - Clear all logs
-  app.delete('/dev/logs', (req, res) => {
-    try {
-      fs.writeFileSync(DEV_LOGS_FILE, JSON.stringify([]), 'utf-8');
-      res.json({
-        message: 'All logs cleared',
-        timestamp: Date.now()
-      });
-    } catch (error) {
-      console.error('Error clearing logs:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Internal server error'
-      });
-    }
-  });
-}
+// GET /logs/export - Export all logs
+app.get('/logs/export', (req, res) => {
+  try {
+    const logs = logService.getAllLogs();
+    res.json({
+      logs,
+      count: logs.length,
+      timestamp: Date.now(),
+      exportedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error exporting logs:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});
 
 // API-005: WebSocket connection handling
 setupJobSystemWebSocket(io, sessions);
@@ -434,17 +552,19 @@ io.on('connection', (socket) => {
 // Start server
 httpServer.listen(PORT, () => {
   console.log(`🌍 TerrainSim API server running on http://localhost:${PORT}`);
-  console.log(`� WebSocket server ready`);
+  console.log(`🔌 WebSocket server ready`);
   console.log(`📊 Endpoints:`);
   console.log(`   GET  /health     - Health check`);
   console.log(`   POST /generate   - Generate heightmap`);
   console.log(`   WS   /           - WebSocket for erosion simulation`);
-
-  if (IS_DEV) {
-    console.log(`\n🔧 Development endpoints:`);
-    console.log(`   POST   /dev/logs - Receive browser logs`);
-    console.log(`   GET    /dev/logs - Retrieve logs (query: level, component, since, limit)`);
-    console.log(`   DELETE /dev/logs - Clear all logs`);
-    console.log(`   📂 Logs stored in: ${DEV_LOGS_FILE}`);
-  }
+  console.log(`\n📝 Unified Logging Endpoints (Production & Development):`);
+  console.log(`   POST   /logs        - Receive logs from frontend`);
+  console.log(`   GET    /logs        - Query logs (correlationId, level, source, component, limit)`);
+  console.log(`   GET    /logs/latest - Get recent operations`);
+  console.log(`   GET    /logs/stats  - Get system statistics`);
+  console.log(`   GET    /logs/export - Export all logs`);
+  console.log(`   POST   /logs/config - Change log level (info/debug/trace)`);
+  console.log(`   DELETE /logs        - Clear all logs`);
+  console.log(`\n🎚️  Current log level: ${logService.getLogLevel()}`);
+  console.log(`📂 Logs stored in: ${path.join(process.cwd(), '.logs')}`);
 });

@@ -1,4 +1,7 @@
 import { PerlinNoise } from '../noise/PerlinNoise.js';
+import { logger } from '../utils/logger.js';
+
+const log = logger.withContext('heightmapGenerators');
 
 /**
  * Generate a heightmap using Perlin noise
@@ -10,7 +13,8 @@ export function generatePerlinNoise(
   frequency: number = 0.05,
   amplitude: number = 1.0
 ): Float32Array {
-  console.log('[DEBUG] generatePerlinNoise called with:', { width, height, seed, frequency, amplitude });
+  log.trace('generatePerlinNoise called', { width, height, seed, frequency, amplitude });
+  const startTime = Date.now();
 
   // Parameter validation
   if (width <= 0 || height <= 0) {
@@ -26,11 +30,18 @@ export function generatePerlinNoise(
     throw new Error('Amplitude must be a finite number');
   }
 
-  console.log('[DEBUG] Creating heightmap array...');
+  const totalCells = width * height;
+  log.trace('Creating heightmap array', { totalCells, sizeBytes: totalCells * 4 });
+
   const heightmap = new Float32Array(width * height);
-  console.log('[DEBUG] Creating PerlinNoise instance...');
+
+  log.trace('Creating PerlinNoise instance', { seed });
   const perlin = new PerlinNoise(seed);
-  console.log('[DEBUG] PerlinNoise instance created, starting generation loop...');
+
+  log.trace('Starting generation loop', { totalCells });
+
+  let processedCells = 0;
+  const reportInterval = Math.max(Math.floor(totalCells / 10), 1); // Report every 10%
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -41,10 +52,45 @@ export function generatePerlinNoise(
       const elevation = noiseValue * amplitude;
 
       heightmap[y * width + x] = elevation;
+
+      processedCells++;
+
+      // Log progress every 10%
+      if (processedCells % reportInterval === 0) {
+        const percentComplete = Math.round((processedCells / totalCells) * 100);
+        log.trace('Generation progress', {
+          processed: processedCells,
+          total: totalCells,
+          percentComplete
+        });
+      }
     }
   }
 
-  console.log('[DEBUG] Heightmap generation complete');
+  // Calculate statistics
+  let min = Infinity;
+  let max = -Infinity;
+  let sum = 0;
+
+  for (let i = 0; i < heightmap.length; i++) {
+    const value = heightmap[i];
+    if (value < min) min = value;
+    if (value > max) max = value;
+    sum += value;
+  }
+
+  const mean = sum / heightmap.length;
+  const duration = Date.now() - startTime;
+
+  log.trace('Heightmap generation complete', {
+    width,
+    height,
+    min,
+    max,
+    mean,
+    duration
+  });
+
   return heightmap;
 }
 
@@ -61,6 +107,18 @@ export function generateFbm(
   persistence: number = 0.5,
   lacunarity: number = 2.0
 ): Float32Array {
+  log.trace('generateFbm called', {
+    width,
+    height,
+    seed,
+    octaves,
+    frequency,
+    amplitude,
+    persistence,
+    lacunarity
+  });
+  const startTime = Date.now();
+
   // Parameter validation
   if (width <= 0 || height <= 0) {
     throw new Error('Width and height must be greater than 0');
@@ -78,34 +136,57 @@ export function generateFbm(
     throw new Error('All parameters must be finite numbers');
   }
 
+  const totalCells = width * height;
+  log.trace('Creating heightmap array', { totalCells, octaves });
+
   const heightmap = new Float32Array(width * height);
   const perlin = new PerlinNoise(seed);
 
+  log.trace('Starting fBm generation loop');
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      let totalValue = 0.0;
-      let currentAmplitude = amplitude;
-      let currentFrequency = frequency;
-      let maxValue = 0.0;
+      let value = 0;
+      let freq = frequency;
+      let amp = amplitude;
 
-      // Layer multiple octaves of noise
+      // Accumulate noise from multiple octaves
       for (let octave = 0; octave < octaves; octave++) {
-        const nx = x * currentFrequency;
-        const ny = y * currentFrequency;
-
-        const noiseValue = perlin.noise(nx, ny);
-        totalValue += noiseValue * currentAmplitude;
-        maxValue += currentAmplitude;
-
-        currentFrequency *= lacunarity;
-        currentAmplitude *= persistence;
+        const nx = x * freq;
+        const ny = y * freq;
+        value += perlin.noise(nx, ny) * amp;
+        freq *= lacunarity;
+        amp *= persistence;
       }
 
-      // Normalize to approximately [-amplitude, amplitude] range
-      const normalizedValue = (totalValue / maxValue) * amplitude;
-      heightmap[y * width + x] = normalizedValue;
+      heightmap[y * width + x] = value;
     }
   }
+
+  // Calculate statistics
+  let min = Infinity;
+  let max = -Infinity;
+  let sum = 0;
+
+  for (let i = 0; i < heightmap.length; i++) {
+    const value = heightmap[i];
+    if (value < min) min = value;
+    if (value > max) max = value;
+    sum += value;
+  }
+
+  const mean = sum / heightmap.length;
+  const duration = Date.now() - startTime;
+
+  log.trace('fBm generation complete', {
+    width,
+    height,
+    octaves,
+    min,
+    max,
+    mean,
+    duration
+  });
 
   return heightmap;
 }

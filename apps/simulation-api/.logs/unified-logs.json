@@ -1,0 +1,327 @@
+[
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "iter2-test-002",
+      "bodyKeys": [
+        "method",
+        "width",
+        "height",
+        "seed"
+      ],
+      "rawMethod": "perlin"
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0998a59f-4abe-49fa-ab8d-0bdd52570009",
+    "timestamp": 1769079157234,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 128,
+      "height": 128,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "47c9b1a8-975d-46d5-8641-d3622e020a18",
+    "timestamp": 1769079157235,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 128,
+      "height": 128
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f58cb19b-0822-4815-b64a-d4ba2645b4d3",
+    "timestamp": 1769079157235,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "ba0b4e53-0a1a-49dd-a716-5c3cd5097fa6",
+    "timestamp": 1769079157235,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 128,
+      "height": 128,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "13fc7207-d1c5-4735-958a-aca1ed21b38f",
+    "timestamp": 1769079157235,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 128,
+      "height": 128,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6a31b680-95b3-4fea-838c-974da87a4792",
+    "timestamp": 1769079157236,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 16384,
+      "sizeBytes": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "1f2832a0-bddf-4344-b270-5e22f12917f5",
+    "timestamp": 1769079157236,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "653a4f80-fbba-46d7-8fbb-5118a624c1dc",
+    "timestamp": 1769079157236,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 16384
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "cbed92d8-fb57-4bb7-9dc5-decb60a32c30",
+    "timestamp": 1769079157237,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 1638,
+      "total": 16384,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "51508073-e9f9-4ee5-818d-b0ffc0843c4a",
+    "timestamp": 1769079157238,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 3276,
+      "total": 16384,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bd748407-f981-42bf-9f1f-0031c73e517c",
+    "timestamp": 1769079157239,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 4914,
+      "total": 16384,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7934b23e-6170-4431-b3c2-0e112478fa7b",
+    "timestamp": 1769079157239,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6552,
+      "total": 16384,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e31456fd-6dc1-4bf6-8fa1-a21a1365e960",
+    "timestamp": 1769079157240,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 8190,
+      "total": 16384,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e5c77e7e-54d5-499b-a939-707f306f0518",
+    "timestamp": 1769079157240,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 9828,
+      "total": 16384,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "18aab9cd-c764-4c42-b16a-eb652ef84dd5",
+    "timestamp": 1769079157240,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 11466,
+      "total": 16384,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "50c45810-c800-47e2-830c-7e780acc3dd4",
+    "timestamp": 1769079157241,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13104,
+      "total": 16384,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c597fc2c-85ab-46e2-9382-4cfa47a50baf",
+    "timestamp": 1769079157241,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 14742,
+      "total": 16384,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7afa23e5-b92d-44b7-b0f6-8baf0c05d842",
+    "timestamp": 1769079157241,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 16380,
+      "total": 16384,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "95759c7f-0336-4ccb-ab8f-7115e6eb71a3",
+    "timestamp": 1769079157242,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 128,
+      "height": 128,
+      "min": -0.6961833834648132,
+      "max": 0.8121017217636108,
+      "mean": -0.004105687359537508,
+      "duration": 6
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fd354dfb-4449-462d-b735-4b3e0a441ab6",
+    "timestamp": 1769079157242,
+    "environment": "development"
+  }
+]
