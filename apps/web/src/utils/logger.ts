@@ -49,7 +49,9 @@ class Logger {
 
   constructor(options: LoggerOptions = {}) {
     this.enabled = options.enabled ?? true
-    this.minLevel = options.level ?? (import.meta.env.DEV ? 'trace' : 'info')
+    // Always use 'trace' level for maximum visibility in both dev and production
+    // This helps with debugging production issues without redeploying
+    this.minLevel = options.level ?? 'trace'
     this.component = options.component
   }
 
