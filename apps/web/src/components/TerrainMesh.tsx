@@ -309,32 +309,18 @@ export function TerrainMesh({
       shouldBeFlat: textureModeValue === 1,
     })
 
-    // Only include uniforms needed by the current shader
-    if (textureMode === 'landscape') {
-      return {
-        heightmapTexture: { value: heightmapTexture },
-        meshWidth: { value: meshWidth },
-        meshDepth: { value: meshDepth },
-        gridWidth: { value: width },
-        gridHeight: { value: height },
-        lightDirection: { value: [0.5, 0.5, 0.7] },
-        ambientColor: { value: [0.3, 0.3, 0.3] },
-        lightColor: { value: [0.7, 0.7, 0.7] },
-        minElevation: { value: minElevation },
-        maxElevation: { value: maxElevation },
-      }
-    } else {
-      // None mode - gray color with lighting (no elevation gradient)
-      return {
-        heightmapTexture: { value: heightmapTexture },
-        meshWidth: { value: meshWidth },
-        meshDepth: { value: meshDepth },
-        gridWidth: { value: width },
-        gridHeight: { value: height },
-        lightDirection: { value: [0.5, 0.5, 0.7] },
-        ambientColor: { value: [0.3, 0.3, 0.3] },
-        lightColor: { value: [0.7, 0.7, 0.7] },
-      }
+    // Always include all uniforms with consistent types
+    return {
+      heightmapTexture: { value: heightmapTexture },
+      meshWidth: { value: meshWidth },
+      meshDepth: { value: meshDepth },
+      gridWidth: { value: width },
+      gridHeight: { value: height },
+      lightDirection: { value: [0.5, 0.5, 0.7] },
+      ambientColor: { value: [0.3, 0.3, 0.3] },
+      lightColor: { value: [0.7, 0.7, 0.7] },
+      minElevation: { value: minElevation },
+      maxElevation: { value: maxElevation },
     }
   }, [heightmapTexture, meshWidth, meshDepth, width, height, heightmap, textureMode])
 
@@ -351,7 +337,7 @@ export function TerrainMesh({
   // Manually update shader when texture mode changes
   useEffect(() => {
     if (meshRef.current && meshRef.current.material) {
-      const material = meshRef.current.material as THREE.ShaderMaterial;
+      const material = meshRef.current.material as any;
       console.log(`🔄 Updating shader for texture mode: ${textureMode}`);
 
       // Update the fragment shader code

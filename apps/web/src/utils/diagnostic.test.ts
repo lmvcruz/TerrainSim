@@ -176,7 +176,7 @@ describe('diagnostic', () => {
 
     beforeEach(() => {
       fetchMock = vi.fn()
-      global.fetch = fetchMock
+      global.fetch = fetchMock as any
     })
 
     afterEach(() => {
