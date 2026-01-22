@@ -199,6 +199,13 @@ export function TerrainMesh({
       if (heightmap[i] > max) max = heightmap[i]
     }
 
+    componentLogger.trace('TerrainMesh received heightmap prop', {
+      length: heightmap.length,
+      centerValue: heightmap[centerIdx].toFixed(4),
+      statistics: { min: min.toFixed(2), max: max.toFixed(2), mean: mean.toFixed(2) },
+      wireframe,
+    })
+
     componentLogger.debug('🎨 TerrainMesh received NEW heightmap prop', {
       reference: `Float32Array@${heightmap.byteOffset}`,
       length: heightmap.length,
@@ -221,6 +228,7 @@ export function TerrainMesh({
   // Update texture data whenever heightmap changes
   useEffect(() => {
     if (!heightmap) {
+      componentLogger.trace('Updating texture with flat heightmap');
       componentLogger.debug('🖼️ Updating texture with flat heightmap (no data)')
       const flatHeightmap = new Float32Array(width * height).fill(0)
       const data = new Float32Array(width * height * 4) // RGBA
@@ -234,8 +242,14 @@ export function TerrainMesh({
         heightmapTexture.image.data = data
       }
       heightmapTexture.needsUpdate = true
+      componentLogger.trace('Flat texture update complete');
       return
     }
+
+    componentLogger.trace('Starting GPU texture update', {
+      heightmapLength: heightmap.length,
+      textureSize: `${width}x${height}`,
+    });
 
     // Pack heightmap data into RGBA texture (elevation in red channel)
     const centerIdx = Math.floor(heightmap.length / 2)
@@ -265,6 +279,12 @@ export function TerrainMesh({
       heightmapTexture.image.data = data
     }
     heightmapTexture.needsUpdate = true
+
+    componentLogger.trace('GPU texture updated', {
+      dataLength: data.length,
+      needsUpdate: true,
+    });
+
     console.log('✨ GPU TEXTURE UPDATED - needsUpdate set to true');
     console.log('   Sample values:', heightmap.slice(0, 5));
 

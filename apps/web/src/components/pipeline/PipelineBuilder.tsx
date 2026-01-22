@@ -2,7 +2,8 @@ import { usePipeline, type ModelingConfig, type SimulationJob } from '../../cont
 import { Sliders, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 import apiConfig from '../../config/api';
-import { logger } from '../../utils/logger';
+import { logger, setCorrelationId } from '../../utils/logger';
+import { useCorrelationId } from '../../hooks/useCorrelationId';
 
 const builderLogger = logger.withContext('PipelineBuilder');
 
@@ -10,10 +11,17 @@ export default function PipelineBuilder() {
   const { config, updateStep0, updateDimensions, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId, addJob } = usePipeline();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { correlationId, refresh: refreshCorrelationId } = useCorrelationId();
 
   const handleGenerateTerrain = async () => {
     setIsGenerating(true);
     setError(null);
+
+    // Generate new correlation ID for this operation
+    const opCorrelationId = refreshCorrelationId();
+    setCorrelationId(opCorrelationId);
+
+    const startTime = Date.now();
 
     try {
       // Convert method to lowercase for backend API
@@ -24,25 +32,61 @@ export default function PipelineBuilder() {
         height: config.height,
       };
 
+      builderLogger.trace('Generating terrain', {
+        correlationId: opCorrelationId,
+        method: payload.method,
+        width: payload.width,
+        height: payload.height,
+        seed: payload.seed,
+        frequency: payload.frequency,
+        amplitude: payload.amplitude,
+      });
+
+      builderLogger.trace('Sending API request', {
+        endpoint: apiConfig.endpoints.generate,
+        payload,
+      });
+
       const response = await fetch(apiConfig.endpoints.generate, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-correlation-id': opCorrelationId,
         },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
+        builderLogger.error('API request failed', {
+          status: response.status,
+          statusText: response.statusText,
+        });
         const errorData = await response.json().catch(() => ({ error: response.statusText }));
         throw new Error(errorData.error || `Server error: ${response.statusText}`);
       }
 
+      const apiDuration = Date.now() - startTime;
+      builderLogger.trace('API response received', {
+        duration: apiDuration,
+        status: response.status,
+      });
+
       const data = await response.json();
+
+      builderLogger.trace('Response data parsed', {
+        dataSize: data.data?.length || 0,
+        statistics: data.statistics,
+      });
 
       if (data.data) {
         // Convert heightmap array to Float32Array and store in cache at frame 0 (input model)
+        builderLogger.trace('Converting heightmap to Float32Array');
         const heightmapArray = new Float32Array(data.data);
         setHeightmapForFrame(0, heightmapArray);
+
+        builderLogger.trace('Heightmap stored at frame 0', {
+          arrayLength: heightmapArray.length,
+        });
 
         // Create simulation session with this terrain as initial model
         const sessionResponse = await fetch(apiConfig.endpoints.simulate.create, {
@@ -96,7 +140,19 @@ export default function PipelineBuilder() {
         }
 
         setCurrentFrame(0); // Switch to frame 0 to display generated terrain (input model)
-        builderLogger.info('Terrain generated successfully', { statistics: data.statistics, sessionId: sessionData.sessionId });
+
+        const totalDuration = Date.now() - startTime;
+        builderLogger.info('Terrain generated successfully', {
+          statistics: data.statistics,
+          sessionId: sessionData.sessionId,
+          totalDuration,
+        });
+
+        builderLogger.trace('Operation complete', {
+          correlationId: opCorrelationId,
+          totalDuration,
+          heightmapSize: heightmapArray.length,
+        });
       } else {
         throw new Error('No heightmap data received');
       }

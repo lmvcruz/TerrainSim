@@ -2,15 +2,21 @@
  * Centralized logging system for TerrainSim
  *
  * Features:
- * - Log levels (debug, info, warn, error)
+ * - Log levels (trace, debug, info, warn, error)
  * - Colored console output
  * - Performance timing utilities
- * - Development-only logging
+ * - Auto-sends logs to backend
  * - Structured log format
  * - Log grouping for related operations
+ * - Correlation ID support
  */
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+import { logTransport } from '../services/logTransport';
+
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error'
+
+// Current correlation ID (set per operation)
+let currentCorrelationId: string = 'unknown';
 
 interface LogEntry {
   timestamp: number
@@ -34,15 +40,16 @@ class Logger {
 
   // Log level hierarchy
   private levelPriority: Record<LogLevel, number> = {
-    debug: 0,
-    info: 1,
-    warn: 2,
-    error: 3,
+    trace: 0,
+    debug: 1,
+    info: 2,
+    warn: 3,
+    error: 4,
   }
 
   constructor(options: LoggerOptions = {}) {
-    this.enabled = options.enabled ?? import.meta.env.DEV
-    this.minLevel = options.level ?? (import.meta.env.DEV ? 'debug' : 'warn')
+    this.enabled = options.enabled ?? true
+    this.minLevel = options.level ?? (import.meta.env.DEV ? 'trace' : 'info')
     this.component = options.component
   }
 
@@ -82,11 +89,23 @@ class Logger {
     // Notify listeners (for log collection)
     this.listeners.forEach(listener => listener(entry))
 
+    // Send to backend via log transport
+    if (this.component) {
+      logTransport.addLog({
+        correlationId: currentCorrelationId,
+        component: this.component,
+        level,
+        message,
+        data,
+        timestamp: entry.timestamp,
+      });
+    }
+
     // Console output with colors
     const styles = this.getStyles(level)
     const prefix = this.component ? `[${this.component}]` : ''
 
-    console[level === 'debug' ? 'log' : level](
+    console[level === 'debug' || level === 'trace' ? 'log' : level](
       `%c${styles.emoji} ${level.toUpperCase()}${prefix}`,
       styles.css,
       message,
@@ -99,8 +118,12 @@ class Logger {
    */
   private getStyles(level: LogLevel): { emoji: string; css: string } {
     const styles = {
-      debug: {
+      trace: {
         emoji: '🔍',
+        css: 'background: #9ca3af; color: white; padding: 2px 6px; border-radius: 3px;',
+      },
+      debug: {
+        emoji: '🐛',
         css: 'background: #6b7280; color: white; padding: 2px 6px; border-radius: 3px;',
       },
       info: {
@@ -121,7 +144,14 @@ class Logger {
   }
 
   /**
-   * Log a debug message (development only)
+   * Log a trace message - most detailed debugging
+   */
+  trace(message: string, data?: any) {
+    this.log('trace', message, data)
+  }
+
+  /**
+   * Log a debug message
    */
   debug(message: string, data?: any) {
     this.log('debug', message, data)
@@ -246,3 +276,24 @@ export const logger = new Logger()
 
 // Export for creating component-specific loggers
 export { Logger }
+
+/**
+ * Set the correlation ID for all subsequent logs
+ */
+export function setCorrelationId(id: string): void {
+  currentCorrelationId = id;
+}
+
+/**
+ * Get the current correlation ID
+ */
+export function getCorrelationId(): string {
+  return currentCorrelationId;
+}
+
+/**
+ * Clear the correlation ID (reset to unknown)
+ */
+export function clearCorrelationId(): void {
+  currentCorrelationId = 'unknown';
+}

@@ -323,5 +323,4335 @@
     "logId": "fd354dfb-4449-462d-b735-4b3e0a441ab6",
     "timestamp": 1769079157242,
     "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 16384,
+      "expectedLength": 16384,
+      "generationDuration": 8
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2007046a-f291-404e-9975-693eb04f5dbf",
+    "timestamp": 1769079157243,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "29fe49e8-0039-4be7-b530-c7bde43375c8",
+    "timestamp": 1769079157243,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -0.6961833834648132,
+      "max": 0.8121017217636108,
+      "range": 1.508285105228424,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d6da4bb3-babf-4e87-a71e-e261b7891069",
+    "timestamp": 1769079157244,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 16384
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fe0e8f45-96b6-433a-9dcb-7564b67adb73",
+    "timestamp": 1769079157244,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 16384,
+      "conversionDuration": 0
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8a7f3403-685d-4992-a6b9-3ffc3d1b45e0",
+    "timestamp": 1769079157244,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 16384,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 11
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d652ed8e-055d-468a-82dd-54a3be6c0835",
+    "timestamp": 1769079157245,
+    "environment": "development"
+  },
+  {
+    "correlationId": "iter2-test-002",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 16
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a5081377-9171-4e9d-9aaa-5a1d26e7ce12",
+    "timestamp": 1769079157250,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "5ecaafbf-e8eb-4aae-bc29-03be9b30ad5f",
+    "timestamp": 1769079190041,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 1,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "be7c3173-f336-4943-b30f-accc2c67a3a2",
+    "timestamp": 1769079190041,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "de7673be-2a77-42ea-aea7-54fedb2c8f84",
+    "timestamp": 1769079190042,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "78b81fa2-50e7-4157-ac0d-cf9b27cdf705",
+    "timestamp": 1769079190043,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 1,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3b2975c2-3575-4e2b-b36c-0b7d67e264b8",
+    "timestamp": 1769079190043,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 1,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bac66399-1283-4706-8d2b-81e7c8cc59ba",
+    "timestamp": 1769079190043,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8c25bc67-e7d7-4d3d-819c-feeae16aa3be",
+    "timestamp": 1769079190043,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3efbb9a9-5f26-479b-8094-2e62429e75ff",
+    "timestamp": 1769079190044,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8cb1633a-b83c-425a-8f68-baf1bd389ba7",
+    "timestamp": 1769079190044,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2ba3452e-89a6-4e5b-924d-6ee40e186f55",
+    "timestamp": 1769079190046,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bd9148c8-89ff-4d0a-84ae-7a7090dc4a9e",
+    "timestamp": 1769079190047,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "736b2855-c7e7-461a-b9c1-8abf1438d3a9",
+    "timestamp": 1769079190048,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a4ad14b7-29cd-4c5d-baa6-3d48f67f024e",
+    "timestamp": 1769079190050,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6443494b-8141-4d0c-b8ad-43618aa5b55f",
+    "timestamp": 1769079190053,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "51609181-8987-4a64-a8c9-df1bd21d36f1",
+    "timestamp": 1769079190054,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ed8e552b-025b-487d-90b8-2593c479d536",
+    "timestamp": 1769079190054,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "98af30ca-bdca-475f-88d6-5289d1c84279",
+    "timestamp": 1769079190055,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bd0d7478-9388-4575-a90c-a7296b08d2e3",
+    "timestamp": 1769079190056,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "eae864b7-ab6a-4473-bfbc-3eab164b976a",
+    "timestamp": 1769079190057,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -40.238399505615234,
+      "max": 40.238399505615234,
+      "mean": -0.40004768771204857,
+      "duration": 17
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "cfde2559-4cd8-40cb-bae3-02dd89e2e7a1",
+    "timestamp": 1769079190060,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 17
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4881a8c3-d99d-4b2a-aa33-513c7e68b1fc",
+    "timestamp": 1769079190060,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "7ea69f07-91b5-4992-963a-d4e1bd750c2a",
+    "timestamp": 1769079190060,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -40.238399505615234,
+      "max": 40.238399505615234,
+      "range": 80.47679901123047,
+      "statsDuration": 4
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "41f0129b-ff36-46db-912d-94c8075131c5",
+    "timestamp": 1769079190064,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7be63402-da54-4d90-a2c9-0daf59e9350d",
+    "timestamp": 1769079190066,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 8
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c47fd17f-ad9c-47a5-9b92-d4d47873890e",
+    "timestamp": 1769079190074,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 35
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "56f947ba-91af-4c76-a718-aa26e18753e1",
+    "timestamp": 1769079190076,
+    "environment": "development"
+  },
+  {
+    "correlationId": "131f1680-04b0-48f8-a53e-b51e5367bf0d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 63
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f6cd3a0f-ee57-444a-9b98-29b5ad0a0e85",
+    "timestamp": 1769079190104,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3a629ed2-0406-4f62-9986-2984a48e0ef0",
+    "timestamp": 1769079190124,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9ad7d211-4ad9-4d04-a984-87fb00d5f085",
+    "timestamp": 1769079190124,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e38f7615-89df-4852-ae51-608cc5643fa6",
+    "timestamp": 1769079190124,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "df60f2a1-7ec3-4a37-8540-fb0af704488b",
+    "timestamp": 1769079190125,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "dde0154b-393b-41d4-af86-bcf440888ab1",
+    "timestamp": 1769079190125,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "434f545e-4339-411a-b4f6-d6fa1c8a4249",
+    "timestamp": 1769079190125,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9d664a6e-8fab-43f2-822d-a25803d0e682",
+    "timestamp": 1769079190127,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b2a7a6c8-d9e2-4811-b6ac-ce3c2e709d65",
+    "timestamp": 1769079190127,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "029050c5-e281-4731-8c91-ece3a1251682",
+    "timestamp": 1769079190127,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c7b5147b-e770-4f36-8490-69d9992f6678",
+    "timestamp": 1769079190128,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "45681a17-8bda-401b-9d74-87b1b5b89140",
+    "timestamp": 1769079190129,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "37c6631b-b40a-4c7b-9ba4-88b61e326224",
+    "timestamp": 1769079190132,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0d697efb-0cea-4214-aa07-9f3a1549fd9b",
+    "timestamp": 1769079190133,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "66974cfd-ca1e-4e7d-9ac7-1270bb6133a1",
+    "timestamp": 1769079190135,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "72036abb-8f95-4ed2-9df3-752239da1d83",
+    "timestamp": 1769079190136,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "894d4407-3946-47d3-a530-d0a40bbc79e7",
+    "timestamp": 1769079190137,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "de0434d3-bab4-454c-ab01-99dde2e9a3de",
+    "timestamp": 1769079190139,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "716793c9-6368-4fef-bf32-6c33bcd8ae31",
+    "timestamp": 1769079190141,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2cd6639b-dc50-4fe5-b12e-92f24647736a",
+    "timestamp": 1769079190142,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "mean": 0.34591443787088194,
+      "duration": 17
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a4ecb25f-b019-417a-a1f1-acf96ef7344a",
+    "timestamp": 1769079190143,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 18
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "927bf533-20a9-47dc-a709-c9389d75fe40",
+    "timestamp": 1769079190143,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "dfd0f1b5-265f-4edd-8d92-9dbcd0fb27ad",
+    "timestamp": 1769079190143,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "range": 77.90170288085938,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "33dcf617-4243-4b80-9e5b-5ae3652d4f40",
+    "timestamp": 1769079190144,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "86e9cc90-8671-4448-926d-4576bf720a25",
+    "timestamp": 1769079190144,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 8
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e9dfae77-5107-4859-b668-3d0dcc90d359",
+    "timestamp": 1769079190152,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 29
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4fc45914-4f93-4641-99eb-a83ee932191b",
+    "timestamp": 1769079190153,
+    "environment": "development"
+  },
+  {
+    "correlationId": "8f4eaff9-8e5b-4712-b1c0-67937b4d726b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 65
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8828db05-01a7-457f-b9ed-0c70f01b2f0e",
+    "timestamp": 1769079190189,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0e1692d1-1eda-45a8-9167-cc5bb6c701bb",
+    "timestamp": 1769079190237,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.08,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ac3a04bc-dd7e-4f32-a4c2-a8c2596eb2aa",
+    "timestamp": 1769079190238,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "dff5f829-cb31-4a19-bb92-4199f7b582c3",
+    "timestamp": 1769079190238,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "9f8de4c8-f2b9-4034-8b34-e1b1072ae279",
+    "timestamp": 1769079190239,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.08,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "656d6df9-f190-4a86-b819-6fa52184ee93",
+    "timestamp": 1769079190239,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.08,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bf7043ca-4f32-4d89-a792-629970cfc0f0",
+    "timestamp": 1769079190240,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c8d979f7-1413-4848-b1ca-8b49be02f52a",
+    "timestamp": 1769079190240,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "336b813a-dbe0-4c68-88cb-34ff4cbbc05a",
+    "timestamp": 1769079190241,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ce43de20-e6c1-4ed1-830f-5a0623103507",
+    "timestamp": 1769079190241,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b2f195f4-0374-4a57-9083-4bbd2b95ea65",
+    "timestamp": 1769079190244,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "35d6cde0-a1fe-4a7c-a0a9-cadb455a1ed5",
+    "timestamp": 1769079190247,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2f113a6d-355b-4bfa-a935-e6f212e3df28",
+    "timestamp": 1769079190248,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "945e9b47-ac3b-4f33-b006-55f3f187bb00",
+    "timestamp": 1769079190250,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b0dc57cc-5d72-4332-b6be-412e1cc388be",
+    "timestamp": 1769079190252,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bfa515d0-5c7e-4ec4-b59f-533229364e78",
+    "timestamp": 1769079190254,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "022f116d-6d62-42bc-88c5-887a36fe5c1c",
+    "timestamp": 1769079190256,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "966da123-517a-4dcd-8499-fffeec81a49b",
+    "timestamp": 1769079190258,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7ea0af12-0ed4-4adb-b0f0-c1d1d78fce5f",
+    "timestamp": 1769079190260,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2a2b3928-71c4-4721-a00c-d5d282fc7bfc",
+    "timestamp": 1769079190262,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -39.34934997558594,
+      "max": 44.58351135253906,
+      "mean": -0.10897063187395556,
+      "duration": 26
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fee83d17-721c-449f-85f2-034d91c70d80",
+    "timestamp": 1769079190266,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 29
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9e5f8704-e4fa-44e1-9a14-30fc55fad820",
+    "timestamp": 1769079190268,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "e0143c45-5168-4d5f-9ebc-dd05fd06a89f",
+    "timestamp": 1769079190269,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -39.34934997558594,
+      "max": 44.58351135253906,
+      "range": 83.932861328125,
+      "statsDuration": 0
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "66977956-4dd3-493b-9552-15d9bdb1103a",
+    "timestamp": 1769079190270,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "70e3d961-2d22-4a4e-9b8c-0159547e2882",
+    "timestamp": 1769079190272,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 8
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "09ffbc57-33b1-42a0-b3a0-e1954d7f907d",
+    "timestamp": 1769079190280,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 44
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "88176e39-cae7-49ac-9ded-bef35031dc3f",
+    "timestamp": 1769079190281,
+    "environment": "development"
+  },
+  {
+    "correlationId": "7da4adbe-7eb2-42bf-bad5-e5858766e00d",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 78
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "54f67421-0019-43c2-94f6-f3e5df827c83",
+    "timestamp": 1769079190315,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ec3d7db2-420e-4768-ad58-5da086b0045d",
+    "timestamp": 1769079190354,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "10e9ae09-801d-4280-8ae0-3d62d16b3564",
+    "timestamp": 1769079190356,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2baabb75-05fb-42ce-95a2-f6af239098d0",
+    "timestamp": 1769079190359,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "771395ab-1c5d-40dd-b5d6-f55484cfa5bc",
+    "timestamp": 1769079190359,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9644bbc6-a0cd-4713-8f95-7c8244f50c25",
+    "timestamp": 1769079190359,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "58a3acff-9963-4db2-b061-91f7a5a5b520",
+    "timestamp": 1769079190360,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9c2d5ba0-8149-4650-a037-565b988966ae",
+    "timestamp": 1769079190360,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "91fab9c5-fe09-4f5a-aeb8-5fe486881dfe",
+    "timestamp": 1769079190360,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "29b16938-2a05-4e41-b5dc-546386a57836",
+    "timestamp": 1769079190361,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "36ab1f8a-cd2d-4e2d-a859-50a3856778db",
+    "timestamp": 1769079190364,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0b116e06-c685-4410-90ee-c8a033da66ea",
+    "timestamp": 1769079190367,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fd79bb8b-8035-4837-8cbe-f172d57ea11b",
+    "timestamp": 1769079190370,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "36889c34-60c4-4924-bb25-7983e0aae383",
+    "timestamp": 1769079190373,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "deacdbbd-f541-445f-9ed9-eb16f592ccff",
+    "timestamp": 1769079190375,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c7b49263-b69a-4789-9683-d6fd3cf63a4b",
+    "timestamp": 1769079190376,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d2d573a2-ee81-4ebb-a642-68d35ed2c49e",
+    "timestamp": 1769079190382,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "cd5f2435-b431-400f-94c3-a1770dad5f41",
+    "timestamp": 1769079190384,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "1ab42ac5-a90a-4362-ae88-230ef8568056",
+    "timestamp": 1769079190386,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "83fa440c-1019-4c4e-80f2-ca4e1aeecae4",
+    "timestamp": 1769079190387,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -22.37796974182129,
+      "max": 24.363052368164062,
+      "mean": 0.20754866304372238,
+      "duration": 29
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ee7a5807-dfe8-485e-9eb2-e1f6e8865e57",
+    "timestamp": 1769079190389,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 32
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e1295212-34ab-49e0-9c1b-315add4eb85e",
+    "timestamp": 1769079190391,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "b89d9974-7df8-4db6-a3e4-45678e1bbe10",
+    "timestamp": 1769079190398,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -22.37796974182129,
+      "max": 24.363052368164062,
+      "range": 46.74102210998535,
+      "statsDuration": 6
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f32a9305-726f-4340-968b-42a21daf9556",
+    "timestamp": 1769079190410,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "93c84336-4cf1-4ff6-a30e-860902f5ee9c",
+    "timestamp": 1769079190410,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "52c729c8-e517-4046-8811-1124b7619675",
+    "timestamp": 1769079190421,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 67
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "370caebd-cda7-4f35-a3c1-dea4925c9ff2",
+    "timestamp": 1769079190421,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ea88958b-8a8a-4d82-b663-9f09dbb9863b",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 97
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "64c7cd3f-13d7-4423-add6-717a9c182a61",
+    "timestamp": 1769079190451,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e1a77615-e14b-4453-9f7c-02d7af8cb8a5",
+    "timestamp": 1769079190476,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d10669ed-4bb0-45f7-90d4-2880c4776f1f",
+    "timestamp": 1769079190477,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f4b96635-2fec-433f-8429-fc8c5221c3ba",
+    "timestamp": 1769079190477,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "ff1f0f17-6a71-43a1-9cd1-06276a2e044e",
+    "timestamp": 1769079190478,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "81a56a34-9fa8-44f2-9756-ca43f68d51f1",
+    "timestamp": 1769079190478,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "51690219-0947-47a7-afc1-0fd0bd80fb54",
+    "timestamp": 1769079190481,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "94b42e9c-ff14-458e-8c65-1693075fa095",
+    "timestamp": 1769079190483,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "343ab593-68d2-4660-ba05-a31f994a29ee",
+    "timestamp": 1769079190483,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c529f6aa-3485-460b-9b45-03afa9f4dd61",
+    "timestamp": 1769079190484,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4e34956c-e4ab-44b6-a211-d43ba8a913be",
+    "timestamp": 1769079190485,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "567976e2-18be-4737-92de-31c064f0f32c",
+    "timestamp": 1769079190485,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ebd2488a-af77-44ee-9897-e5729134a3eb",
+    "timestamp": 1769079190486,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "40f7a1cd-39ef-4f7d-85c7-a00cc75b247f",
+    "timestamp": 1769079190487,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fdae9d90-a7dd-4759-888c-015957352540",
+    "timestamp": 1769079190487,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6fd69daf-ec09-4277-bc5f-2a32dadd3391",
+    "timestamp": 1769079190488,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "506692fb-879d-4933-8b1c-c29c54772a08",
+    "timestamp": 1769079190490,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a4d7eaa9-666c-41e4-b98e-acce5f88b67f",
+    "timestamp": 1769079190490,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4663eaa3-6c0c-4ca0-9742-3ba0bac5a8b6",
+    "timestamp": 1769079190491,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0049e9e5-f3b7-4dbd-8d8c-a9f4f40b59a5",
+    "timestamp": 1769079190492,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -52.21525955200195,
+      "max": 56.84712219238281,
+      "mean": 0.4842802119551106,
+      "duration": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4ed98b75-37b0-4358-adf2-15b3eed1f533",
+    "timestamp": 1769079190492,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 14
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f2f0de0d-ab22-4c01-a7f6-9bb700d300dc",
+    "timestamp": 1769079190492,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "019fd4b6-fa9a-4ad4-a751-ff682b2ea97e",
+    "timestamp": 1769079190493,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -52.21525955200195,
+      "max": 56.84712219238281,
+      "range": 109.06238174438477,
+      "statsDuration": 0
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "cb8e6719-31d7-4981-8edf-e9339306902c",
+    "timestamp": 1769079190493,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "51a65169-2af1-44f7-bc6f-5b3cc473358e",
+    "timestamp": 1769079190493,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 6
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bb27d585-74cc-49e2-9b04-d034999c0f5c",
+    "timestamp": 1769079190504,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 29
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fd4306d3-0af2-46da-bd64-1e6f7ea434fa",
+    "timestamp": 1769079190505,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1346694c-9bb5-4d6f-9a03-3b52bb538349",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 56
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2af5f748-5744-4e5f-96fd-f239be124a44",
+    "timestamp": 1769079190532,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8f150aa2-3ff6-4a5a-ba66-8a21ac63bfc9",
+    "timestamp": 1769079190559,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ec485d37-e571-4f4c-9d4e-4ac8fd63b953",
+    "timestamp": 1769079190559,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7bb3f61d-2f92-4790-8bdc-bc5479615ac1",
+    "timestamp": 1769079190559,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "928b15d3-239d-47f6-aa97-2beb1fa2353f",
+    "timestamp": 1769079190560,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d90557ab-45c9-4d14-a65a-4be19c2efcb9",
+    "timestamp": 1769079190560,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6f92539a-f6d5-495b-94c8-caf7c8d29696",
+    "timestamp": 1769079190560,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7202ba58-94dc-461b-aec3-8aac40e0fb73",
+    "timestamp": 1769079190560,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "72a20492-7b03-4476-afc8-9d965359f160",
+    "timestamp": 1769079190560,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fe4b68e2-6085-4fa6-bd2b-e08f6987dc5b",
+    "timestamp": 1769079190564,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7700e6d9-1974-42b6-99c5-ec45b19f0fa7",
+    "timestamp": 1769079190565,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c11fb40a-6d9d-4438-8638-a3ad1f521c74",
+    "timestamp": 1769079190566,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8a8c7cc2-a3cb-4a7a-b2ce-0cfd18abe891",
+    "timestamp": 1769079190567,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fb9d319f-1cfb-4695-b083-7b04c50d7eda",
+    "timestamp": 1769079190569,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2993f468-f138-4bb6-8623-9c2db82c0e01",
+    "timestamp": 1769079190571,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "1bbee227-7a4f-4b56-93ec-b9076513b198",
+    "timestamp": 1769079190573,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3bf5db51-ccf4-4d9b-acff-7d846708e8c7",
+    "timestamp": 1769079190574,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "bf8bea85-ca7d-4860-a8cd-9cf908873ba5",
+    "timestamp": 1769079190574,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "694f9061-53a9-45e6-a2ef-bafc5d43189f",
+    "timestamp": 1769079190575,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4afaf3a7-fa64-4948-add1-fcb7719243cd",
+    "timestamp": 1769079190578,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "mean": 0.34591443787088194,
+      "duration": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a3929bb3-1d5b-4950-86e8-8eb3583ccc62",
+    "timestamp": 1769079190580,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 21
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3be4f500-b1cf-4237-bb26-6ec7e72f3922",
+    "timestamp": 1769079190581,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "b0e9bdaf-c55c-483a-ad55-868018578117",
+    "timestamp": 1769079190581,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "range": 77.90170288085938,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3c7a0f38-20eb-4e2a-95c4-8323254fc0e3",
+    "timestamp": 1769079190582,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c406a3f9-33f1-4c68-98e2-6e170955725c",
+    "timestamp": 1769079190583,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 8
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "66ffbece-2855-478d-9eac-468b5ba95349",
+    "timestamp": 1769079190592,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 34
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f9d8db57-04ea-44f4-bbf1-6d7cf274de05",
+    "timestamp": 1769079190593,
+    "environment": "development"
+  },
+  {
+    "correlationId": "1223dd76-0e5c-4b06-bb64-3cac33aa527e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 65
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3874f05e-c659-4bbf-bbfb-5265325b2ef3",
+    "timestamp": 1769079190624,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8d4196bb-7773-4f5d-92b7-a95404748e61",
+    "timestamp": 1769079190652,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "1e9d5fbb-ad31-4f6d-b155-45b377116e27",
+    "timestamp": 1769079190656,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ee0f5812-2b0d-45e3-ba52-15082988637f",
+    "timestamp": 1769079190657,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "8bae392e-9f46-43a0-9e1d-46def1d26f16",
+    "timestamp": 1769079190657,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "aec9189e-866b-4a52-bd02-71e26e3b8db0",
+    "timestamp": 1769079190658,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "311a8496-5042-4012-961d-7f9e87af2e87",
+    "timestamp": 1769079190658,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "81bc0977-7159-4a00-a422-39cc78619289",
+    "timestamp": 1769079190659,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2759e240-d78c-43a2-91f5-8189a7d1614a",
+    "timestamp": 1769079190659,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "45bb0c81-3c7d-4889-8da9-1d4f70a6d982",
+    "timestamp": 1769079190660,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "468212bd-6069-435b-beef-874a0fcaf018",
+    "timestamp": 1769079190660,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "83853e62-468f-4411-90ce-14e6e0080a27",
+    "timestamp": 1769079190661,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f4727375-16ec-4ffd-ab9e-93f7b2a7de5f",
+    "timestamp": 1769079190668,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4072a20a-7dbf-4fa8-bf18-e7fb0899b681",
+    "timestamp": 1769079190672,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "75b97b24-e882-47d3-b98e-4d3ab152ec7d",
+    "timestamp": 1769079190674,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b06c50cb-b96c-44dc-9fee-3b5c37bf1b50",
+    "timestamp": 1769079190675,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "94d38ab4-fc2b-4871-82bb-dd9606d02f0f",
+    "timestamp": 1769079190676,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7ba6bcf4-e30d-4ba1-b4f5-37c902e049e2",
+    "timestamp": 1769079190677,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c0552b4a-5b43-4eee-96d6-f428ce5dd948",
+    "timestamp": 1769079190678,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "5c780932-10e1-4ef6-91b1-1496c5fdf567",
+    "timestamp": 1769079190679,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "mean": 0.34591443787088194,
+      "duration": 23
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "006476df-d4d1-4f4f-8930-d20a8af60b56",
+    "timestamp": 1769079190682,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 25
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a4af5b58-dfd6-48a0-b6e5-effced56f9a8",
+    "timestamp": 1769079190683,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "03ae5886-02df-4eb4-98b2-019fa79c17ba",
+    "timestamp": 1769079190688,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "range": 77.90170288085938,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "24a3e19f-61ed-4556-affa-66be78933337",
+    "timestamp": 1769079190689,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "60b37d88-8406-4115-881f-d9cbfdb19ddd",
+    "timestamp": 1769079190690,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 6
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b14d16c8-b1e6-4fe9-b977-abb29039d307",
+    "timestamp": 1769079190697,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 47
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "5e6bdfdf-521e-47ac-8462-e1c4a5ee8303",
+    "timestamp": 1769079190699,
+    "environment": "development"
+  },
+  {
+    "correlationId": "01798039-1289-42e0-890d-a0113dfbb4f5",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 82
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3f9e6ca3-9503-4e3e-8d4e-6a23d249b45d",
+    "timestamp": 1769079190734,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2c0f01d3-e927-4bfa-bd06-3c6f72e53bc2",
+    "timestamp": 1769079190765,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4771fb17-819d-4919-a3b5-62e0822d0ebd",
+    "timestamp": 1769079190766,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "5f7c3db7-102e-4340-b46a-54fb78c07c5f",
+    "timestamp": 1769079190767,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "48be2c4e-461f-4a96-b04b-7253186d47d0",
+    "timestamp": 1769079190769,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2c11176b-3804-4343-843d-f99df8c6cfcd",
+    "timestamp": 1769079190773,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 42,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "98c5cb9f-5f9c-4bf8-913c-c5f920ddf3f5",
+    "timestamp": 1769079190773,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "71513281-0047-4cab-91cf-9bfbdfcec953",
+    "timestamp": 1769079190774,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 42
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "dbc22bc8-089d-4826-9c0d-61960fc5297c",
+    "timestamp": 1769079190774,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "818cabf2-ca41-4713-8bd4-6bed19c75fe4",
+    "timestamp": 1769079190774,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e5eb9cc9-a410-498a-be7b-1d93299818ca",
+    "timestamp": 1769079190775,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b5c7728c-c94d-4117-a96c-203d0427526b",
+    "timestamp": 1769079190775,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2a292483-d25e-4135-ab71-ed5ffe336220",
+    "timestamp": 1769079190776,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "7146d725-d783-4d1e-9aa1-0f1231569440",
+    "timestamp": 1769079190777,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "57eb8079-a770-456b-a2ba-09dc6eb1ea87",
+    "timestamp": 1769079190777,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "462be6dd-eb5f-48f8-9855-ddadc86e8bf1",
+    "timestamp": 1769079190781,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "983e95ee-c28f-4f19-ae8d-1600252970bf",
+    "timestamp": 1769079190782,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9acc27a2-053d-414c-94d1-700bd1db1b6d",
+    "timestamp": 1769079190784,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "07010e24-2407-4448-85cd-7db92ecce533",
+    "timestamp": 1769079190785,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "213bb7d2-68ed-4f21-872f-aceb1312b742",
+    "timestamp": 1769079190787,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "mean": 0.34591443787088194,
+      "duration": 13
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "f5ccb3c5-ae30-4f09-898b-d73e102d2ef5",
+    "timestamp": 1769079190787,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 14
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9f21e4e1-02b1-4857-9f5f-a56aead63041",
+    "timestamp": 1769079190787,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "47b66033-1f92-4c5f-8f0c-9a3da783f17e",
+    "timestamp": 1769079190788,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -37.29661560058594,
+      "max": 40.60508728027344,
+      "range": 77.90170288085938,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "67ae58a7-2cf5-46b0-9c08-fb5f7fcbb364",
+    "timestamp": 1769079190789,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "60c18b7b-3cac-44fb-bab6-034442de5824",
+    "timestamp": 1769079190789,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 5
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "0e94895f-a7cb-4032-9a62-d4e55e327fc1",
+    "timestamp": 1769079190797,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 33
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2bb1e540-ab07-49f7-a5f4-30062b44f06b",
+    "timestamp": 1769079190798,
+    "environment": "development"
+  },
+  {
+    "correlationId": "13bd5073-ae48-40b6-bf66-2e14f9ad1c3e",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 69
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3f23f075-1b58-496f-96be-e890065e7338",
+    "timestamp": 1769079190834,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "668e48b1-a070-4e18-803e-f83406e49b1a",
+    "timestamp": 1769079190860,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 123,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a602df31-941a-4100-9692-0e5b61771a2d",
+    "timestamp": 1769079190860,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "053074e3-4d54-462f-864f-963f643fd59a",
+    "timestamp": 1769079190861,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "87ed99d0-3bc6-463d-81d3-4fccd2429a73",
+    "timestamp": 1769079190864,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 123,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2fe12c49-0054-45ed-9c1c-c19adf8037fa",
+    "timestamp": 1769079190865,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 123,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "a473f9cc-0ef5-46f9-bcb6-eba93a2de00f",
+    "timestamp": 1769079190868,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "3ffbc791-2fbc-481d-8174-86451e217ab2",
+    "timestamp": 1769079190869,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 123
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "1f13829d-1a4e-4f8a-87c7-9e7fd146a3d5",
+    "timestamp": 1769079190873,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d2bfda18-70f6-499a-85c6-b10f86a5cbdb",
+    "timestamp": 1769079190874,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e45fa405-c101-40f5-b244-e9dc917a060b",
+    "timestamp": 1769079190875,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2b454ef2-9581-414a-a7d4-faee3e182e9e",
+    "timestamp": 1769079190875,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "8969f51d-d05e-4d89-9d8a-4eb8f247b55e",
+    "timestamp": 1769079190876,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "dc7797c0-8165-4b53-aadf-3136c649df0d",
+    "timestamp": 1769079190877,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "d94db2fd-6871-4f7f-82ed-99f4e1545b19",
+    "timestamp": 1769079190878,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6b124831-94a7-44d5-8f6f-af785fd17bdd",
+    "timestamp": 1769079190878,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "370745de-127e-4906-ac40-bd53e8a480ee",
+    "timestamp": 1769079190879,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "221f202b-cc77-4c57-b171-2b003bb75ed5",
+    "timestamp": 1769079190880,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "82ba6adb-9b2e-4f15-80cc-314ee691533c",
+    "timestamp": 1769079190883,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2450e8af-b301-4104-86fc-4ea22acef015",
+    "timestamp": 1769079190884,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -39.59768295288086,
+      "max": 37.20869064331055,
+      "mean": 0.09198674135099838,
+      "duration": 16
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b898001d-0f28-483a-9032-759b7efb1bf3",
+    "timestamp": 1769079190885,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "generatePerlinNoise returned",
+    "data": {
+      "arrayLength": 65536,
+      "expectedLength": 65536,
+      "generationDuration": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "eab36709-d1f2-484d-8ac4-b6bf41a4f933",
+    "timestamp": 1769079190885,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calculating response statistics",
+    "nodeVersion": "v24.12.0",
+    "logId": "c611e387-ea73-45cf-9c8c-43c07fa895ea",
+    "timestamp": 1769079190885,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Statistics calculated",
+    "data": {
+      "min": -39.59768295288086,
+      "max": 37.20869064331055,
+      "range": 76.8063735961914,
+      "statsDuration": 1
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "46c83f6f-18d9-4ade-ab2c-cb3dd558a7f3",
+    "timestamp": 1769079190886,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Converting Float32Array to array for JSON serialization",
+    "data": {
+      "sourceLength": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "fe0eb237-948b-4c48-9c89-bd40574d0a4a",
+    "timestamp": 1769079190886,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Conversion complete",
+    "data": {
+      "dataLength": 65536,
+      "conversionDuration": 5
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9f31f2be-6a7f-4dea-867a-98ce37bcc43c",
+    "timestamp": 1769079190892,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Sending response",
+    "data": {
+      "dataSize": 65536,
+      "responseKeys": [
+        "width",
+        "height",
+        "data",
+        "statistics",
+        "parameters"
+      ],
+      "totalDuration": 32
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2976c913-e57d-406c-ac5a-81462388cf91",
+    "timestamp": 1769079190892,
+    "environment": "development"
+  },
+  {
+    "correlationId": "bba556cb-2ca2-44ee-8dc2-73aadc190b1f",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Response sent successfully",
+    "data": {
+      "totalDuration": 62
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "174c9a64-b8af-4599-8830-079a83766dfc",
+    "timestamp": 1769079190922,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Request received",
+    "data": {
+      "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+      "bodyKeys": [
+        "seed",
+        "frequency",
+        "amplitude",
+        "octaves"
+      ]
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6aaed408-dee0-4bb4-9a9d-09b7c7bac66d",
+    "timestamp": 1769079190948,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Parameters parsed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256,
+      "seed": 999,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "66002ae5-2c7b-4778-b77b-b5f047dbe9b2",
+    "timestamp": 1769079190948,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Validation passed",
+    "data": {
+      "method": "perlin",
+      "width": 256,
+      "height": 256
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "66906d9b-22d7-434b-b6ab-75be91d98a71",
+    "timestamp": 1769079190949,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Selected generation method: perlin",
+    "nodeVersion": "v24.12.0",
+    "logId": "080b34ca-a5ef-485e-b266-700c68973e60",
+    "timestamp": 1769079190949,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "/generate",
+    "level": "trace",
+    "message": "Calling generatePerlinNoise",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 999,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "04eb4057-59b8-4a9c-b023-8e31ee9cf55c",
+    "timestamp": 1769079190950,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "generatePerlinNoise called",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "seed": 999,
+      "frequency": 0.05,
+      "amplitude": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "2f9a5a9c-6166-4cca-9b21-71199cc72144",
+    "timestamp": 1769079190951,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating heightmap array",
+    "data": {
+      "totalCells": 65536,
+      "sizeBytes": 262144
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "45a85013-ec5e-46db-9f59-3747b6c50413",
+    "timestamp": 1769079190951,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Creating PerlinNoise instance",
+    "data": {
+      "seed": 999
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "e4b6ca92-27db-4a5a-95d4-6abd8291cdbc",
+    "timestamp": 1769079190951,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Starting generation loop",
+    "data": {
+      "totalCells": 65536
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4f785d6c-78f2-4d5d-b2f6-3487242b2f5e",
+    "timestamp": 1769079190952,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 6553,
+      "total": 65536,
+      "percentComplete": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "4abe19ae-5142-4161-9187-03be8df6cc02",
+    "timestamp": 1769079190953,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 13106,
+      "total": 65536,
+      "percentComplete": 20
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6dcdf0fa-26e0-4449-99b9-2ba3a3e52177",
+    "timestamp": 1769079190956,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 19659,
+      "total": 65536,
+      "percentComplete": 30
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "21bf29d4-78fc-46ca-ad91-cc44f328e326",
+    "timestamp": 1769079190956,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 26212,
+      "total": 65536,
+      "percentComplete": 40
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "6081f8fb-fa82-478a-8474-5d98b75a5a5b",
+    "timestamp": 1769079190957,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 32765,
+      "total": 65536,
+      "percentComplete": 50
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "c3a712cc-962f-4069-8d7a-22a407466135",
+    "timestamp": 1769079190958,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 39318,
+      "total": 65536,
+      "percentComplete": 60
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "cc51c9cf-48ab-4f37-8448-d009aacb0383",
+    "timestamp": 1769079190958,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 45871,
+      "total": 65536,
+      "percentComplete": 70
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "9b0d279f-6c01-4f24-b7ea-fae4d83ed59a",
+    "timestamp": 1769079190959,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 52424,
+      "total": 65536,
+      "percentComplete": 80
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "159dc27b-9f7b-4142-9c36-c1f3b9ef8703",
+    "timestamp": 1769079190960,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 58977,
+      "total": 65536,
+      "percentComplete": 90
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "783c8424-5f51-4328-9f3c-b6c10face750",
+    "timestamp": 1769079190960,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Generation progress",
+    "data": {
+      "processed": 65530,
+      "total": 65536,
+      "percentComplete": 100
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "b3d57845-da96-4a48-a189-bac66d2a75b2",
+    "timestamp": 1769079190961,
+    "environment": "development"
+  },
+  {
+    "correlationId": "ef391dce-2c3d-4daa-a6ea-835f9e054be0",
+    "source": "backend",
+    "component": "heightmapGenerators",
+    "level": "trace",
+    "message": "Heightmap generation complete",
+    "data": {
+      "width": 256,
+      "height": 256,
+      "min": -44.5162239074707,
+      "max": 40.60508728027344,
+      "mean": 0.05584736037336979,
+      "duration": 10
+    },
+    "nodeVersion": "v24.12.0",
+    "logId": "ae5c2f13-5252-4b99-a873-1c8382016d7e",
+    "timestamp": 1769079190961,
+    "environment": "development"
   }
 ]
