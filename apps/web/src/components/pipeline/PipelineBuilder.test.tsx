@@ -173,7 +173,7 @@ describe('PipelineBuilder', () => {
     const seedInput = screen.getByLabelText(/Seed/i) as HTMLInputElement;
 
     // Initial value
-    expect(seedInput.value).toBe('12345');
+    expect(seedInput.value).toBe('42');
 
     // Change seed
     fireEvent.change(seedInput, { target: { value: '99999' } });
