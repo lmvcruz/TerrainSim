@@ -207,8 +207,8 @@ describe('PipelineBuilder', () => {
 
     await waitFor(() => {
       // Find the /generate API call (not the /logs call)
-      const generateCalls = (mockFetch as jest.Mock).mock.calls.filter(
-        call => call[0].includes('/generate')
+      const generateCalls = (mockFetch as any).mock.calls.filter(
+        (call: any[]) => call[0].includes('/generate')
       );
       expect(generateCalls.length).toBeGreaterThan(0);
       expect(generateCalls[0][1]).toMatchObject({

@@ -11,7 +11,7 @@ export default function PipelineBuilder() {
   const { config, updateStep0, updateDimensions, updateTotalFrames, setHeightmapForFrame, setCurrentFrame, setSessionId, addJob } = usePipeline();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { correlationId, refresh: refreshCorrelationId } = useCorrelationId();
+  const { refresh: refreshCorrelationId } = useCorrelationId();
 
   const handleGenerateTerrain = async () => {
     setIsGenerating(true);
