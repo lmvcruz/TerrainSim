@@ -23,6 +23,7 @@ vcpkg.user.targets
 cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
+_deps/
 
 # === Node / pnpm ===
 # Node modules and pnpm store (monorepo package manager)
@@ -73,6 +74,8 @@ yarn-error.log*
 lerna-debug.log*
 pnpm-debug.log*
 .dev-logs/
+*-logs.json
+prod-correlation-id.txt
 
 # === Environment Variables ===
 # Local environment configuration (secrets)
