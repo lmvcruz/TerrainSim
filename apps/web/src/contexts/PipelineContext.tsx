@@ -130,7 +130,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
 
   const [validation, setValidation] = useState<ValidationResult | null>(null);
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [heightmapCache] = useState<Map<number, Float32Array>>(new Map());
+  const [heightmapCache, setHeightmapCache] = useState<Map<number, Float32Array>>(new Map());
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [shouldStopSimulation, setShouldStopSimulation] = useState(false);
@@ -217,7 +217,15 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
   };
 
   const setHeightmapForFrame = (frame: number, heightmap: Float32Array) => {
-    heightmapCache.set(frame, heightmap);
+    // Create a new Map to trigger React re-render
+    const newCache = new Map(heightmapCache);
+    newCache.set(frame, heightmap);
+    setHeightmapCache(newCache);
+    pipelineLogger.trace('Heightmap cache updated', {
+      frame,
+      totalCachedFrames: newCache.size,
+      heightmapLength: heightmap.length,
+    });
   };
 
   const executeSimulation = async () => {
@@ -304,10 +312,11 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     pipelineLogger.info('Clearing heightmap cache (preserving frame 0)');
     // Preserve frame 0 (original terrain) when clearing cache
     const frame0 = heightmapCache.get(0);
-    heightmapCache.clear();
+    const newCache = new Map<number, Float32Array>();
     if (frame0) {
-      heightmapCache.set(0, frame0);
+      newCache.set(0, frame0);
     }
+    setHeightmapCache(newCache);
     setCurrentFrame(0); // Return to original terrain
   };
 
