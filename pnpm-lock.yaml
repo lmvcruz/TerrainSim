@@ -30,6 +30,9 @@ importers:
       pngjs:
         specifier: ^7.0.0
         version: 7.0.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
 
   apps/simulation-api:
     dependencies:

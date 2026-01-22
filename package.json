@@ -23,6 +23,10 @@
     "test:e2e:debug": "playwright test --debug",
     "test:visual": "playwright test e2e/terrain.visual.spec.ts",
     "test:visual:update": "playwright test e2e/terrain.visual.spec.ts --update-snapshots",
+    "test:compare": "tsx scripts/test-helper.ts compare",
+    "test:latest": "tsx scripts/test-helper.ts latest",
+    "test:prod": "tsx scripts/test-helper.ts prod",
+    "test:local": "tsx scripts/test-helper.ts local",
     "lint": "pnpm --filter \"*\" run lint",
     "typecheck": "pnpm --filter \"*\" run typecheck",
     "ci": "python scripts/run-ci-locally.py",
@@ -38,6 +42,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "playwright": "^1.57.0",
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "tsx": "^4.21.0"
   }
 }

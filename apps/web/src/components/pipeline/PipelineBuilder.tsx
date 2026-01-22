@@ -186,7 +186,7 @@ export default function PipelineBuilder() {
               <input
                 id="seed-input"
                 type="number"
-                value={config.step0.seed || 12345}
+                value={config.step0.seed || 42}
                 onChange={(e) => handleParameterChange('seed', parseInt(e.target.value))}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm"
               />

@@ -84,7 +84,7 @@ const PipelineContext = createContext<PipelineContextType | undefined>(undefined
 const DEFAULT_CONFIG: PipelineConfig = {
   step0: {
     method: 'Perlin',
-    seed: 12345,
+    seed: 42, // Fixed seed for consistent testing (was 12345)
     frequency: 0.05,
     amplitude: 50,
   },
