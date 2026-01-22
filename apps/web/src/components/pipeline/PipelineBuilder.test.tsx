@@ -206,14 +206,19 @@ describe('PipelineBuilder', () => {
     fireEvent.click(generateButton);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/generate'),
-        expect.objectContaining({
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: expect.stringContaining('"frequency":0.08'),
-        })
+      // Find the /generate API call (not the /logs call)
+      const generateCalls = (mockFetch as jest.Mock).mock.calls.filter(
+        call => call[0].includes('/generate')
       );
+      expect(generateCalls.length).toBeGreaterThan(0);
+      expect(generateCalls[0][1]).toMatchObject({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          'x-correlation-id': expect.any(String),
+        }),
+        body: expect.stringContaining('"frequency":0.08'),
+      });
     });
   });
 
