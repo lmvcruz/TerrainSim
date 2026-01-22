@@ -20,4 +20,12 @@ export function useCorrelationId(initialId?: string) {
    */
   const refresh = useCallback(() => {
     const newId = generateUUID();
+    setCorrelationId(newId);
+    return newId;
+  }, []);
+
+  return {
+    correlationId,
+    refresh,
+  };
 }
