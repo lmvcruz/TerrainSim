@@ -40,7 +40,7 @@ def add_test_result(name, status, details=""):
         "status": status,
         "details": details
     })
-    
+
     if status == "PASS":
         print(f"{Colors.GREEN}✓{Colors.RESET} {name}")
     elif status == "FAIL":
@@ -68,7 +68,7 @@ def run_ssh_command(command):
 def test_backend_health():
     """Test 1: Backend health check"""
     print_header("Test 1: Backend Health Check")
-    
+
     try:
         response = requests.get(f"{PRODUCTION_API}/health", timeout=10)
         if response.status_code == 200:
@@ -85,7 +85,7 @@ def test_backend_health():
 def test_admin_log_level_get():
     """Test 2: GET /admin/log-level"""
     print_header("Test 2: GET /admin/log-level")
-    
+
     try:
         response = requests.get(f"{PRODUCTION_API}/admin/log-level", timeout=10)
         if response.status_code == 200:
@@ -103,7 +103,7 @@ def test_admin_log_level_get():
 def test_admin_log_level_post():
     """Test 3: POST /admin/log-level (dynamic change)"""
     print_header("Test 3: POST /admin/log-level (Dynamic Change)")
-    
+
     try:
         # Change to debug
         response = requests.post(
@@ -114,7 +114,7 @@ def test_admin_log_level_post():
         if response.status_code != 200:
             add_test_result("POST /admin/log-level (set debug)", "FAIL", f"HTTP {response.status_code}")
             return False
-        
+
         # Verify change
         response = requests.get(f"{PRODUCTION_API}/admin/log-level", timeout=10)
         if response.status_code == 200 and response.json().get('logLevel') == 'debug':
@@ -122,7 +122,7 @@ def test_admin_log_level_post():
         else:
             add_test_result("POST /admin/log-level (set debug)", "FAIL", "Level not changed")
             return False
-        
+
         # Change back to info
         response = requests.post(
             f"{PRODUCTION_API}/admin/log-level",
@@ -135,7 +135,7 @@ def test_admin_log_level_post():
         else:
             add_test_result("POST /admin/log-level (reset to info)", "FAIL")
             return False
-            
+
     except Exception as e:
         add_test_result("POST /admin/log-level", "FAIL", str(e))
         return False
@@ -143,7 +143,7 @@ def test_admin_log_level_post():
 def test_logs_stats():
     """Test 4: GET /api/logs/stats"""
     print_header("Test 4: GET /api/logs/stats")
-    
+
     try:
         response = requests.get(f"{PRODUCTION_API}/api/logs/stats", timeout=10)
         if response.status_code == 200:
@@ -162,7 +162,7 @@ def test_logs_stats():
 def test_logs_filter():
     """Test 5: GET /api/logs/filter"""
     print_header("Test 5: GET /api/logs/filter")
-    
+
     try:
         # Test filter by level
         response = requests.get(
@@ -185,7 +185,7 @@ def test_logs_filter():
 def test_frontend_logging():
     """Test 6: POST /api/logs/frontend"""
     print_header("Test 6: POST /api/logs/frontend (Frontend Log Ingestion)")
-    
+
     try:
         test_log = {
             "level": "info",
@@ -196,13 +196,13 @@ def test_frontend_logging():
                 "source": "test-production.py"
             }
         }
-        
+
         response = requests.post(
             f"{PRODUCTION_API}/api/logs/frontend",
             json=test_log,
             timeout=10
         )
-        
+
         if response.status_code == 200:
             add_test_result("POST /api/logs/frontend", "PASS", "Test log accepted")
             return True
@@ -216,13 +216,13 @@ def test_frontend_logging():
 def test_ssh_access(skip_ssh=False):
     """Test 7: SSH access to production"""
     print_header("Test 7: SSH Access to Production")
-    
+
     if skip_ssh:
         add_test_result("SSH access", "SKIP")
         return True
-    
+
     stdout, stderr, code = run_ssh_command("echo 'SSH test successful'")
-    
+
     if code == 0 and "SSH test successful" in stdout:
         add_test_result("SSH access", "PASS")
         return True
@@ -233,13 +233,13 @@ def test_ssh_access(skip_ssh=False):
 def test_log_directory(skip_ssh=False):
     """Test 8: Log directory exists on production"""
     print_header("Test 8: Log Directory Verification")
-    
+
     if skip_ssh:
         add_test_result("Log directory check", "SKIP")
         return True
-    
+
     stdout, stderr, code = run_ssh_command("ls -lhd /var/log/terrainsim")
-    
+
     if code == 0:
         add_test_result("Log directory check", "PASS", stdout.strip())
         return True
@@ -250,13 +250,13 @@ def test_log_directory(skip_ssh=False):
 def test_log_files(skip_ssh=False):
     """Test 9: Log files exist"""
     print_header("Test 9: Log Files Verification")
-    
+
     if skip_ssh:
         add_test_result("Log files check", "SKIP")
         return True
-    
+
     stdout, stderr, code = run_ssh_command("ls -lh /var/log/terrainsim/*.log 2>/dev/null | wc -l")
-    
+
     if code == 0:
         file_count = int(stdout.strip() or 0)
         if file_count > 0:
@@ -272,19 +272,19 @@ def test_log_files(skip_ssh=False):
 def test_env_configuration(skip_ssh=False):
     """Test 10: Environment configuration"""
     print_header("Test 10: Environment Configuration")
-    
+
     if skip_ssh:
         add_test_result("Environment config check", "SKIP")
         return True
-    
+
     stdout, stderr, code = run_ssh_command(
         "cd /var/www/terrainsim && grep -E 'LOG_LEVEL|LOG_DIR|ENABLE' .env"
     )
-    
+
     if code == 0:
         required_vars = ['LOG_LEVEL', 'LOG_DIR', 'ENABLE_FILE_LOGGING']
         found_vars = [var for var in required_vars if var in stdout]
-        
+
         if len(found_vars) == len(required_vars):
             add_test_result("Environment config check", "PASS", f"All {len(required_vars)} required vars found")
             return True
@@ -299,11 +299,11 @@ def test_env_configuration(skip_ssh=False):
 def test_python_log_manager():
     """Test 11: Python log-manager.py status"""
     print_header("Test 11: Python Log Manager Script")
-    
+
     if not Path("scripts/log-manager.py").exists():
         add_test_result("Python log-manager.py", "FAIL", "Script not found")
         return False
-    
+
     try:
         result = subprocess.run(
             [sys.executable, "scripts/log-manager.py", "status"],
@@ -311,7 +311,7 @@ def test_python_log_manager():
             text=True,
             timeout=30
         )
-        
+
         if result.returncode == 0:
             add_test_result("Python log-manager.py status", "PASS")
             return True
@@ -325,23 +325,23 @@ def test_python_log_manager():
 def print_summary():
     """Print test results summary"""
     print_header("Test Results Summary")
-    
+
     passed = sum(1 for r in TEST_RESULTS if r["status"] == "PASS")
     failed = sum(1 for r in TEST_RESULTS if r["status"] == "FAIL")
     skipped = sum(1 for r in TEST_RESULTS if r["status"] == "SKIP")
     total = len(TEST_RESULTS)
-    
+
     print(f"\n{Colors.CYAN}{'Test':<50} {'Status':<10}{Colors.RESET}")
     print(f"{Colors.CYAN}{'-' * 60}{Colors.RESET}")
-    
+
     for result in TEST_RESULTS:
         status_color = Colors.GREEN if result["status"] == "PASS" else Colors.RED if result["status"] == "FAIL" else Colors.YELLOW
         print(f"{result['test']:<50} {status_color}{result['status']:<10}{Colors.RESET}")
-    
+
     print(f"\n{Colors.CYAN}{'=' * 60}{Colors.RESET}")
     print(f"{Colors.WHITE}Total: {total}  {Colors.GREEN}Passed: {passed}  {Colors.RED}Failed: {failed}  {Colors.YELLOW}Skipped: {skipped}{Colors.RESET}")
     print(f"{Colors.CYAN}{'=' * 60}{Colors.RESET}\n")
-    
+
     if failed == 0:
         print(f"{Colors.GREEN}🎉 All critical tests passed!{Colors.RESET}")
         print(f"\n{Colors.CYAN}Next Steps:{Colors.RESET}")
@@ -357,14 +357,14 @@ def print_summary():
         print(f"{Colors.WHITE}  - Check .env.production settings{Colors.RESET}")
         print(f"{Colors.WHITE}  - Verify log directory exists: /var/log/terrainsim/{Colors.RESET}")
         print(f"{Colors.WHITE}  - Check PM2 logs: ssh -i {SSH_KEY} {PRODUCTION_SSH} 'pm2 logs terrainsim-api'{Colors.RESET}")
-    
+
     print()
     return failed == 0
 
 def main():
     """Main test execution"""
     skip_ssh = "--skip-ssh" in sys.argv
-    
+
     print(f"{Colors.CYAN}")
     print("=" * 70)
     print("  TerrainSim Production Testing Suite (Phase 3.2)")
@@ -374,7 +374,7 @@ def main():
     print(f"{Colors.WHITE}Production SSH: {PRODUCTION_SSH}{Colors.RESET}")
     if skip_ssh:
         print(f"{Colors.YELLOW}SSH tests will be skipped{Colors.RESET}")
-    
+
     # Run all tests
     test_backend_health()
     test_admin_log_level_get()
@@ -387,7 +387,7 @@ def main():
     test_log_files(skip_ssh)
     test_env_configuration(skip_ssh)
     test_python_log_manager()
-    
+
     # Print summary and return exit code
     success = print_summary()
     sys.exit(0 if success else 1)
