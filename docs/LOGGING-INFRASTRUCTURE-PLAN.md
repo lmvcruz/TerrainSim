@@ -1693,13 +1693,69 @@ External API access via `https://api.lmvcruz.work` requires infrastructure fixes
 
 Once external access is restored, run `python scripts/test-production.py` for full end-to-end testing.
 
-#### 3.3 Cloudflare Log Capture Testing
-- [ ] Trigger Cloudflare deployment (push to main)
-- [ ] Wait for deployment to complete
-- [ ] Manually trigger `.github/workflows/capture-cloudflare-logs.yml`
-- [ ] Download artifacts from GitHub Actions
-- [ ] Verify deployment logs are captured correctly
-- [ ] Or test Python script locally: `python scripts/capture-cloudflare-deployment-logs.py`
+#### 3.3 Cloudflare Log Capture Testing ✅ COMPLETE
+
+**Status**: Cloudflare Pages deployment log capture successfully tested and validated (January 23, 2026).
+
+**Test Method**: Local testing with Cloudflare API credentials
+
+**Test Results**:
+- ✅ **Script Execution** - `capture-cloudflare-deployment-logs.py` ran successfully
+- ✅ **API Authentication** - Cloudflare API token validated
+- ✅ **Deployment Fetch** - Successfully retrieved latest deployment (ID: 17647797)
+- ✅ **Log Capture** - Captured 92 build log entries (891 lines total JSON)
+- ✅ **File Save** - Logs saved to `logs/captured/deployments/cloudflare/`
+
+**Captured Deployment Details**:
+- **Deployment ID**: 17647797-d6f9-49d4-913d-30878a60c3c9
+- **Commit**: 9744996 (Phase 3.2 completion)
+- **Status**: Success
+- **Build Command**: `pnpm install && pnpm --filter @terrain/web run build`
+- **Environment**: Production
+- **URL**: https://17647797.terrainsim.pages.dev
+- **Alias**: https://terrainsim.lmvcruz.work
+- **Build Time**: ~10 seconds (14:40:59 - 14:41:09 UTC)
+
+**Log Contents Include**:
+- Repository cloning and checkout
+- Build tool detection (pnpm@10.11.1, nodejs@22.16.0)
+- Dependency installation logs
+- Build command execution
+- Asset compilation and optimization
+- Deployment success confirmation
+- Deployment URL and aliases
+
+**Environment Variables Used**:
+- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account identifier
+- `CLOUDFLARE_API_TOKEN` - API token with Pages read access
+- `CLOUDFLARE_PROJECT_NAME` - Project name (terrainsim)
+
+**Usage**:
+```powershell
+# Set credentials (one-time setup)
+$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"
+$env:CLOUDFLARE_API_TOKEN = "your-api-token"
+$env:CLOUDFLARE_PROJECT_NAME = "terrainsim"
+
+# Capture latest deployment
+python scripts/capture-cloudflare-deployment-logs.py
+
+# Capture specific deployment
+python scripts/capture-cloudflare-deployment-logs.py --deployment-id <id>
+
+# Capture last 5 deployments
+python scripts/capture-cloudflare-deployment-logs.py --count 5
+```
+
+**Integration with log-manager.py**:
+```powershell
+python scripts/log-manager.py capture-deployment frontend
+```
+
+**Next Steps**:
+- Add Cloudflare credentials to GitHub Secrets for automated workflow
+- Test GitHub Action: `.github/workflows/capture-deployment-logs.yml`
+- Schedule automated capture (already configured for 2 AM UTC daily)
 
 ### Phase 4: Documentation & Training
 

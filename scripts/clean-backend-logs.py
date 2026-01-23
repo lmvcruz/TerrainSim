@@ -43,13 +43,17 @@ class BackendLogCleaner:
         self.server = server
         self.remote_log_dir = "/var/log/terrainsim"
         self.local_log_dir = Path("apps/simulation-api/logs")
+        # SSH key path for Windows
+        self.ssh_key = r"C:\Users\l-cruz\.ssh\terrainsim-key.pem"
 
     def run_ssh_command(self, command: str) -> tuple[str, str, int]:
         """Execute command on remote server via SSH."""
         result = subprocess.run(
-            ["ssh", "-o", "StrictHostKeyChecking=no", self.server, command],
+            ["ssh", "-i", self.ssh_key, "-o", "StrictHostKeyChecking=no", self.server, command],
             capture_output=True,
-            text=True
+            text=True,
+            encoding='utf-8',
+            errors='replace'
         )
         return result.stdout, result.stderr, result.returncode
 
@@ -79,9 +83,10 @@ find {self.remote_log_dir} -name "*.log" -type f -mtime +{retention_days} -exec 
             print(f"❌ Error listing files: {stderr}")
             return
 
-        print(stdout)
+        if stdout:
+            print(stdout)
 
-        if "No such file or directory" in stdout or not stdout.strip():
+        if not stdout or "No such file or directory" in stdout or not stdout.strip():
             print("✅ No old log files to clean")
             return
 

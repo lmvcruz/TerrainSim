@@ -11,7 +11,7 @@ export const config = {
   wsUrl: WS_URL,
   endpoints: {
     generate: `${API_URL}/generate`,
-    logs: `${API_URL}/logs`,
+    logs: `${API_URL}/api/logs/frontend`,
     simulate: {
       create: `${API_URL}/simulate/create`,
       execute: `${API_URL}/simulate/execute`,
