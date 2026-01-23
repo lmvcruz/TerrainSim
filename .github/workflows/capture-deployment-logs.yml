@@ -1,0 +1,191 @@
+name: Capture Deployment Logs
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_type:
+        description: 'Deployment type to capture'
+        required: true
+        type: choice
+        options:
+          - cloudflare-latest
+          - cloudflare-recent
+          - backend-latest
+          - all
+        default: 'cloudflare-latest'
+      count:
+        description: 'Number of recent deployments (for cloudflare-recent)'
+        required: false
+        default: '5'
+  schedule:
+    # Run daily at 2 AM UTC to capture previous day's deployments
+    - cron: '0 2 * * *'
+
+jobs:
+  capture-cloudflare-logs:
+    if: github.event_name == 'schedule' || github.event.inputs.deployment_type == 'cloudflare-latest' || github.event.inputs.deployment_type == 'cloudflare-recent' || github.event.inputs.deployment_type == 'all'
+    runs-on: ubuntu-latest
+    name: Capture Cloudflare Deployment Logs
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Capture Latest Deployment
+        if: github.event_name == 'schedule' || github.event.inputs.deployment_type == 'cloudflare-latest' || github.event.inputs.deployment_type == 'all'
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME || 'terrainsim' }}
+        run: |
+          echo "📥 Capturing latest Cloudflare Pages deployment..."
+          python scripts/capture-cloudflare-deployment-logs.py --count 1
+
+      - name: Capture Recent Deployments
+        if: github.event.inputs.deployment_type == 'cloudflare-recent'
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME || 'terrainsim' }}
+        run: |
+          echo "📥 Capturing last ${{ github.event.inputs.count }} Cloudflare deployments..."
+          python scripts/capture-cloudflare-deployment-logs.py --count ${{ github.event.inputs.count }}
+
+      - name: Upload Cloudflare Deployment Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-deployment-logs-${{ github.run_id }}
+          path: logs/captured/deployments/cloudflare/*.json
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## 📊 Cloudflare Deployment Logs Captured" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d "logs/captured/deployments/cloudflare" ]; then
+            LOG_COUNT=$(find logs/captured/deployments/cloudflare -name "*.json" | wc -l)
+            echo "- **Files Captured**: $LOG_COUNT" >> $GITHUB_STEP_SUMMARY
+            echo "- **Project**: terrainsim" >> $GITHUB_STEP_SUMMARY
+            echo "- **Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ $LOG_COUNT -gt 0 ]; then
+              echo "### 📁 Captured Files" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              find logs/captured/deployments/cloudflare -name "*.json" -exec basename {} \; | sort -r >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ No logs captured" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  capture-backend-logs:
+    if: github.event.inputs.deployment_type == 'backend-latest' || github.event.inputs.deployment_type == 'all'
+    runs-on: ubuntu-latest
+    name: Capture Backend Deployment Logs
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Server to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 54.242.131.12 >> ~/.ssh/known_hosts
+
+      - name: Capture PM2 Logs
+        run: |
+          echo "📥 Capturing backend PM2 logs from production..."
+
+          mkdir -p logs/captured/deployments/backend
+
+          # Capture PM2 logs
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            pm2 logs terrainsim-api --lines 500 --nostream --raw
+          ' > logs/captured/deployments/backend/pm2-logs-$(date +%Y%m%d-%H%M%S).log
+
+          # Capture PM2 status
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 '
+            pm2 jlist
+          ' > logs/captured/deployments/backend/pm2-status-$(date +%Y%m%d-%H%M%S).json
+
+          echo "✅ Backend logs captured"
+
+      - name: Capture Application Logs (Last Hour)
+        run: |
+          echo "📥 Capturing application logs from last hour..."
+
+          TODAY=$(date +%Y-%m-%d)
+
+          # Capture recent app logs
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 "
+            if [ -f /var/log/terrainsim/app-${TODAY}.log ]; then
+              tail -n 1000 /var/log/terrainsim/app-${TODAY}.log
+            else
+              echo 'No app logs found for today'
+            fi
+          " > logs/captured/deployments/backend/app-logs-recent-$(date +%Y%m%d-%H%M%S).log
+
+          # Capture recent error logs
+          ssh -o StrictHostKeyChecking=no ubuntu@54.242.131.12 "
+            if [ -f /var/log/terrainsim/error-${TODAY}.log ]; then
+              tail -n 500 /var/log/terrainsim/error-${TODAY}.log
+            else
+              echo 'No error logs found for today'
+            fi
+          " > logs/captured/deployments/backend/error-logs-recent-$(date +%Y%m%d-%H%M%S).log
+
+          echo "✅ Application logs captured"
+
+      - name: Upload Backend Deployment Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-deployment-logs-${{ github.run_id }}
+          path: logs/captured/deployments/backend/*
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## 📊 Backend Deployment Logs Captured" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d "logs/captured/deployments/backend" ]; then
+            LOG_COUNT=$(find logs/captured/deployments/backend -type f | wc -l)
+            echo "- **Files Captured**: $LOG_COUNT" >> $GITHUB_STEP_SUMMARY
+            echo "- **Server**: 54.242.131.12" >> $GITHUB_STEP_SUMMARY
+            echo "- **Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ $LOG_COUNT -gt 0 ]; then
+              echo "### 📁 Captured Files" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              find logs/captured/deployments/backend -type f -exec basename {} \; | sort -r >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ No logs captured" >> $GITHUB_STEP_SUMMARY
+          fi

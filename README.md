@@ -216,6 +216,47 @@ python scripts/run-ci-locally.py --help
 
 This script mimics exactly what GitHub Actions does in the CI/CD pipeline.
 
+## 📊 Log Management
+
+The project includes comprehensive logging infrastructure for both frontend and backend. Use the unified log manager CLI for all logging operations:
+
+```bash
+# Show logging system status
+python scripts/log-manager.py status
+
+# Capture production backend logs
+python scripts/log-manager.py capture-execution-backend production
+
+# Capture local backend logs
+python scripts/log-manager.py capture-execution-backend local
+
+# Clean old logs (default retention: 7 days for local, 14 days for production)
+python scripts/log-manager.py clean-backend local
+python scripts/log-manager.py clean-backend production 30
+
+# Set log level dynamically
+python scripts/log-manager.py set-level local backend debug
+python scripts/log-manager.py set-level production frontend info
+
+# View logs in real-time
+python scripts/log-manager.py view local backend
+python scripts/log-manager.py view production frontend
+
+# Get help
+python scripts/log-manager.py help
+```
+
+**Available Scripts:**
+- `capture-backend-logs.py` - Download backend logs from production/local
+- `capture-frontend-logs.py` - Extract frontend logs from backend simulation logs
+- `clean-backend-logs.py` - Remove old logs based on retention policy
+- `clean-frontend-logs.py` - Clean captured frontend logs
+- `set-log-level.py` - Dynamically change log levels without redeployment
+- `filter-logs.py` - Query and filter logs via backend API
+- `log-manager.py` - Unified CLI for all log operations
+
+For detailed documentation, see [docs/python-scripts-implementation.md](./docs/python-scripts-implementation.md) and [docs/LOGGING-INFRASTRUCTURE-PLAN.md](./docs/LOGGING-INFRASTRUCTURE-PLAN.md).
+
 ## 📝 License
 
 MIT License - see LICENSE file for details

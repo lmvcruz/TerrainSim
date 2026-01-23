@@ -101,6 +101,17 @@ Add real-time terrain editing with sculpting brushes: raise/lower, smooth, flatt
 
 ---
 
+## GitHub Action-Based Frontend Deployment
+
+Switch from Cloudflare's Direct GitHub Integration to a GitHub Action-based deployment workflow for frontend. This gives more control over the deployment process and enables better integration with CI/CD pipeline. Create `.github/workflows/deploy-frontend.yml` workflow that triggers on push to main branch, builds the frontend using pnpm, deploys to Cloudflare Pages via wrangler-action, captures deployment logs automatically, and uploads logs as workflow artifacts. Configure workflow with Node.js 20, pnpm 10, and Cloudflare API credentials. Add automatic log capture step that creates timestamped deployment log files and uploads them with 30-day retention.
+
+**Open Questions:**
+- Should we disable Cloudflare's automatic deployment when switching to GitHub Actions?
+- Keep both manual trigger (workflow_dispatch) and automatic (push) triggers?
+- What's the fallback strategy if GitHub Actions workflow fails?
+
+---
+
 ## Build Optimization (CI/CD)
 
 Optimize build times for local development and CI/CD pipelines. Measure baseline build times for all workspaces (frontend, backend, C++ libs). Enable TypeScript incremental builds with `.tsbuildinfo` files. Configure GitHub Actions caching for pnpm store and CMake build artifacts. Add build time reporting to CI workflow summaries. Verify Vite HMR is properly configured for instant hot-reloading during development. Document build performance baselines and improvements in repository documentation.
@@ -135,6 +146,51 @@ Enable real-time collaborative terrain editing with multiple users. Implement op
 - Maximum concurrent users per session?
 - Real-time sync protocol (WebRTC, WebSocket, CRDT)?
 
+---
+
+## Centralized Log Aggregation
+
+Integrate logging infrastructure with cloud monitoring services like CloudWatch, ELK Stack (Elasticsearch, Logstash, Kibana), or Datadog for centralized log management. Implement real-time log streaming from production servers to aggregation service, configure log parsers and indexers for structured log data, set up retention policies and archival to S3 Glacier for compliance, and create dashboards for log volume trends and error rate monitoring. Add advanced analytics with machine learning-based anomaly detection and distributed tracing correlation across microservices.
+
+**Open Questions:**
+- Which aggregation platform best fits budget and scale?
+- Real-time vs batch log shipping strategy?
+- Long-term retention period for compliance requirements?
+
+---
+
+## Log Correlation & Distributed Tracing
+
+Implement correlation IDs to link frontend and backend logs for end-to-end request tracing. Generate unique correlation ID on each frontend request and propagate through all backend service calls. Integrate with distributed tracing tools like OpenTelemetry, Jaeger, or Zipkin for visual trace representation. Add automatic instrumentation for Express routes, database queries, and external API calls. Create trace viewer UI component to visualize request flow across services and identify performance bottlenecks.
+
+**Open Questions:**
+- Trace sampling rate for production to minimize overhead?
+- How to handle correlation across async operations?
+- Integration with existing monitoring stack?
+
+---
+
+## Automated Log Alerts & Monitoring
+
+Build automated alerting system for critical log patterns and thresholds. Implement error rate monitoring with configurable thresholds (e.g., >10 errors in 5 minutes). Add performance degradation detection by analyzing response time trends in logs. Create disk space monitoring for log directories with alerts at 80% capacity. Integrate with notification channels (Slack, email, PagerDuty) for alert delivery. Implement alert deduplication and escalation policies. Add health check endpoints that query recent logs for system status reporting.
+
+**Open Questions:**
+- Alert notification channels and escalation rules?
+- False positive mitigation strategies?
+- Alert acknowledge and resolution workflow?
+
+---
+
+## Log Analytics Dashboard (Grafana)
+
+Create comprehensive log analytics dashboard using Grafana for real-time monitoring and visualization. Set up Grafana instance with Loki or Elasticsearch data source for log queries. Build dashboards showing log volume trends, error rates by component, top error messages, request latency percentiles, and user session analytics. Add custom metrics derived from logs (simulation completion rate, API endpoint performance). Implement drill-down capabilities from dashboard panels to detailed log entries. Configure alerting rules in Grafana for automated notifications.
+
+**Open Questions:**
+- Grafana cloud vs self-hosted deployment?
+- Refresh rate for real-time dashboards?
+- Custom metric retention period?
+
+---
 ---
 
 ## Machine Learning Integration

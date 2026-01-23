@@ -7,13 +7,19 @@ import { Server as SocketServer } from 'socket.io';
 import { generatePerlinNoise, generateFbm } from './generators/heightmapGenerators.js';
 import { simulateParticle } from './erosion-binding.js';
 import { jobSystemRouter, sessions } from './routes/jobSystem.js';
+import frontendLogsRouter from './routes/frontend-logs.js';
+import adminRouter from './routes/admin.js';
+import logsRouter from './routes/logs.js';
 import { setupJobSystemWebSocket } from './websocket/jobSystemEvents.js';
 import { logService } from './services/LogService.js';
 import { correlationIdMiddleware } from './middleware/correlationId.js';
 import { logger, setCorrelationId } from './utils/logger.js';
 import type { LogLevel } from './types/logging.js';
+// Winston logging infrastructure
+import { logger as winstonLogger, simulationLogger, createLogger } from './utils/logging.js';
 
 const endpointLogger = logger.withContext('/generate');
+const winstonEndpointLogger = createLogger('generate-endpoint');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -87,6 +93,15 @@ app.use(correlationIdMiddleware);
 // Mount job system routes
 app.use(jobSystemRouter);
 
+// Mount frontend logs route
+app.use('/api/logs', frontendLogsRouter);
+
+// Mount admin routes (log level management, health)
+app.use('/admin', adminRouter);
+
+// Mount logs API routes (filtering, search, stats)
+app.use('/api/logs', logsRouter);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -99,6 +114,13 @@ app.post('/generate', (req, res) => {
   try {
     // Set correlation ID for this request
     setCorrelationId(req.correlationId);
+
+    // Winston logging - request received
+    winstonEndpointLogger.info('Heightmap generation request', {
+      correlationId: req.correlationId,
+      method: req.body.method || 'perlin',
+      dimensions: `${req.body.width || 256}x${req.body.height || 256}`,
+    });
 
     endpointLogger.trace('Request received', {
       correlationId: req.correlationId,
@@ -130,6 +152,11 @@ app.post('/generate', (req, res) => {
 
     // Validate basic parameters
     if (typeof width !== 'number' || typeof height !== 'number') {
+      winstonEndpointLogger.warn('Invalid parameter types', {
+        correlationId: req.correlationId,
+        widthType: typeof width,
+        heightType: typeof height
+      });
       endpointLogger.warn('Invalid parameter types', {
         widthType: typeof width,
         heightType: typeof height
@@ -138,6 +165,11 @@ app.post('/generate', (req, res) => {
     }
 
     if (width < 1 || width > 2048 || height < 1 || height > 2048) {
+      winstonEndpointLogger.warn('Parameters out of range', {
+        correlationId: req.correlationId,
+        width,
+        height
+      });
       endpointLogger.warn('Parameters out of range', { width, height });
       return res.status(400).json({
         error: 'Width and height must be between 1 and 2048'
@@ -236,15 +268,36 @@ app.post('/generate', (req, res) => {
 
     res.json(responseData);
 
+    const totalDuration = Date.now() - requestStartTime;
+
+    // Winston logging - successful response
+    winstonEndpointLogger.info('Heightmap generated successfully', {
+      correlationId: req.correlationId,
+      method,
+      dimensions: `${width}x${height}`,
+      duration: totalDuration,
+      dataPoints: dataArray.length,
+    });
+
     endpointLogger.trace('Response sent successfully', {
-      totalDuration: Date.now() - requestStartTime
+      totalDuration
     });
 
   } catch (error) {
+    const errorDuration = Date.now() - requestStartTime;
+
+    // Winston logging - error
+    winstonEndpointLogger.error('Heightmap generation failed', {
+      correlationId: req.correlationId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      duration: errorDuration,
+    });
+
     endpointLogger.error('Error generating terrain', {
       errorMessage: error instanceof Error ? error.message : String(error),
       errorStack: error instanceof Error ? error.stack : undefined,
-      duration: Date.now() - requestStartTime
+      duration: errorDuration
     });
 
     res.status(500).json({
@@ -551,6 +604,18 @@ io.on('connection', (socket) => {
 
 // Start server
 httpServer.listen(PORT, () => {
+  const startupInfo = {
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development',
+    logLevel: logService.getLogLevel(),
+    winstonLogLevel: winstonLogger.level,
+    logDir: process.env.LOG_DIR || './logs',
+  };
+
+  // Winston logging
+  winstonLogger.info('TerrainSim API server started', startupInfo);
+
+  // Console output
   console.log(`🌍 TerrainSim API server running on http://localhost:${PORT}`);
   console.log(`🔌 WebSocket server ready`);
   console.log(`📊 Endpoints:`);
@@ -566,5 +631,6 @@ httpServer.listen(PORT, () => {
   console.log(`   POST   /logs/config - Change log level (info/debug/trace)`);
   console.log(`   DELETE /logs        - Clear all logs`);
   console.log(`\n🎚️  Current log level: ${logService.getLogLevel()}`);
+  console.log(`🎚️  Winston log level: ${winstonLogger.level}`);
   console.log(`📂 Logs stored in: ${path.join(process.cwd(), '.logs')}`);
 });
